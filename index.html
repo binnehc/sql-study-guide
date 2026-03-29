@@ -1,0 +1,2613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Interview Prep — 7-Day Study Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:    #0f0f0f;
+    --bg2:   #1a1a1a;
+    --bg3:   #222222;
+    --text:  #e8e8e8;
+    --text2: #8b8b8b;
+    --text3: #4a4a4a;
+    --green: #6fcf97;
+    --blue:  #79b8ff;
+    --red:   #ff7b7b;
+    --purp:  #b392f0;
+    --yel:   #ffab70;
+    --bdr:   rgba(255,255,255,0.07);
+    --bdr2:  rgba(255,255,255,0.12);
+    --hover: rgba(255,255,255,0.04);
+    /* keep legacy aliases so existing HTML classes still work */
+    --cream: var(--text);
+    --crm2:  var(--text2);
+    --muted: var(--text3);
+    --amber: var(--text);
+    --amb2:  var(--text2);
+    --glow:  var(--hover);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; font-size:16px; line-height:1.7; }
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:var(--bg3); border-radius:4px; }
+  .wrap { max-width:740px; margin:0 auto; padding:0 28px; }
+
+  /* ── PROGRESS ── */
+  #prog-rail { position:fixed; top:0; left:0; right:0; height:2px; background:transparent; z-index:300; }
+  #prog-bar  { height:100%; width:0%; background:var(--text3); transition:width 0.1s; }
+
+  /* ── NAV ── */
+  nav {
+    position:fixed; top:0; left:0; right:0; height:48px;
+    padding:0 16px; display:flex; align-items:center; gap:10px;
+    z-index:199;
+    background:rgba(15,15,15,0.94);
+    -webkit-backdrop-filter:blur(12px);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--bdr);
+  }
+  #sb-btn {
+    width:32px; height:32px; border-radius:6px; border:none;
+    background:none; color:var(--text3); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:background 0.15s, color 0.15s; flex-shrink:0;
+  }
+  #sb-btn:hover { background:var(--hover); color:var(--text); }
+  .nav-title { font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; color:var(--text2); }
+
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    position:fixed; top:48px; left:0; bottom:0; width:232px;
+    background:var(--bg2); border-right:1px solid var(--bdr);
+    display:flex; flex-direction:column;
+    transform:translateX(-232px);
+    transition:transform 0.22s ease;
+    z-index:198; overflow:hidden;
+  }
+  #sidebar.open { transform:translateX(0); }
+  .sb-head {
+    padding:16px 16px 12px; display:flex; align-items:center;
+    justify-content:space-between; border-bottom:1px solid var(--bdr); flex-shrink:0;
+  }
+  .sb-heading { font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; color:var(--text2); letter-spacing:0.04em; text-transform:uppercase; }
+  .sb-close { width:24px; height:24px; border:none; background:none; color:var(--text3); cursor:pointer; border-radius:4px; display:flex; align-items:center; justify-content:center; transition:background 0.15s, color 0.15s; }
+  .sb-close:hover { background:var(--hover); color:var(--text); }
+  .sb-days { flex:1; overflow-y:auto; padding:8px 0; }
+  .sb-item {
+    display:flex; align-items:center; gap:10px;
+    padding:8px 16px; text-decoration:none;
+    transition:background 0.15s; border-radius:0;
+  }
+  .sb-item:hover { background:var(--hover); }
+  .sb-item.active { background:var(--hover); }
+  .sb-num { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); flex-shrink:0; min-width:20px; }
+  .sb-info { flex:1; min-width:0; }
+  .sb-label { display:block; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; transition:color 0.15s; }
+  .sb-item:hover .sb-label { color:var(--text); }
+  .sb-sub { display:block; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+  .sb-check { width:16px; height:16px; border-radius:50%; border:1px solid var(--bdr2); flex-shrink:0; transition:all 0.2s; }
+  .sb-check.done { background:var(--green); border-color:var(--green); }
+  .sb-footer { padding:14px 16px; border-top:1px solid var(--bdr); flex-shrink:0; }
+  .sb-overall { display:flex; flex-direction:column; gap:7px; }
+  #sb-count { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); }
+  .sb-overall-bar { height:3px; background:var(--bdr2); border-radius:2px; overflow:hidden; }
+  #sb-overall-fill { height:100%; width:0%; background:var(--green); border-radius:2px; transition:width 0.3s ease; }
+  /* backdrop for mobile */
+  #sb-backdrop { display:none; position:fixed; inset:0; top:48px; background:rgba(0,0,0,0.5); z-index:197; }
+  #sb-backdrop.show { display:block; }
+
+  /* ── HERO — compact ── */
+  #hero { padding:88px 0 52px; border-top:none; }
+  .hero-eyebrow {
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    color:var(--text3); margin-bottom:16px;
+    opacity:0; animation:fadeUp 0.5s 0.1s forwards;
+  }
+  .hero-eyebrow span { display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--text3); }
+  .hero-title {
+    font-family:'DM Sans',sans-serif; font-size:clamp(32px,5vw,52px);
+    font-weight:700; line-height:1.1; letter-spacing:-0.025em;
+    color:var(--text); margin-bottom:14px;
+    opacity:0; animation:fadeUp 0.5s 0.2s forwards;
+  }
+  .hero-title em { color:var(--text2); font-style:normal; font-weight:300; }
+  .hero-sub { font-size:15px; color:var(--text2); max-width:500px; line-height:1.65; opacity:0; animation:fadeUp 0.5s 0.3s forwards; margin-bottom:0; }
+  .hero-grid { display:none; }
+
+  /* hide old roadmap styles — sidebar replaces them */
+  .roadmap, .roadmap-row, .roadmap-dot-col, .roadmap-vert,
+  .roadmap-item, .roadmap-day, .roadmap-topic { display:none; }
+
+  /* ── SECTION BASE ── */
+  section { padding:72px 0; border-top:1px solid var(--bdr); }
+  .s-label {
+    font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500;
+    color:var(--text3); letter-spacing:0.08em; margin-bottom:12px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .s-label::before { content:''; display:inline-block; width:16px; height:1px; background:var(--text3); }
+  .s-title {
+    font-family:'DM Sans',sans-serif; font-size:clamp(26px,4vw,36px);
+    font-weight:700; line-height:1.2; letter-spacing:-0.02em;
+    color:var(--text); margin-bottom:16px;
+  }
+  .s-title em { color:var(--text2); font-style:normal; font-weight:400; }
+  .s-body { font-size:16px; color:var(--text2); max-width:640px; margin-bottom:24px; line-height:1.7; }
+  .s-body strong { color:var(--text); font-weight:600; }
+  .s-body code, p code {
+    font-family:'JetBrains Mono',monospace; font-size:13px;
+    background:var(--bg2); color:var(--text);
+    padding:2px 6px; border-radius:4px; border:1px solid var(--bdr2);
+  }
+  .reveal { opacity:0; transform:translateY(10px); transition:opacity 0.45s ease,transform 0.45s ease; }
+  .reveal.vis { opacity:1; transform:translateY(0); }
+
+  /* ── TABLE ── */
+  .tbl-wrap { overflow-x:auto; border:1px solid var(--bdr); border-radius:8px; background:var(--bg2); margin:20px 0; }
+  table { width:100%; border-collapse:collapse; font-family:'JetBrains Mono',monospace; font-size:13px; }
+  thead tr { background:var(--bg3); border-bottom:1px solid var(--bdr2); }
+  th { padding:10px 16px; text-align:left; color:var(--text2); font-size:11px; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; white-space:nowrap; }
+  td { padding:10px 16px; color:var(--text2); border-bottom:1px solid var(--bdr); white-space:nowrap; transition:background 0.15s; }
+  tbody tr:last-child td { border-bottom:none; }
+  tbody tr:hover td { background:var(--hover); }
+  .hl  { color:var(--text) !important; font-weight:600; }
+  .red { color:var(--red) !important; }
+  .grn { color:var(--green) !important; }
+  .blu { color:var(--blue) !important; }
+  .null-cell { color:var(--text3) !important; font-style:italic; }
+  .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-family:'JetBrains Mono',monospace; }
+  .tag-g { background:rgba(111,207,151,0.1); color:var(--green); border:1px solid rgba(111,207,151,0.2); }
+  .tag-b { background:rgba(121,184,255,0.1); color:var(--blue);  border:1px solid rgba(121,184,255,0.2); }
+  .tag-r { background:rgba(255,123,123,0.1); color:var(--red);   border:1px solid rgba(255,123,123,0.2); }
+  .tag-a { background:var(--hover); color:var(--text); border:1px solid var(--bdr2); }
+
+  /* ── CODE BLOCK ── */
+  .cb { background:var(--bg2); border:1px solid var(--bdr); border-radius:8px; overflow:hidden; margin:20px 0; }
+  .cb-head { background:var(--bg3); border-bottom:1px solid var(--bdr); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .cb-dots { display:flex; gap:5px; }
+  .cb-dot { width:10px; height:10px; border-radius:50%; background:var(--bg); border:1px solid var(--bdr2); }
+  .cb-lang { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:500; color:var(--text3); letter-spacing:0.08em; text-transform:uppercase; }
+  .cp-btn { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); background:none; border:1px solid var(--bdr); padding:3px 9px; border-radius:4px; cursor:pointer; transition:all 0.15s; }
+  .cp-btn:hover { color:var(--text); border-color:var(--bdr2); }
+  pre { padding:18px; overflow-x:auto; font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.8; }
+  pre code { background:none; border:none; padding:0; font-size:13px; }
+  .kw  { color:var(--red);  }
+  .fn  { color:var(--blue); }
+  .st  { color:var(--green);}
+  .cm  { color:var(--text3); font-style:italic; }
+  .nu  { color:var(--yel);  }
+  .cl  { color:var(--purp); }
+  .tb  { color:var(--text); }
+
+  /* ── CALLOUT (Notion style) ── */
+  .callout { background:var(--bg2); border:1px solid var(--bdr); border-radius:8px; padding:14px 16px; margin:20px 0; display:flex; gap:12px; align-items:flex-start; }
+  .callout::before { content:'💡'; font-size:16px; flex-shrink:0; margin-top:1px; }
+  .callout-lbl { display:none; }
+  .callout p { font-size:15px; color:var(--text2); }
+  .callout p strong { color:var(--text); }
+
+  /* ── GRID CARDS ── */
+  .card-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1px; margin:20px 0; background:var(--bdr); border:1px solid var(--bdr); border-radius:8px; overflow:hidden; }
+  .card { background:var(--bg); padding:18px; transition:background 0.15s; }
+  .card:hover { background:var(--bg2); }
+  .card h5 { font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; color:var(--text); letter-spacing:0.04em; margin-bottom:6px; }
+  .card p { font-size:14px; color:var(--text2); line-height:1.6; }
+
+  /* ── STEP TABS ── */
+  .stabs { background:var(--bg2); border:1px solid var(--bdr); border-radius:8px; overflow:hidden; margin:24px 0; }
+  .stab-row { display:flex; background:var(--bg3); border-bottom:1px solid var(--bdr); overflow-x:auto; }
+  .stab { font-family:'DM Sans',sans-serif; font-size:13px; font-weight:400; padding:10px 16px; cursor:pointer; color:var(--text3); border:none; background:none; white-space:nowrap; border-bottom:1px solid transparent; transition:all 0.15s; }
+  .stab:hover { color:var(--text2); background:var(--hover); }
+  .stab.on { color:var(--text); border-bottom-color:var(--text); background:var(--bg2); }
+  .stab-panel { padding:24px; display:none; }
+  .stab-panel.on { display:block; }
+  .stab-panel h4 { font-family:'DM Sans',sans-serif; font-size:16px; font-weight:600; color:var(--text); margin-bottom:8px; }
+  .stab-panel > p { font-size:14px; color:var(--text2); margin-bottom:14px; }
+
+  /* ── MODULO ── */
+  .mod-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin:18px 0; }
+  @media(max-width:480px){ .mod-grid { grid-template-columns:repeat(3,1fr); } }
+  .mod-cell { background:var(--bg2); border:1px solid var(--bdr); border-radius:6px; padding:12px 6px; text-align:center; font-family:'JetBrains Mono',monospace; }
+  .mod-cell .n { font-size:20px; font-weight:600; color:var(--text); display:block; margin-bottom:2px; }
+  .mod-cell .r { font-size:10px; color:var(--text3); display:block; margin-bottom:5px; }
+  .mod-cell.odd  { border-color:rgba(111,207,151,0.25); background:rgba(111,207,151,0.04); }
+  .mod-cell.odd  .n { color:var(--green); }
+  .mod-cell.odd  .r { color:var(--green); }
+  .mod-cell.even { border-color:rgba(121,184,255,0.25); background:rgba(121,184,255,0.04); }
+  .mod-cell.even .n { color:var(--blue); }
+  .mod-cell.even .r { color:var(--blue); }
+
+  /* ── DIVIDER ── */
+  .dvd { display:flex; align-items:center; gap:12px; margin:28px 0; }
+  .dvd-line { flex:1; height:1px; background:var(--bdr); }
+  .dvd-txt { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); letter-spacing:0.06em; white-space:nowrap; }
+
+  /* ── PATTERN BOX ── */
+  .pattern-box { background:var(--bg2); border:1px solid var(--bdr); border-radius:8px; padding:28px; margin:24px 0; }
+  .pattern-box::before { display:none; }
+  .pattern-box h4 { font-family:'DM Sans',sans-serif; font-size:18px; font-weight:700; color:var(--text); letter-spacing:-0.01em; margin-bottom:12px; }
+
+  /* ── CHECKLIST ── */
+  .chk { list-style:none; margin:20px 0; }
+  .chk li { display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid var(--bdr); cursor:pointer; transition:background 0.15s; border-radius:4px; padding-left:4px; }
+  .chk li:last-child { border-bottom:none; }
+  .chk li:hover { background:var(--hover); }
+  .chk-box { width:18px; height:18px; min-width:18px; border:1px solid var(--bdr2); border-radius:3px; background:transparent; display:flex; align-items:center; justify-content:center; transition:all 0.15s; margin-top:3px; }
+  .chk-box svg { display:none; }
+  .chk li.done .chk-box { background:var(--text); border-color:var(--text); }
+  .chk li.done .chk-box svg { display:block; }
+  .chk li.done .chk-txt { color:var(--text3); text-decoration:line-through; }
+  .chk-txt { font-size:15px; color:var(--text2); transition:color 0.15s; }
+  .chk-txt strong { color:var(--text); font-weight:600; }
+
+  /* ── COMPARE TWO-COL ── */
+  .compare { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:20px 0; }
+  @media(max-width:600px){ .compare { grid-template-columns:1fr; } }
+  .compare-col h5 { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; color:var(--text3); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:8px; }
+  .compare-col h5.good { color:var(--green); }
+  .compare-col h5.bad  { color:var(--red); }
+
+  /* ── RANK TABLE ── */
+  .rank-compare { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; margin:20px 0; background:var(--bdr); border:1px solid var(--bdr); border-radius:8px; overflow:hidden; }
+  .rank-compare .card { border-radius:0; }
+  @media(max-width:580px){ .rank-compare { grid-template-columns:1fr; } }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── FOOTER ── */
+  footer { padding:48px 0; border-top:1px solid var(--bdr); text-align:center; }
+  footer p { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text3); }
+  footer span { color:var(--text2); }
+
+  /* ── PRACTICE BLOCK ── */
+  .practice-wrap { margin-top:40px; }
+  .practice-prompt {
+    background:var(--bg2); border:1px solid var(--bdr); border-bottom:none;
+    border-radius:8px 8px 0 0; padding:14px 16px;
+    display:flex; gap:12px; align-items:flex-start;
+  }
+  .practice-prompt::before { content:'✏️'; font-size:15px; flex-shrink:0; margin-top:2px; }
+  .practice-q { font-size:15px; color:var(--text); font-weight:500; line-height:1.5; margin-bottom:4px; }
+  .practice-hint { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); }
+  .practice-cb {
+    border:1px solid var(--bdr); border-top:1px solid var(--bdr2);
+    border-radius:0; overflow:hidden; background:var(--bg2);
+  }
+  .practice-cb .cb-head { background:var(--bg3); border-bottom:1px solid var(--bdr); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .practice-ta {
+    display:block; width:100%; min-height:200px;
+    background:var(--bg2); color:var(--text);
+    font-family:'JetBrains Mono',monospace; font-size:13px;
+    line-height:1.8; padding:16px 18px;
+    border:none; outline:none; resize:vertical;
+    caret-color:var(--text);
+  }
+  @media(max-width:768px) {
+    .practice-ta { font-size:16px; }
+  }
+  .practice-ta::placeholder { color:var(--text3); font-style:italic; }
+  .practice-answer { display:none; }
+  .practice-answer.show { display:block; }
+  .practice-answer .cb {
+    margin:0; border-radius:0 0 8px 8px;
+    border:1px solid var(--bdr); border-top:1px solid var(--bdr2);
+  }
+
+  /* ── DAY LAYOUT — day-right is now a hidden store; content moves to float panel ── */
+  .day-layout { display:block; }
+  .day-right  { display:none; }
+
+  /* ── FLOATING PRACTICE PANEL ── */
+  #float-panel {
+    position:fixed; right:20px; top:68px;
+    width:340px; max-height:calc(100dvh - 88px);
+    background:var(--bg2);
+    border:1px solid var(--bdr2);
+    border-radius:10px;
+    box-shadow:0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+    z-index:500;
+    display:flex; flex-direction:column;
+    overflow:hidden;
+  }
+  @media(max-width:600px) {
+    #float-panel {
+      left:0; right:0; bottom:0; top:auto;
+      width:100%; max-height:55dvh;
+      border-radius:14px 14px 0 0;
+      border-bottom:none;
+    }
+    #float-panel.minimized {
+      max-height:none;
+    }
+    #float-handle { border-radius:14px 14px 0 0; cursor:default; }
+    #float-panel.minimized #float-handle { border-radius:14px 14px 0 0; }
+  }
+  #float-panel.minimized #float-body { display:none; }
+  #float-handle {
+    display:flex; align-items:center; gap:10px;
+    padding:9px 14px;
+    background:var(--bg3); border-bottom:1px solid var(--bdr);
+    cursor:grab; flex-shrink:0;
+    border-radius:10px 10px 0 0;
+  }
+  #float-panel.minimized #float-handle { border-radius:10px; border-bottom:none; }
+  #float-handle:active { cursor:grabbing; }
+  #float-grip { color:var(--text3); display:flex; align-items:center; }
+  @media(max-width:600px) { #float-grip { display:none; } }
+  #float-day-label { flex:1; font-size:11px; color:var(--text2); letter-spacing:0.04em; text-transform:uppercase; }
+  #float-min-btn {
+    background:none; border:none; color:var(--text3);
+    cursor:pointer; padding:2px 5px; border-radius:3px;
+    font-size:13px; line-height:1;
+  }
+  #float-min-btn:hover { background:var(--hover); color:var(--text); }
+  #float-tabs { display:flex; border-bottom:1px solid var(--bdr); flex-shrink:0; }
+  .float-tab {
+    flex:1; padding:7px 0; background:none; border:none; border-bottom:2px solid transparent;
+    font-family:'DM Sans',sans-serif; font-size:11px; font-weight:500; letter-spacing:0.05em;
+    text-transform:uppercase; color:var(--text3); cursor:pointer; transition:color 0.15s, border-color 0.15s;
+    margin-bottom:-1px;
+  }
+  .float-tab:hover { color:var(--text2); }
+  .float-tab.on { color:var(--text); border-bottom-color:var(--blue); }
+  #float-panel.minimized #float-tabs,
+  #float-panel.minimized #float-ref-body { display:none; }
+  #float-body { overflow-y:auto; flex:1; }
+  #float-body .practice-wrap { margin:0; }
+  #float-body .practice-wrap > .dvd { display:none; }
+  #float-ref-body { overflow-y:auto; flex:1; display:none; }
+  #float-ref-body.on { display:block; }
+  /* inner ref tabs */
+  .fref-tabs { display:flex; gap:4px; padding:10px 12px 8px; border-bottom:1px solid var(--bdr); }
+  .fref-tab {
+    padding:3px 9px; border:1px solid var(--bdr2); border-radius:20px; background:none;
+    font-family:'DM Sans',sans-serif; font-size:10px; font-weight:500; color:var(--text3);
+    cursor:pointer; transition:all 0.15s;
+  }
+  .fref-tab:hover { color:var(--text2); border-color:var(--text3); }
+  .fref-tab.on { background:var(--bg3); color:var(--text); border-color:var(--bdr2); }
+  .fref-panel { display:none; padding:12px 14px 16px; }
+  .fref-panel.on { display:block; }
+  .fref-fn { margin-bottom:10px; }
+  .fref-fn h5 { font-size:11px; font-weight:600; color:var(--blue); font-family:'JetBrains Mono',monospace; margin-bottom:3px; }
+  .fref-fn p { font-size:12px; color:var(--text2); line-height:1.5; }
+  .fref-fn code { font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--yel); background:var(--bg3); padding:1px 4px; border-radius:3px; }
+  .fref-pat { margin-bottom:14px; }
+  .fref-pat-lbl { font-size:10px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:var(--text3); margin-bottom:5px; }
+  #float-ref-body .cb { margin-bottom:10px; }
+  #float-ref-body .cb pre { font-size:11px; max-height:160px; overflow-y:auto; }
+  #float-ref-body .cb-lang { font-size:10px; }
+
+  /* ── PRACTICE CONTEXT STRIP ── */
+  .practice-context {
+    font-size:11px; padding:7px 14px 8px;
+    color:var(--text3); border-bottom:1px solid var(--bdr);
+    letter-spacing:0.03em; min-height:34px;
+    transition:color 0.35s;
+  }
+  .practice-context.lit { color:var(--blue); }
+
+  /* ── CHECK BUTTON ── */
+  .check-btn {
+    flex:1; padding:6px 10px;
+    background:rgba(121,184,255,0.08);
+    border:1px solid rgba(121,184,255,0.2);
+    color:var(--blue); border-radius:4px;
+    font-family:inherit; font-size:12px;
+    cursor:pointer; transition:background 0.15s;
+  }
+  .check-btn:hover { background:rgba(121,184,255,0.16); }
+
+  /* ── ATTEMPT FEEDBACK ── */
+  .practice-status {
+    margin:0 14px 6px; padding:8px 11px;
+    font-size:12px; line-height:1.5; border-radius:5px;
+    display:none;
+  }
+  .practice-status.show { display:block; }
+  .practice-status.neutral { background:var(--bg3); color:var(--text2); }
+
+  /* ── HINT BOX ── */
+  .hint-box {
+    margin:0 14px 10px; padding:10px 12px;
+    background:var(--bg3); border-radius:5px;
+    border-left:2px solid var(--yel);
+    display:none;
+  }
+  .hint-box.show { display:block; }
+  .hint-label {
+    font-size:10px; text-transform:uppercase;
+    letter-spacing:0.08em; color:var(--text3); margin-bottom:6px;
+  }
+  .hint-item {
+    font-size:12px; color:var(--yel); line-height:1.55;
+  }
+  .hint-item + .hint-item {
+    margin-top:8px; padding-top:8px;
+    border-top:1px solid rgba(255,255,255,0.06);
+  }
+
+  /* ── CASE STUDIES ── */
+  .cases-layout { display:flex; gap:28px; align-items:flex-start; margin-top:32px; }
+  .cases-list { width:208px; flex-shrink:0; position:sticky; top:68px; max-height:calc(100vh - 88px); overflow-y:auto; }
+  .case-btn {
+    display:block; width:100%; text-align:left;
+    padding:10px 12px 10px 14px;
+    background:transparent; border:none;
+    border-left:2px solid var(--bdr);
+    cursor:pointer; margin-bottom:1px;
+    transition:background 0.12s, border-color 0.12s;
+  }
+  .case-btn:hover { background:var(--hover); }
+  .case-btn.on { border-left-color:var(--text2); background:var(--bg2); }
+  .case-btn-title { display:block; font-size:13px; color:var(--text); font-family:inherit; line-height:1.4; }
+  .case-btn-meta  { display:flex; gap:6px; margin-top:5px; align-items:center; }
+  .diff { font-size:10px; text-transform:uppercase; letter-spacing:0.07em; padding:2px 6px; border-radius:3px; font-weight:600; }
+  .diff.easy   { background:rgba(111,207,151,0.12); color:var(--green); }
+  .diff.medium { background:rgba(255,171,112,0.12); color:var(--yel);   }
+  .diff.hard   { background:rgba(255,123,123,0.12); color:var(--red);   }
+  .cases-detail { flex:1; min-width:0; }
+  .case-panel { display:none; }
+  .case-panel.on { display:block; }
+  .case-title-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+  .case-h { font-size:20px; font-weight:600; color:var(--text); line-height:1.3; }
+  .ctag {
+    font-size:10px; padding:2px 7px; border-radius:3px;
+    background:var(--bg3); color:var(--text2); border:1px solid var(--bdr);
+    letter-spacing:0.02em;
+  }
+  .case-approach { margin:20px 0; }
+  .case-approach h5 { font-size:12px; text-transform:uppercase; letter-spacing:0.07em; color:var(--text3); margin-bottom:10px; }
+  .case-approach ol { padding-left:20px; }
+  .case-approach li { margin-bottom:8px; font-size:14px; color:var(--text2); line-height:1.65; }
+  .case-approach li strong { color:var(--text); }
+  .case-sol { display:none; margin-top:4px; }
+  .case-sol.show { display:block; }
+  .case-sol-btn {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:7px 14px; margin:14px 0 0;
+    background:var(--bg3); border:1px solid var(--bdr2);
+    color:var(--text2); border-radius:5px;
+    font-family:inherit; font-size:12px; cursor:pointer;
+    transition:background 0.12s, color 0.12s;
+  }
+  .case-sol-btn:hover { background:var(--hover); color:var(--text); }
+  .case-ta {
+    display:block; width:100%; min-height:130px;
+    background:var(--bg2); color:var(--text);
+    font-family:'JetBrains Mono',monospace; font-size:13px;
+    line-height:1.8; padding:14px 16px;
+    border:1px solid var(--bdr); border-top:none; border-radius:0 0 6px 6px;
+    outline:none; resize:vertical; caret-color:var(--text);
+  }
+  @media(max-width:768px) {
+    .case-ta { font-size:16px; }
+  }
+  .case-ta:focus { border-color:var(--bdr2); }
+  .case-ta-head {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 14px; background:var(--bg3);
+    border:1px solid var(--bdr); border-radius:6px 6px 0 0;
+    margin-top:16px;
+  }
+  .case-ta-head span { font-size:11px; color:var(--text3); letter-spacing:0.04em; }
+  @media(max-width:760px){
+    .cases-layout { flex-direction:column; }
+    .cases-list { width:100%; position:static; }
+  }
+  @media(max-width:600px){
+    body { padding-bottom:calc(55dvh + 16px); }
+  }
+</style>
+</head>
+<body>
+
+<div id="prog-rail"><div id="prog-bar"></div></div>
+
+<nav>
+  <button id="sb-btn" onclick="toggleSb()" title="Toggle sidebar">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <rect x="1" y="3" width="14" height="1.5" rx="0.75" fill="currentColor"/>
+      <rect x="1" y="7.25" width="14" height="1.5" rx="0.75" fill="currentColor"/>
+      <rect x="1" y="11.5" width="14" height="1.5" rx="0.75" fill="currentColor"/>
+    </svg>
+  </button>
+
+</nav>
+
+<!-- ════════════ SIDEBAR ════════════ -->
+<aside id="sidebar">
+  <div class="sb-head">
+    <span class="sb-heading">Progress</span>
+    <button class="sb-close" onclick="toggleSb()" title="Hide sidebar">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+  <div class="sb-days">
+    <a href="#day1" class="sb-item" data-day="day1">
+      <span class="sb-num">01</span>
+      <div class="sb-info">
+        <span class="sb-label">SQL Basics</span>
+        <span class="sb-sub">SELECT · WHERE · ORDER BY</span>
+      </div>
+      <span class="sb-check" id="dot-day1"></span>
+    </a>
+    <a href="#day2" class="sb-item" data-day="day2">
+      <span class="sb-num">02</span>
+      <div class="sb-info">
+        <span class="sb-label">JOIN Types</span>
+        <span class="sb-sub">INNER · LEFT · RIGHT · FULL</span>
+      </div>
+      <span class="sb-check" id="dot-day2"></span>
+    </a>
+    <a href="#day3" class="sb-item" data-day="day3">
+      <span class="sb-num">03</span>
+      <div class="sb-info">
+        <span class="sb-label">Aggregations</span>
+        <span class="sb-sub">GROUP BY · HAVING · COUNT</span>
+      </div>
+      <span class="sb-check" id="dot-day3"></span>
+    </a>
+    <a href="#day4" class="sb-item" data-day="day4">
+      <span class="sb-num">04</span>
+      <div class="sb-info">
+        <span class="sb-label">NULLs &amp; Self-Joins</span>
+        <span class="sb-sub">Subqueries · Edge cases</span>
+      </div>
+      <span class="sb-check" id="dot-day4"></span>
+    </a>
+    <a href="#day5" class="sb-item" data-day="day5">
+      <span class="sb-num">05</span>
+      <div class="sb-info">
+        <span class="sb-label">CTEs</span>
+        <span class="sb-sub">Common Table Expressions</span>
+      </div>
+      <span class="sb-check" id="dot-day5"></span>
+    </a>
+    <a href="#day6" class="sb-item" data-day="day6">
+      <span class="sb-num">06</span>
+      <div class="sb-info">
+        <span class="sb-label">Window Functions</span>
+        <span class="sb-sub">ROW_NUMBER · RANK · LAG</span>
+      </div>
+      <span class="sb-check" id="dot-day6"></span>
+    </a>
+    <a href="#day7" class="sb-item" data-day="day7">
+      <span class="sb-num">07</span>
+      <div class="sb-info">
+        <span class="sb-label">Capstone</span>
+        <span class="sb-sub">Odd/Even full solution</span>
+      </div>
+      <span class="sb-check" id="dot-day7"></span>
+    </a>
+    <a href="#cases" class="sb-item" data-day="cases">
+      <span class="sb-num">📋</span>
+      <div class="sb-info">
+        <span class="sb-label">Case Studies</span>
+        <span class="sb-sub">7 Google Interview Problems</span>
+      </div>
+    </a>
+  </div>
+  <div class="sb-footer">
+    <div class="sb-overall">
+      <span id="sb-count">0 / 10 complete</span>
+      <div class="sb-overall-bar"><div id="sb-overall-fill"></div></div>
+    </div>
+  </div>
+</aside>
+<div id="sb-backdrop" onclick="toggleSb()"></div>
+
+<!-- ════════════════════════════ HERO ════════════════════════════ -->
+<section id="hero">
+  <div class="wrap">
+    <h1 class="hero-title">7 Days to <em>SQL Ready</em></h1>
+    <p class="hero-sub">Every concept you need — from SELECT basics to window functions — built from zero, one day at a time. Track your progress with the sidebar.</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════ DAY 1 — BASICS ════════════════════════════ -->
+<section id="day1">
+  <div class="wrap day-layout">
+    <div class="day-left">
+    <div class="reveal">
+      <p class="s-label">Day 01 · Foundation</p>
+      <h2 class="s-title">SQL <em>BASICS</em></h2>
+      <p class="s-body">SQL (Structured Query Language) is how you talk to a database. Every query follows the same basic anatomy — you tell the database <strong>what to get</strong>, <strong>where to get it from</strong>, and <strong>how to filter/sort it</strong>.</p>
+
+      <div class="card-grid">
+        <div class="card"><h5>SELECT</h5><p>Which columns to return. Use <code>*</code> for all columns, or list specific ones.</p></div>
+        <div class="card"><h5>FROM</h5><p>Which table to read from. Always required.</p></div>
+        <div class="card"><h5>WHERE</h5><p>Filter rows <em>before</em> any grouping. Only rows matching the condition are kept.</p></div>
+        <div class="card"><h5>ORDER BY</h5><p>Sort the results. <code>ASC</code> (default) = smallest first. <code>DESC</code> = largest first.</p></div>
+        <div class="card"><h5>LIMIT</h5><p>Cap the number of rows returned. Useful for previewing data or "top N" queries.</p></div>
+        <div class="card"><h5>DISTINCT</h5><p>Remove duplicate rows from the result. Place right after <code>SELECT</code>.</p></div>
+      </div>
+
+      <p class="s-body">Here's the table we'll use as our example throughout Day 1:</p>
+
+      <div class="tbl-wrap">
+        <table><thead><tr><th>employee_id</th><th>name</th><th>department</th><th>salary</th><th>hire_date</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Alice</td><td>Engineering</td><td>120000</td><td>2020-03-15</td></tr>
+          <tr><td>2</td><td>Bob</td><td>Engineering</td><td>95000</td><td>2021-06-01</td></tr>
+          <tr><td>3</td><td>Carol</td><td>Marketing</td><td>88000</td><td>2019-11-20</td></tr>
+          <tr><td>4</td><td>Dave</td><td>Marketing</td><td>72000</td><td>2022-01-10</td></tr>
+          <tr><td>5</td><td>Eve</td><td>Engineering</td><td>110000</td><td>2020-08-05</td></tr>
+        </tbody></table>
+      </div>
+
+      <div class="cb">
+        <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · Basic Queries</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+        <pre><code><span class="cm">-- Get all columns from all rows</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tb">employees</span>;
+
+<span class="cm">-- Get only specific columns</span>
+<span class="kw">SELECT</span> <span class="cl">name</span>, <span class="cl">salary</span> <span class="kw">FROM</span> <span class="tb">employees</span>;
+
+<span class="cm">-- Filter: only Engineering employees</span>
+<span class="kw">SELECT</span> <span class="cl">name</span>, <span class="cl">salary</span>
+<span class="kw">FROM</span>   <span class="tb">employees</span>
+<span class="kw">WHERE</span>  <span class="cl">department</span> = <span class="st">'Engineering'</span>;
+
+<span class="cm">-- Sort by salary, highest first</span>
+<span class="kw">SELECT</span> <span class="cl">name</span>, <span class="cl">salary</span>
+<span class="kw">FROM</span>   <span class="tb">employees</span>
+<span class="kw">ORDER BY</span> <span class="cl">salary</span> <span class="kw">DESC</span>;
+
+<span class="cm">-- Filter + Sort + Limit: top earner in Engineering</span>
+<span class="kw">SELECT</span> <span class="cl">name</span>, <span class="cl">salary</span>
+<span class="kw">FROM</span>   <span class="tb">employees</span>
+<span class="kw">WHERE</span>  <span class="cl">department</span> = <span class="st">'Engineering'</span>
+<span class="kw">ORDER BY</span> <span class="cl">salary</span> <span class="kw">DESC</span>
+<span class="kw">LIMIT</span>  <span class="nu">1</span>;</code></pre>
+      </div>
+
+      <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Essential WHERE operators</span><div class="dvd-line"></div></div>
+
+      <div class="card-grid">
+        <div class="card"><h5>IN / NOT IN</h5><p>Match against a list of values. <code>WHERE dept IN ('Eng', 'Mktg')</code> is cleaner than multiple OR conditions. <code>NOT IN</code> excludes a list.</p></div>
+        <div class="card"><h5>BETWEEN</h5><p>Inclusive range filter. <code>WHERE salary BETWEEN 80000 AND 120000</code> is equivalent to <code>>= 80000 AND <= 120000</code>.</p></div>
+        <div class="card"><h5>LIKE</h5><p>Pattern matching on strings. <code>%</code> = any characters, <code>_</code> = exactly one character. <code>WHERE name LIKE 'A%'</code> finds names starting with A.</p></div>
+        <div class="card"><h5>AND / OR / NOT</h5><p>Combine conditions. <code>AND</code> = both must be true. <code>OR</code> = either is true. Use parentheses to control precedence: <code>(a OR b) AND c</code>.</p></div>
+      </div>
+
+      <div class="cb">
+        <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · Filter Operators</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+        <pre><code><span class="cm">-- IN: match multiple values (cleaner than OR)</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tb">employees</span>
+<span class="kw">WHERE</span>  <span class="cl">department</span> <span class="kw">IN</span> (<span class="st">'Engineering'</span>, <span class="st">'Marketing'</span>);
+
+<span class="cm">-- NOT IN: exclude a list</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tb">employees</span>
+<span class="kw">WHERE</span>  <span class="cl">department</span> <span class="kw">NOT IN</span> (<span class="st">'Finance'</span>);
+
+<span class="cm">-- BETWEEN: inclusive range</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tb">employees</span>
+<span class="kw">WHERE</span>  <span class="cl">salary</span> <span class="kw">BETWEEN</span> <span class="nu">80000</span> <span class="kw">AND</span> <span class="nu">120000</span>;
+
+<span class="cm">-- LIKE: % matches any string, _ matches one character</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tb">employees</span>
+<span class="kw">WHERE</span>  <span class="cl">name</span> <span class="kw">LIKE</span> <span class="st">'A%'</span>;      <span class="cm">-- names starting with A</span>
+
+<span class="cm">-- AND + OR: combine conditions (parentheses control order)</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tb">employees</span>
+<span class="kw">WHERE</span>  (<span class="cl">department</span> = <span class="st">'Engineering'</span> <span class="kw">OR</span> <span class="cl">department</span> = <span class="st">'Marketing'</span>)
+  <span class="kw">AND</span>  <span class="cl">salary</span> > <span class="nu">90000</span>;</code></pre>
+      </div>
+
+      <div class="callout">
+        <p class="callout-lbl">Query Execution Order</p>
+        <p>SQL does NOT run in the order you write it. The real order is: <strong>FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT</strong>. This matters — it's why you can't use a SELECT alias inside a WHERE clause.</p>
+      </div>
+
+    </div>
+    </div>
+    <div class="day-right">
+      <div class="practice-wrap">
+        <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Practice</span><div class="dvd-line"></div></div>
+        <div class="practice-prompt"><div><p class="practice-q">Write a query to return the name and salary of every employee in the Engineering department, sorted by salary from highest to lowest.</p><p class="practice-hint">Table: employees (employee_id, name, department, salary, hire_date)</p></div></div>
+        <div class="practice-cb">
+          <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="clearTa(this)">clear</button><button class="cp-btn" onclick="toggleAns(this)">show answer</button></div></div>
+          <textarea class="practice-ta" placeholder="-- Write your SQL here...&#10;-- Press Tab to indent" spellcheck="false"></textarea>
+        </div>
+        <div class="practice-answer">
+          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Answer</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">SELECT</span>   <span class="cl">name</span>, <span class="cl">salary</span>
+<span class="kw">FROM</span>     <span class="tb">employees</span>
+<span class="kw">WHERE</span>    <span class="cl">department</span> = <span class="st">'Engineering'</span>
+<span class="kw">ORDER BY</span> <span class="cl">salary</span> <span class="kw">DESC</span>;</code></pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ DAY 2 — JOINS ════════════════════════════ -->
+<section id="day2">
+  <div class="wrap day-layout">
+    <div class="day-left">
+    <div class="reveal">
+      <p class="s-label">Day 02 · Combining Tables</p>
+      <h2 class="s-title">JOIN <em>TYPES</em></h2>
+      <p class="s-body">A JOIN combines rows from two tables based on a matching column — usually a shared ID. The type of JOIN controls <strong>what happens to rows that don't match</strong>.</p>
+
+      <p class="s-body">Our two example tables:</p>
+      <div class="compare">
+        <div class="compare-col">
+          <h5>employees</h5>
+          <div class="tbl-wrap" style="margin:0">
+            <table><thead><tr><th>id</th><th>name</th><th>dept_id</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Alice</td><td class="hl">10</td></tr>
+              <tr><td>2</td><td>Bob</td><td class="hl">10</td></tr>
+              <tr><td>3</td><td>Carol</td><td class="hl">20</td></tr>
+              <tr><td>4</td><td>Dave</td><td class="red">NULL</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+        <div class="compare-col">
+          <h5>departments</h5>
+          <div class="tbl-wrap" style="margin:0">
+            <table><thead><tr><th>dept_id</th><th>dept_name</th></tr></thead>
+            <tbody>
+              <tr><td class="hl">10</td><td>Engineering</td></tr>
+              <tr><td class="hl">20</td><td>Marketing</td></tr>
+              <tr><td class="hl">30</td><td>Finance</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <div class="stabs">
+        <div class="stab-row">
+          <button class="stab on" onclick="stab(this,0,'jt')">INNER JOIN</button>
+          <button class="stab" onclick="stab(this,1,'jt')">LEFT JOIN</button>
+          <button class="stab" onclick="stab(this,2,'jt')">RIGHT JOIN</button>
+          <button class="stab" onclick="stab(this,3,'jt')">FULL OUTER JOIN</button>
+        </div>
+
+        <div class="stab-panel on" id="jt-0">
+          <h4>INNER JOIN — only matching rows from both tables</h4>
+          <p>The most common join. Returns a row only when the key exists in <strong>both</strong> tables. Dave (NULL dept) and Finance (no employees) are both excluded.</p>
+          <div class="cb" style="margin-top:0">
+            <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+            <pre><code><span class="kw">SELECT</span> <span class="cl">e.name</span>, <span class="cl">d.dept_name</span>
+<span class="kw">FROM</span>       <span class="tb">employees</span>   <span class="cl">e</span>
+<span class="kw">INNER JOIN</span> <span class="tb">departments</span> <span class="cl">d</span> <span class="kw">ON</span> <span class="cl">e.dept_id</span> = <span class="cl">d.dept_id</span>;</code></pre>
+          </div>
+          <div class="tbl-wrap">
+            <table><thead><tr><th>name</th><th>dept_name</th></tr></thead>
+            <tbody>
+              <tr><td>Alice</td><td class="grn">Engineering</td></tr>
+              <tr><td>Bob</td><td class="grn">Engineering</td></tr>
+              <tr><td>Carol</td><td class="grn">Marketing</td></tr>
+            </tbody></table>
+          </div>
+          <p style="font-size:13px;color:var(--muted)">Dave (NULL dept) → excluded. Finance dept (no employees) → excluded.</p>
+        </div>
+
+        <div class="stab-panel" id="jt-1">
+          <h4>LEFT JOIN — all rows from the left table, matched or not</h4>
+          <p>Returns <strong>every row from the left table</strong> (employees). If there's no match in the right table, the right-side columns are NULL. Use this to find "things without a match" — e.g., employees with no department.</p>
+          <div class="cb" style="margin-top:0">
+            <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+            <pre><code><span class="kw">SELECT</span> <span class="cl">e.name</span>, <span class="cl">d.dept_name</span>
+<span class="kw">FROM</span>      <span class="tb">employees</span>   <span class="cl">e</span>
+<span class="kw">LEFT JOIN</span> <span class="tb">departments</span> <span class="cl">d</span> <span class="kw">ON</span> <span class="cl">e.dept_id</span> = <span class="cl">d.dept_id</span>;
+
+<span class="cm">-- Find employees with NO department:</span>
+<span class="kw">SELECT</span> <span class="cl">e.name</span>
+<span class="kw">FROM</span>      <span class="tb">employees</span>   <span class="cl">e</span>
+<span class="kw">LEFT JOIN</span> <span class="tb">departments</span> <span class="cl">d</span> <span class="kw">ON</span> <span class="cl">e.dept_id</span> = <span class="cl">d.dept_id</span>
+<span class="kw">WHERE</span>     <span class="cl">d.dept_id</span> <span class="kw">IS NULL</span>;   <span class="cm">-- the "no match" trick</span></code></pre>
+          </div>
+          <div class="tbl-wrap">
+            <table><thead><tr><th>name</th><th>dept_name</th></tr></thead>
+            <tbody>
+              <tr><td>Alice</td><td class="grn">Engineering</td></tr>
+              <tr><td>Bob</td><td class="grn">Engineering</td></tr>
+              <tr><td>Carol</td><td class="grn">Marketing</td></tr>
+              <tr><td class="hl">Dave</td><td class="null-cell">NULL ← no dept</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+
+        <div class="stab-panel" id="jt-2">
+          <h4>RIGHT JOIN — all rows from the right table, matched or not</h4>
+          <p>Mirror of LEFT JOIN. Returns <strong>every row from the right table</strong> (departments). Finance shows up even though no employees belong to it. Rarely used — most developers just swap the table order and use LEFT JOIN instead.</p>
+          <div class="cb" style="margin-top:0">
+            <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+            <pre><code><span class="kw">SELECT</span> <span class="cl">e.name</span>, <span class="cl">d.dept_name</span>
+<span class="kw">FROM</span>       <span class="tb">employees</span>   <span class="cl">e</span>
+<span class="kw">RIGHT JOIN</span> <span class="tb">departments</span> <span class="cl">d</span> <span class="kw">ON</span> <span class="cl">e.dept_id</span> = <span class="cl">d.dept_id</span>;</code></pre>
+          </div>
+          <div class="tbl-wrap">
+            <table><thead><tr><th>name</th><th>dept_name</th></tr></thead>
+            <tbody>
+              <tr><td>Alice</td><td>Engineering</td></tr>
+              <tr><td>Bob</td><td>Engineering</td></tr>
+              <tr><td>Carol</td><td>Marketing</td></tr>
+              <tr><td class="null-cell">NULL</td><td class="hl">Finance ← no employees</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+
+        <div class="stab-panel" id="jt-3">
+          <h4>FULL OUTER JOIN — all rows from both tables</h4>
+          <p>The union of LEFT and RIGHT. Returns <strong>every row from both tables</strong>. Non-matching sides get NULL. Use when you need a complete picture across two tables regardless of matches.</p>
+          <div class="cb" style="margin-top:0">
+            <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+            <pre><code><span class="kw">SELECT</span> <span class="cl">e.name</span>, <span class="cl">d.dept_name</span>
+<span class="kw">FROM</span>            <span class="tb">employees</span>   <span class="cl">e</span>
+<span class="kw">FULL OUTER JOIN</span> <span class="tb">departments</span> <span class="cl">d</span> <span class="kw">ON</span> <span class="cl">e.dept_id</span> = <span class="cl">d.dept_id</span>;</code></pre>
+          </div>
+          <div class="tbl-wrap">
+            <table><thead><tr><th>name</th><th>dept_name</th></tr></thead>
+            <tbody>
+              <tr><td>Alice</td><td>Engineering</td></tr>
+              <tr><td>Bob</td><td>Engineering</td></tr>
+              <tr><td>Carol</td><td>Marketing</td></tr>
+              <tr><td class="hl">Dave</td><td class="null-cell">NULL</td></tr>
+              <tr><td class="null-cell">NULL</td><td class="hl">Finance</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p class="callout-lbl">The "Missing Data" Pattern</p>
+        <p><strong>LEFT JOIN + WHERE right.id IS NULL</strong> is one of the most common interview patterns. It finds rows in the left table with no match on the right — e.g., "customers who never placed an order", "users with no activity."</p>
+      </div>
+
+    </div>
+    </div>
+    <div class="day-right">
+      <div class="practice-wrap">
+        <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Practice</span><div class="dvd-line"></div></div>
+        <div class="practice-prompt"><div><p class="practice-q">Write a query to find all employees who have no department assigned. Return only the employee name.</p><p class="practice-hint">Tables: employees (id, name, dept_id) · departments (dept_id, dept_name)</p></div></div>
+        <div class="practice-cb">
+          <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="clearTa(this)">clear</button><button class="cp-btn" onclick="toggleAns(this)">show answer</button></div></div>
+          <textarea class="practice-ta" placeholder="-- Write your SQL here...&#10;-- Press Tab to indent" spellcheck="false"></textarea>
+        </div>
+        <div class="practice-answer">
+          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Answer</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">SELECT</span>    <span class="cl">e.name</span>
+<span class="kw">FROM</span>      <span class="tb">employees</span>   <span class="cl">e</span>
+<span class="kw">LEFT JOIN</span> <span class="tb">departments</span> <span class="cl">d</span> <span class="kw">ON</span> <span class="cl">e.dept_id</span> = <span class="cl">d.dept_id</span>
+<span class="kw">WHERE</span>     <span class="cl">d.dept_id</span> <span class="kw">IS NULL</span>;</code></pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ DAY 3 — AGGREGATIONS ════════════════════════════ -->
+<section id="day3">
+  <div class="wrap day-layout">
+    <div class="day-left">
+    <div class="reveal">
+      <p class="s-label">Day 03 · Summarising Data</p>
+      <h2 class="s-title">GROUP BY <em>&amp; HAVING</em></h2>
+      <p class="s-body">Aggregation functions collapse many rows into a single summary value. <code>GROUP BY</code> controls <strong>which rows are grouped together</strong> before the summary is computed.</p>
+
+      <div class="card-grid">
+        <div class="card"><h5>COUNT(*)</h5><p>Number of rows in each group. <code>COUNT(col)</code> ignores NULLs.</p></div>
+        <div class="card"><h5>SUM(col)</h5><p>Total of a numeric column. NULLs are ignored.</p></div>
+        <div class="card"><h5>AVG(col)</h5><p>Mean value. NULLs are excluded from both numerator and denominator.</p></div>
+        <div class="card"><h5>MIN / MAX</h5><p>Smallest or largest value in the group.</p></div>
+      </div>
+
+      <div class="cb">
+        <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · Aggregations</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+        <pre><code><span class="cm">-- Count employees per department</span>
+<span class="kw">SELECT</span>   <span class="cl">department</span>, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="cl">headcount</span>
+<span class="kw">FROM</span>     <span class="tb">employees</span>
+<span class="kw">GROUP BY</span> <span class="cl">department</span>;
+
+<span class="cm">-- Average salary per department</span>
+<span class="kw">SELECT</span>   <span class="cl">department</span>, <span class="fn">AVG</span>(<span class="cl">salary</span>) <span class="kw">AS</span> <span class="cl">avg_salary</span>
+<span class="kw">FROM</span>     <span class="tb">employees</span>
+<span class="kw">GROUP BY</span> <span class="cl">department</span>;</code></pre>
+      </div>
+
+      <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">WHERE vs HAVING — the most common interview gotcha</span><div class="dvd-line"></div></div>
+
+      <div class="compare">
+        <div class="compare-col">
+          <h5 class="bad">WHERE — filters BEFORE grouping</h5>
+          <div class="cb" style="margin:8px 0 0">
+            <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span></div>
+            <pre style="padding:14px 18px"><code><span class="cm">-- Filter individual rows first</span>
+<span class="kw">SELECT</span>   <span class="cl">department</span>, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="cl">cnt</span>
+<span class="kw">FROM</span>     <span class="tb">employees</span>
+<span class="kw">WHERE</span>    <span class="cl">salary</span> > <span class="nu">80000</span>    <span class="cm">← rows removed here</span>
+<span class="kw">GROUP BY</span> <span class="cl">department</span>;</code></pre>
+          </div>
+          <p style="font-size:13px;color:var(--crm2);margin-top:8px">Keeps only high-salary employees, <em>then</em> groups them. The group itself can have any size.</p>
+        </div>
+        <div class="compare-col">
+          <h5 class="good">HAVING — filters AFTER grouping</h5>
+          <div class="cb" style="margin:8px 0 0">
+            <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span></div>
+            <pre style="padding:14px 18px"><code><span class="cm">-- Filter the group summary</span>
+<span class="kw">SELECT</span>   <span class="cl">department</span>, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="cl">cnt</span>
+<span class="kw">FROM</span>     <span class="tb">employees</span>
+<span class="kw">GROUP BY</span> <span class="cl">department</span>
+<span class="kw">HAVING</span>   <span class="fn">COUNT</span>(*) > <span class="nu">1</span>;    <span class="cm">← groups removed here</span></code></pre>
+          </div>
+          <p style="font-size:13px;color:var(--crm2);margin-top:8px">Groups all employees first, <em>then</em> removes groups with only 1 person. You can only use aggregate functions here, not raw column values.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p class="callout-lbl">Rule of thumb</p>
+        <p>If your filter is on an <strong>individual row value</strong> → use <code>WHERE</code>.<br>
+        If your filter is on the <strong>result of an aggregate</strong> (COUNT, SUM, AVG…) → use <code>HAVING</code>.</p>
+      </div>
+
+      <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Two more aggregation gotchas</span><div class="dvd-line"></div></div>
+
+      <div class="compare">
+        <div class="compare-col">
+          <h5 class="good">COUNT(DISTINCT col)</h5>
+          <p style="font-size:13px;color:var(--crm2);margin:6px 0 8px">Counts only unique non-NULL values. Classic pattern: "how many unique users placed an order?"</p>
+          <div class="cb" style="margin:0">
+            <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span></div>
+            <pre style="padding:14px 18px"><code><span class="cm">-- Distinct departments vs total employees</span>
+<span class="kw">SELECT</span>
+  <span class="fn">COUNT</span>(*)                     <span class="cm">-- 5 rows</span>
+, <span class="fn">COUNT</span>(<span class="cl">department</span>)            <span class="cm">-- 5 (no NULLs here)</span>
+, <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> <span class="cl">department</span>)  <span class="cm">-- 2 unique depts</span>
+<span class="kw">FROM</span> <span class="tb">employees</span>;</code></pre>
+          </div>
+        </div>
+        <div class="compare-col">
+          <h5 class="bad">SELECT column not in GROUP BY</h5>
+          <p style="font-size:13px;color:var(--crm2);margin:6px 0 8px">Every column in SELECT must either be in GROUP BY or wrapped in an aggregate. This is the #1 GROUP BY syntax error.</p>
+          <div class="cb" style="margin:0">
+            <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span></div>
+            <pre style="padding:14px 18px"><code><span class="cm">-- ❌ ERROR: name not in GROUP BY</span>
+<span class="kw">SELECT</span>   <span class="cl">department</span>, <span class="cl">name</span>, <span class="fn">COUNT</span>(*)
+<span class="kw">FROM</span>     <span class="tb">employees</span>
+<span class="kw">GROUP BY</span> <span class="cl">department</span>;
+
+<span class="cm">-- ✓ Fix: either aggregate name or add to GROUP BY</span>
+<span class="kw">SELECT</span>   <span class="cl">department</span>, <span class="fn">COUNT</span>(*)
+<span class="kw">FROM</span>     <span class="tb">employees</span>
+<span class="kw">GROUP BY</span> <span class="cl">department</span>;</code></pre>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    </div>
+    <div class="day-right">
+      <div class="practice-wrap">
+        <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Practice</span><div class="dvd-line"></div></div>
+        <div class="practice-prompt"><div><p class="practice-q">Write a query to show each department, its headcount, and average salary — but only for departments where the average salary is above 90,000.</p><p class="practice-hint">Table: employees (employee_id, name, department, salary)</p></div></div>
+        <div class="practice-cb">
+          <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="clearTa(this)">clear</button><button class="cp-btn" onclick="toggleAns(this)">show answer</button></div></div>
+          <textarea class="practice-ta" placeholder="-- Write your SQL here...&#10;-- Press Tab to indent" spellcheck="false"></textarea>
+        </div>
+        <div class="practice-answer">
+          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Answer</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">SELECT</span>   <span class="cl">department</span>,
+         <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="cl">headcount</span>,
+         <span class="fn">AVG</span>(<span class="cl">salary</span>) <span class="kw">AS</span> <span class="cl">avg_salary</span>
+<span class="kw">FROM</span>     <span class="tb">employees</span>
+<span class="kw">GROUP BY</span> <span class="cl">department</span>
+<span class="kw">HAVING</span>   <span class="fn">AVG</span>(<span class="cl">salary</span>) > <span class="nu">90000</span>;</code></pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ DAY 4 — NULLS / SUBQUERIES / SELF-JOINS ════════════════════════════ -->
+<section id="day4">
+  <div class="wrap day-layout">
+    <div class="day-left">
+    <div class="reveal">
+      <p class="s-label">Day 04 · Edge Cases &amp; Patterns</p>
+      <h2 class="s-title">NULLS, SUBQUERIES<br><em>&amp; SELF-JOINS</em></h2>
+
+      <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Part 1 · NULL Handling</span><div class="dvd-line"></div></div>
+
+      <p class="s-body">NULL means <strong>"unknown" or "missing"</strong> — it is not zero, not an empty string. NULL has its own rules that trip up almost every SQL beginner.</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <h5>NULL ≠ NULL</h5>
+          <p>You cannot compare NULL with <code>=</code>. <code>WHERE col = NULL</code> always returns nothing. Always use <code>IS NULL</code> or <code>IS NOT NULL</code>.</p>
+        </div>
+        <div class="card">
+          <h5>COUNT(*) vs COUNT(col)</h5>
+          <p><code>COUNT(*)</code> counts all rows. <code>COUNT(col)</code> counts only non-NULL values in that column. This is a common interview trap.</p>
+        </div>
+        <div class="card">
+          <h5>NULLs in JOINs</h5>
+          <p>NULL never matches anything — not even another NULL. A row with a NULL key will never match in a JOIN condition.</p>
+        </div>
+        <div class="card">
+          <h5>COALESCE()</h5>
+          <p><code>COALESCE(col, 0)</code> returns the first non-NULL value. Use it to substitute a default when a column is NULL.</p>
+        </div>
+      </div>
+
+      <div class="cb">
+        <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · NULL Gotchas</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+        <pre><code><span class="cm">-- WRONG — this returns 0 rows, not the NULLs</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tb">employees</span> <span class="kw">WHERE</span> <span class="cl">dept_id</span> = <span class="kw">NULL</span>;
+
+<span class="cm">-- CORRECT</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tb">employees</span> <span class="kw">WHERE</span> <span class="cl">dept_id</span> <span class="kw">IS NULL</span>;
+
+<span class="cm">-- COUNT difference: employees table has 4 rows, 1 has NULL dept_id</span>
+<span class="kw">SELECT</span> <span class="fn">COUNT</span>(*)         <span class="cm">-- returns 4  (all rows)</span>
+     , <span class="fn">COUNT</span>(<span class="cl">dept_id</span>)   <span class="cm">-- returns 3  (ignores NULLs)</span>
+<span class="kw">FROM</span> <span class="tb">employees</span>;
+
+<span class="cm">-- Replace NULL with a default</span>
+<span class="kw">SELECT</span> <span class="cl">name</span>, <span class="fn">COALESCE</span>(<span class="cl">dept_id</span>, <span class="nu">0</span>) <span class="kw">AS</span> <span class="cl">dept_id</span>
+<span class="kw">FROM</span>   <span class="tb">employees</span>;</code></pre>
+      </div>
+
+      <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Part 2 · Subqueries</span><div class="dvd-line"></div></div>
+
+      <p class="s-body">A <strong>subquery</strong> is a query nested inside another query. They work but can get hard to read — CTEs (Day 5) are the cleaner alternative. Knowing subqueries helps you understand legacy code and interview questions.</p>
+
+      <div class="cb">
+        <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · Subqueries</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+        <pre><code><span class="cm">-- In WHERE: employees earning above the average</span>
+<span class="kw">SELECT</span> <span class="cl">name</span>, <span class="cl">salary</span>
+<span class="kw">FROM</span>   <span class="tb">employees</span>
+<span class="kw">WHERE</span>  <span class="cl">salary</span> > (<span class="kw">SELECT</span> <span class="fn">AVG</span>(<span class="cl">salary</span>) <span class="kw">FROM</span> <span class="tb">employees</span>);
+
+<span class="cm">-- In FROM: treat result as a temporary table (like a CTE)</span>
+<span class="kw">SELECT</span> <span class="cl">dept</span>, <span class="cl">avg_sal</span>
+<span class="kw">FROM</span> (
+    <span class="kw">SELECT</span> <span class="cl">department</span> <span class="kw">AS</span> <span class="cl">dept</span>, <span class="fn">AVG</span>(<span class="cl">salary</span>) <span class="kw">AS</span> <span class="cl">avg_sal</span>
+    <span class="kw">FROM</span>   <span class="tb">employees</span>
+    <span class="kw">GROUP BY</span> <span class="cl">department</span>
+) <span class="kw">AS</span> <span class="tb">dept_avgs</span>
+<span class="kw">WHERE</span>  <span class="cl">avg_sal</span> > <span class="nu">90000</span>;</code></pre>
+      </div>
+
+      <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Part 3 · Self-Joins</span><div class="dvd-line"></div></div>
+
+      <p class="s-body">A <strong>self-join</strong> joins a table to itself. This sounds strange but is very useful for comparing rows within the same table — classic examples: finding employees who earn more than their manager, or finding pairs of products bought together.</p>
+
+      <div class="tbl-wrap">
+        <table><thead><tr><th>employee_id</th><th>name</th><th>salary</th><th>manager_id</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Alice (CEO)</td><td>200000</td><td class="null-cell">NULL</td></tr>
+          <tr><td>2</td><td>Bob</td><td>120000</td><td>1</td></tr>
+          <tr><td>3</td><td>Carol</td><td>95000</td><td>2</td></tr>
+          <tr><td>4</td><td>Dave</td><td>130000</td><td>2</td></tr>
+        </tbody></table>
+      </div>
+
+      <div class="cb">
+        <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · Self-Join: employees earning more than their manager</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+        <pre><code><span class="cm">-- Alias the same table twice — "e" is the employee, "m" is their manager</span>
+<span class="kw">SELECT</span>
+    <span class="cl">e.name</span>        <span class="kw">AS</span> <span class="cl">employee</span>,
+    <span class="cl">e.salary</span>      <span class="kw">AS</span> <span class="cl">emp_salary</span>,
+    <span class="cl">m.name</span>        <span class="kw">AS</span> <span class="cl">manager</span>,
+    <span class="cl">m.salary</span>      <span class="kw">AS</span> <span class="cl">mgr_salary</span>
+<span class="kw">FROM</span>       <span class="tb">employees</span> <span class="cl">e</span>
+<span class="kw">INNER JOIN</span> <span class="tb">employees</span> <span class="cl">m</span> <span class="kw">ON</span> <span class="cl">e.manager_id</span> = <span class="cl">m.employee_id</span>
+<span class="kw">WHERE</span>      <span class="cl">e.salary</span> > <span class="cl">m.salary</span>;</code></pre>
+      </div>
+
+      <div class="tbl-wrap">
+        <table><thead><tr><th>employee</th><th>emp_salary</th><th>manager</th><th>mgr_salary</th></tr></thead>
+        <tbody>
+          <tr><td class="hl">Dave</td><td class="grn">130000</td><td>Bob</td><td class="red">120000</td></tr>
+        </tbody></table>
+      </div>
+
+      <div class="callout">
+        <p class="callout-lbl">Self-Join Pattern</p>
+        <p>Always give the table <strong>two different aliases</strong> (e.g., <code>e</code> and <code>m</code>). SQL then treats them as if they were two separate tables. The join condition defines the relationship between the two copies.</p>
+      </div>
+
+    </div>
+    </div>
+    <div class="day-right">
+      <div class="practice-wrap">
+        <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Practice</span><div class="dvd-line"></div></div>
+        <div class="practice-prompt"><div><p class="practice-q">Write a query to find employees whose salary is higher than their manager's salary. Return the employee name, their salary, and their manager's salary.</p><p class="practice-hint">Table: employees (employee_id, name, salary, manager_id) — manager_id references employee_id</p></div></div>
+        <div class="practice-cb">
+          <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="clearTa(this)">clear</button><button class="cp-btn" onclick="toggleAns(this)">show answer</button></div></div>
+          <textarea class="practice-ta" placeholder="-- Write your SQL here...&#10;-- Press Tab to indent" spellcheck="false"></textarea>
+        </div>
+        <div class="practice-answer">
+          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Answer</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">SELECT</span>
+    <span class="cl">e.name</span>   <span class="kw">AS</span> <span class="cl">employee</span>,
+    <span class="cl">e.salary</span> <span class="kw">AS</span> <span class="cl">emp_salary</span>,
+    <span class="cl">m.salary</span> <span class="kw">AS</span> <span class="cl">mgr_salary</span>
+<span class="kw">FROM</span>       <span class="tb">employees</span> <span class="cl">e</span>
+<span class="kw">INNER JOIN</span> <span class="tb">employees</span> <span class="cl">m</span> <span class="kw">ON</span> <span class="cl">e.manager_id</span> = <span class="cl">m.employee_id</span>
+<span class="kw">WHERE</span>      <span class="cl">e.salary</span> > <span class="cl">m.salary</span>;</code></pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ DAY 5 — CTEs ════════════════════════════ -->
+<section id="day5">
+  <div class="wrap day-layout">
+    <div class="day-left">
+    <div class="reveal">
+      <p class="s-label">Day 05 · Readable Queries</p>
+      <h2 class="s-title">COMMON TABLE<br><em>EXPRESSIONS</em></h2>
+      <p class="s-body">A CTE is a <strong>named temporary result set</strong> defined at the top of your query. It only exists for the duration of that query. The main benefit: breaking complex logic into readable, named steps instead of deeply nested subqueries.</p>
+
+      <div class="compare">
+        <div class="compare-col">
+          <h5 class="bad">Without CTE — hard to read</h5>
+          <div class="cb" style="margin:8px 0 0">
+            <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span></div>
+            <pre style="padding:14px 18px"><code><span class="kw">SELECT</span> <span class="cl">department</span>
+<span class="kw">FROM</span> (
+  <span class="kw">SELECT</span> <span class="cl">department</span>,
+         <span class="fn">SUM</span>(<span class="cl">salary</span>) <span class="kw">AS</span> <span class="cl">total</span>
+  <span class="kw">FROM</span>   <span class="tb">employees</span>
+  <span class="kw">GROUP BY</span> <span class="cl">department</span>
+) <span class="tb">dept_totals</span>
+<span class="kw">WHERE</span> <span class="cl">total</span> > <span class="nu">200000</span>;</code></pre>
+          </div>
+        </div>
+        <div class="compare-col">
+          <h5 class="good">With CTE — clean and named</h5>
+          <div class="cb" style="margin:8px 0 0">
+            <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span></div>
+            <pre style="padding:14px 18px"><code><span class="kw">WITH</span> <span class="tb">dept_totals</span> <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> <span class="cl">department</span>,
+         <span class="fn">SUM</span>(<span class="cl">salary</span>) <span class="kw">AS</span> <span class="cl">total</span>
+  <span class="kw">FROM</span>   <span class="tb">employees</span>
+  <span class="kw">GROUP BY</span> <span class="cl">department</span>
+)
+<span class="kw">SELECT</span> <span class="cl">department</span>
+<span class="kw">FROM</span>   <span class="tb">dept_totals</span>
+<span class="kw">WHERE</span>  <span class="cl">total</span> > <span class="nu">200000</span>;</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <p class="s-body" style="margin-top:28px">CTEs are essential for window functions. You <strong>cannot filter on a window function result</strong> in the same query — you must wrap it in a CTE first, then filter in the outer query.</p>
+
+      <div class="cb">
+        <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · Why CTEs Enable Window Functions</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+        <pre><code><span class="cm">-- This FAILS — you can't use ROW_NUMBER alias in WHERE of same query</span>
+<span class="kw">SELECT</span> *, <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (...) <span class="kw">AS</span> <span class="cl">rn</span>
+<span class="kw">FROM</span>   <span class="tb">employees</span>
+<span class="kw">WHERE</span>  <span class="cl">rn</span> = <span class="nu">1</span>;          <span class="cm">-- ❌ ERROR: rn doesn't exist yet</span>
+
+<span class="cm">-- This WORKS — CTE saves the result, outer query filters it</span>
+<span class="kw">WITH</span> <span class="tb">ranked</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> *, <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+        <span class="kw">PARTITION BY</span> <span class="cl">department</span>
+        <span class="kw">ORDER BY</span>     <span class="cl">salary</span> <span class="kw">DESC</span>
+    ) <span class="kw">AS</span> <span class="cl">rn</span>
+    <span class="kw">FROM</span> <span class="tb">employees</span>
+)
+<span class="kw">SELECT</span> <span class="cl">name</span>, <span class="cl">department</span>, <span class="cl">salary</span>
+<span class="kw">FROM</span>   <span class="tb">ranked</span>
+<span class="kw">WHERE</span>  <span class="cl">rn</span> = <span class="nu">1</span>;          <span class="cm">-- ✓ top earner per department</span></code></pre>
+      </div>
+
+      <p class="s-body">You can chain multiple CTEs with a comma — each can reference the ones above it:</p>
+
+      <div class="cb">
+        <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · Chained CTEs</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+        <pre><code><span class="kw">WITH</span>
+
+<span class="tb">step_one</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> ... <span class="kw">FROM</span> <span class="tb">raw_table</span>
+),
+
+<span class="tb">step_two</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> ... <span class="kw">FROM</span> <span class="tb">step_one</span>   <span class="cm">-- references the first CTE</span>
+    <span class="kw">WHERE</span>  ...
+)
+
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tb">step_two</span>;</code></pre>
+      </div>
+
+    </div>
+    </div>
+    <div class="day-right">
+      <div class="practice-wrap">
+        <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Practice</span><div class="dvd-line"></div></div>
+        <div class="practice-prompt"><div><p class="practice-q">Rewrite this using a CTE: find departments where total salary exceeds 200,000.</p><p class="practice-hint">Table: employees (employee_id, name, department, salary) — replace the nested subquery with a named CTE</p></div></div>
+        <div class="practice-cb">
+          <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="clearTa(this)">clear</button><button class="cp-btn" onclick="toggleAns(this)">show answer</button></div></div>
+          <textarea class="practice-ta" placeholder="-- Write your SQL here...&#10;-- Press Tab to indent" spellcheck="false"></textarea>
+        </div>
+        <div class="practice-answer">
+          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Answer</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">WITH</span> <span class="tb">dept_totals</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>   <span class="cl">department</span>,
+             <span class="fn">SUM</span>(<span class="cl">salary</span>) <span class="kw">AS</span> <span class="cl">total</span>
+    <span class="kw">FROM</span>     <span class="tb">employees</span>
+    <span class="kw">GROUP BY</span> <span class="cl">department</span>
+)
+<span class="kw">SELECT</span> <span class="cl">department</span>
+<span class="kw">FROM</span>   <span class="tb">dept_totals</span>
+<span class="kw">WHERE</span>  <span class="cl">total</span> > <span class="nu">200000</span>;</code></pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ DAY 6 — WINDOW FUNCTIONS ════════════════════════════ -->
+<section id="day6">
+  <div class="wrap day-layout">
+    <div class="day-left">
+    <div class="reveal">
+      <p class="s-label">Day 06 · Advanced Analytics</p>
+      <h2 class="s-title">WINDOW <em>FUNCTIONS</em></h2>
+      <p class="s-body">Window functions calculate across a set of rows <strong>without collapsing them</strong>. Unlike GROUP BY which gives one row per group, window functions add a new column to every existing row.</p>
+
+      <div class="callout">
+        <p class="callout-lbl">Core Syntax</p>
+        <p><code>function() OVER ( PARTITION BY col ORDER BY col )</code><br>
+        <strong>PARTITION BY</strong> = reset the calculation for each group &nbsp;·&nbsp; <strong>ORDER BY</strong> = define the sequence within each partition.</p>
+      </div>
+
+      <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">ROW_NUMBER vs RANK vs DENSE_RANK</span><div class="dvd-line"></div></div>
+
+      <p class="s-body">All three assign a number to each row within a group. The difference appears when there are <strong>ties</strong> (equal values).</p>
+
+      <div class="rank-compare">
+        <div class="card">
+          <h5>ROW_NUMBER()</h5>
+          <p>Always unique. Ties get arbitrary order. No gaps. Use when you need exactly one row per group.</p>
+        </div>
+        <div class="card">
+          <h5>RANK()</h5>
+          <p>Ties get the same rank. The next rank skips. E.g., two 2nds → next is 4th. Creates gaps.</p>
+        </div>
+        <div class="card">
+          <h5>DENSE_RANK()</h5>
+          <p>Ties get the same rank. The next rank does NOT skip. E.g., two 2nds → next is 3rd. No gaps.</p>
+        </div>
+      </div>
+
+      <p class="s-body">Example — ranking employees by salary within each department:</p>
+
+      <div class="tbl-wrap">
+        <table><thead><tr><th>name</th><th>dept</th><th>salary</th><th>ROW_NUMBER</th><th>RANK</th><th>DENSE_RANK</th></tr></thead>
+        <tbody>
+          <tr><td>Alice</td><td>Eng</td><td class="hl">120000</td><td class="blu">1</td><td class="blu">1</td><td class="blu">1</td></tr>
+          <tr><td>Eve</td><td>Eng</td><td class="hl">110000</td><td class="blu">2</td><td class="blu">2</td><td class="blu">2</td></tr>
+          <tr><td>Bob</td><td>Eng</td><td class="hl">110000</td><td class="blu">3</td><td class="blu">2 (tie)</td><td class="blu">2 (tie)</td></tr>
+          <tr><td>Carol</td><td>Eng</td><td class="hl">80000</td><td class="blu">4</td><td class="red">4 (gap!)</td><td class="grn">3 (no gap)</td></tr>
+          <tr style="border-top:2px solid rgba(232,162,67,0.3)">
+            <td>Dave</td><td>Mktg</td><td class="hl">90000</td><td class="blu">1 ← resets</td><td class="blu">1</td><td class="blu">1</td></tr>
+          <tr><td>Grace</td><td>Mktg</td><td class="hl">72000</td><td class="blu">2</td><td class="blu">2</td><td class="blu">2</td></tr>
+        </tbody></table>
+      </div>
+
+      <div class="cb">
+        <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · All Three Ranking Functions</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+        <pre><code><span class="kw">SELECT</span>
+    <span class="cl">name</span>,
+    <span class="cl">department</span>,
+    <span class="cl">salary</span>,
+    <span class="fn">ROW_NUMBER</span>()  <span class="kw">OVER</span> (<span class="kw">PARTITION BY</span> <span class="cl">department</span> <span class="kw">ORDER BY</span> <span class="cl">salary</span> <span class="kw">DESC</span>) <span class="kw">AS</span> <span class="cl">row_num</span>,
+    <span class="fn">RANK</span>()        <span class="kw">OVER</span> (<span class="kw">PARTITION BY</span> <span class="cl">department</span> <span class="kw">ORDER BY</span> <span class="cl">salary</span> <span class="kw">DESC</span>) <span class="kw">AS</span> <span class="cl">rnk</span>,
+    <span class="fn">DENSE_RANK</span>()  <span class="kw">OVER</span> (<span class="kw">PARTITION BY</span> <span class="cl">department</span> <span class="kw">ORDER BY</span> <span class="cl">salary</span> <span class="kw">DESC</span>) <span class="kw">AS</span> <span class="cl">dense_rnk</span>
+<span class="kw">FROM</span> <span class="tb">employees</span>;</code></pre>
+      </div>
+
+      <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Other Useful Window Functions</span><div class="dvd-line"></div></div>
+
+      <div class="card-grid">
+        <div class="card">
+          <h5>SUM() OVER()</h5>
+          <p>Running total or group total. Add <code>ORDER BY</code> to make it cumulative.</p>
+        </div>
+        <div class="card">
+          <h5>LAG() / LEAD()</h5>
+          <p>Access a value from the previous or next row. Great for "change from last month" patterns.</p>
+        </div>
+        <div class="card">
+          <h5>NTILE(n)</h5>
+          <p>Divide rows into n equal buckets. <code>NTILE(4)</code> creates quartiles.</p>
+        </div>
+        <div class="card">
+          <h5>FIRST_VALUE() / LAST_VALUE()</h5>
+          <p>Get the first or last value in the window. Useful for comparing each row against the group leader.</p>
+        </div>
+      </div>
+
+      <div class="cb">
+        <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · Running Total + LAG Example</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+        <pre><code><span class="cm">-- Running salary total per department (ordered by hire date)</span>
+<span class="kw">SELECT</span>
+    <span class="cl">name</span>, <span class="cl">department</span>, <span class="cl">salary</span>,
+    <span class="fn">SUM</span>(<span class="cl">salary</span>) <span class="kw">OVER</span> (
+        <span class="kw">PARTITION BY</span> <span class="cl">department</span>
+        <span class="kw">ORDER BY</span>     <span class="cl">hire_date</span>
+    ) <span class="kw">AS</span> <span class="cl">running_total</span>
+<span class="kw">FROM</span> <span class="tb">employees</span>;
+
+<span class="cm">-- Salary change vs previous employee hired in same dept</span>
+<span class="kw">SELECT</span>
+    <span class="cl">name</span>, <span class="cl">department</span>, <span class="cl">salary</span>,
+    <span class="fn">LAG</span>(<span class="cl">salary</span>) <span class="kw">OVER</span> (
+        <span class="kw">PARTITION BY</span> <span class="cl">department</span>
+        <span class="kw">ORDER BY</span>     <span class="cl">hire_date</span>
+    ) <span class="kw">AS</span> <span class="cl">prev_salary</span>
+<span class="kw">FROM</span> <span class="tb">employees</span>;</code></pre>
+      </div>
+
+      <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">The "Top N per Group" Pattern — most common interview question</span><div class="dvd-line"></div></div>
+
+      <p class="s-body">"Return the top-earning employee per department" — this pattern appears constantly. The trick: <strong>ROW_NUMBER in a CTE, then filter in the outer query</strong>.</p>
+
+      <div class="cb">
+        <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · Top 1 per Department</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+        <pre><code><span class="kw">WITH</span> <span class="tb">ranked</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>
+        <span class="cl">name</span>, <span class="cl">department</span>, <span class="cl">salary</span>,
+        <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+            <span class="kw">PARTITION BY</span> <span class="cl">department</span>
+            <span class="kw">ORDER BY</span>     <span class="cl">salary</span> <span class="kw">DESC</span>
+        ) <span class="kw">AS</span> <span class="cl">rn</span>
+    <span class="kw">FROM</span> <span class="tb">employees</span>
+)
+<span class="kw">SELECT</span> <span class="cl">name</span>, <span class="cl">department</span>, <span class="cl">salary</span>
+<span class="kw">FROM</span>   <span class="tb">ranked</span>
+<span class="kw">WHERE</span>  <span class="cl">rn</span> = <span class="nu">1</span>;   <span class="cm">-- change to rn <= 3 for "top 3 per group"</span></code></pre>
+      </div>
+
+      <div class="callout">
+        <p class="callout-lbl">ROW_NUMBER vs DENSE_RANK here</p>
+        <p>If ties exist and you want <em>both</em> tied employees at rank 1, use <code>DENSE_RANK() ... WHERE rn &lt;= 1</code>. If you want exactly one row even when tied, use <code>ROW_NUMBER()</code>. The choice depends on the problem statement.</p>
+      </div>
+
+      <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">CASE WHEN — SQL's if/else</span><div class="dvd-line"></div></div>
+
+      <p class="s-body"><code>CASE WHEN</code> evaluates conditions and returns a value. It can appear in SELECT (to label/transform), inside aggregates (to count/sum conditionally), or in ORDER BY.</p>
+
+      <div class="cb">
+        <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · CASE WHEN Patterns</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+        <pre><code><span class="cm">-- 1. Label/categorise rows</span>
+<span class="kw">SELECT</span> <span class="cl">name</span>, <span class="cl">salary</span>,
+    <span class="kw">CASE</span>
+        <span class="kw">WHEN</span> <span class="cl">salary</span> >= <span class="nu">100000</span> <span class="kw">THEN</span> <span class="st">'Senior'</span>
+        <span class="kw">WHEN</span> <span class="cl">salary</span> >= <span class="nu">75000</span>  <span class="kw">THEN</span> <span class="st">'Mid'</span>
+        <span class="kw">ELSE</span>                        <span class="st">'Junior'</span>
+    <span class="kw">END</span> <span class="kw">AS</span> <span class="cl">level</span>
+<span class="kw">FROM</span> <span class="tb">employees</span>;
+
+<span class="cm">-- 2. Conditional count (count only rows that match)</span>
+<span class="kw">SELECT</span>
+    <span class="fn">COUNT</span>(<span class="kw">CASE WHEN</span> <span class="cl">salary</span> >= <span class="nu">100000</span> <span class="kw">THEN</span> <span class="nu">1</span> <span class="kw">END</span>) <span class="kw">AS</span> <span class="cl">senior_count</span>,
+    <span class="fn">COUNT</span>(<span class="kw">CASE WHEN</span> <span class="cl">salary</span>  < <span class="nu">100000</span> <span class="kw">THEN</span> <span class="nu">1</span> <span class="kw">END</span>) <span class="kw">AS</span> <span class="cl">junior_count</span>
+<span class="kw">FROM</span> <span class="tb">employees</span>;</code></pre>
+      </div>
+
+    </div>
+    </div>
+    <div class="day-right">
+      <div class="practice-wrap">
+        <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Practice</span><div class="dvd-line"></div></div>
+        <div class="practice-prompt"><div><p class="practice-q">Write a query to rank employees by salary within each department (highest = rank 1) using DENSE_RANK. Show name, department, salary, and rank.</p><p class="practice-hint">Table: employees (employee_id, name, department, salary) — use DENSE_RANK so ties don't create gaps</p></div></div>
+        <div class="practice-cb">
+          <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="clearTa(this)">clear</button><button class="cp-btn" onclick="toggleAns(this)">show answer</button></div></div>
+          <textarea class="practice-ta" placeholder="-- Write your SQL here...&#10;-- Press Tab to indent" spellcheck="false"></textarea>
+        </div>
+        <div class="practice-answer">
+          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Answer</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">SELECT</span>
+    <span class="cl">name</span>,
+    <span class="cl">department</span>,
+    <span class="cl">salary</span>,
+    <span class="fn">DENSE_RANK</span>() <span class="kw">OVER</span> (
+        <span class="kw">PARTITION BY</span> <span class="cl">department</span>
+        <span class="kw">ORDER BY</span>     <span class="cl">salary</span> <span class="kw">DESC</span>
+    ) <span class="kw">AS</span> <span class="cl">salary_rank</span>
+<span class="kw">FROM</span> <span class="tb">employees</span>;</code></pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ DAY 7 — FULL SOLUTION ════════════════════════════ -->
+<section id="day7">
+  <div class="wrap day-layout">
+    <div class="day-left">
+    <div class="reveal">
+      <p class="s-label">Day 07 · Capstone Problem</p>
+      <h2 class="s-title">THE ODD/EVEN<br><em>SOLUTION</em></h2>
+      <p class="s-body">This problem uses <strong>everything from Days 1–6</strong>. Work through it as a capstone. The table below is our data — within each day, measurements are numbered by time and we need to sum odd-position and even-position values separately.</p>
+
+      <div class="tbl-wrap">
+        <table><thead><tr><th>measurement_id</th><th>measurement_value</th><th>measurement_time</th></tr></thead>
+        <tbody>
+          <tr><td>131233</td><td>1109.51</td><td>07/10/2022 09:00:00</td></tr>
+          <tr><td>135211</td><td>1662.74</td><td>07/10/2022 11:00:00</td></tr>
+          <tr><td>523542</td><td>1246.24</td><td>07/10/2022 13:15:00</td></tr>
+          <tr><td>143562</td><td>1124.50</td><td>07/11/2022 15:00:00</td></tr>
+          <tr><td>346462</td><td>1234.14</td><td>07/11/2022 16:45:00</td></tr>
+        </tbody></table>
+      </div>
+
+      <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Two tools you need — quick review</span><div class="dvd-line"></div></div>
+
+      <p class="s-body"><strong>1. The modulo operator <code>%</code></strong> — gives you the remainder after division. Any number <code>% 2 = 1</code> is odd. Any number <code>% 2 = 0</code> is even.</p>
+
+      <div class="mod-grid">
+        <div class="mod-cell odd"><span class="n">1</span><span class="r">1%2=1</span><span class="tag tag-g">odd</span></div>
+        <div class="mod-cell even"><span class="n">2</span><span class="r">2%2=0</span><span class="tag tag-b">even</span></div>
+        <div class="mod-cell odd"><span class="n">3</span><span class="r">3%2=1</span><span class="tag tag-g">odd</span></div>
+        <div class="mod-cell even"><span class="n">4</span><span class="r">4%2=0</span><span class="tag tag-b">even</span></div>
+        <div class="mod-cell odd"><span class="n">5</span><span class="r">5%2=1</span><span class="tag tag-g">odd</span></div>
+        <div class="mod-cell even"><span class="n">6</span><span class="r">6%2=0</span><span class="tag tag-b">even</span></div>
+      </div>
+
+      <p class="s-body" style="margin-top:24px"><strong>2. CASE WHEN</strong> — SQL's if/else. Use it inside <code>SUM()</code> to add a value only when a condition is true, otherwise contribute 0.</p>
+
+      <div class="cb">
+        <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · CASE WHEN Pattern</span></div>
+        <pre><code><span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> <span class="cl">position</span> % <span class="nu">2</span> = <span class="nu">1</span> <span class="kw">THEN</span> <span class="cl">value</span> <span class="kw">ELSE</span> <span class="nu">0</span> <span class="kw">END</span>) <span class="kw">AS</span> <span class="cl">odd_sum</span>
+<span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> <span class="cl">position</span> % <span class="nu">2</span> = <span class="nu">0</span> <span class="kw">THEN</span> <span class="cl">value</span> <span class="kw">ELSE</span> <span class="nu">0</span> <span class="kw">END</span>) <span class="kw">AS</span> <span class="cl">even_sum</span></code></pre>
+      </div>
+
+      <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Build the solution step by step</span><div class="dvd-line"></div></div>
+
+      <div class="stabs">
+        <div class="stab-row">
+          <button class="stab on" onclick="stab(this,0,'oe')">Step 1: CTE</button>
+          <button class="stab" onclick="stab(this,1,'oe')">Step 2: ROW_NUMBER</button>
+          <button class="stab" onclick="stab(this,2,'oe')">Step 3: GROUP BY</button>
+          <button class="stab" onclick="stab(this,3,'oe')">Step 4: CASE WHEN</button>
+          <button class="stab" onclick="stab(this,4,'oe')">Full Query</button>
+        </div>
+
+        <div class="stab-panel on" id="oe-0">
+          <h4>Open a CTE called <code style="font-size:15px">numbered</code></h4>
+          <p>We need to use ROW_NUMBER() and then filter on its result — which requires a CTE.</p>
+          <div class="cb" style="margin-top:0"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span></div>
+          <pre><code><span class="kw">WITH</span> <span class="tb">numbered</span> <span class="kw">AS</span> (
+
+    <span class="cm">-- Step 2 goes here</span>
+
+)</code></pre></div>
+        </div>
+
+        <div class="stab-panel" id="oe-1">
+          <h4>Add ROW_NUMBER() inside the CTE</h4>
+          <p>Partition by day (strip the time off with <code>DATE()</code>), order by time. Position resets to 1 each day.</p>
+          <div class="cb" style="margin-top:0"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span></div>
+          <pre><code><span class="kw">WITH</span> <span class="tb">numbered</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>
+        <span class="cl">measurement_value</span>,
+        <span class="fn">DATE</span>(<span class="cl">measurement_time</span>) <span class="kw">AS</span> <span class="cl">measurement_day</span>,
+        <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+            <span class="kw">PARTITION BY</span> <span class="fn">DATE</span>(<span class="cl">measurement_time</span>)
+            <span class="kw">ORDER BY</span>     <span class="cl">measurement_time</span>
+        ) <span class="kw">AS</span> <span class="cl">position</span>
+    <span class="kw">FROM</span> <span class="tb">measurements</span>
+)</code></pre></div>
+        </div>
+
+        <div class="stab-panel" id="oe-2">
+          <h4>Outer query: SELECT and GROUP BY day</h4>
+          <p>We want one row per day in the output. <code>GROUP BY measurement_day</code> does that.</p>
+          <div class="cb" style="margin-top:0"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span></div>
+          <pre><code><span class="cm">-- (CTE is above)</span>
+<span class="kw">SELECT</span>
+    <span class="cl">measurement_day</span>,
+    <span class="cm">-- odd_sum and even_sum go here</span>
+<span class="kw">FROM</span>     <span class="tb">numbered</span>
+<span class="kw">GROUP BY</span> <span class="cl">measurement_day</span>
+<span class="kw">ORDER BY</span> <span class="cl">measurement_day</span>;</code></pre></div>
+        </div>
+
+        <div class="stab-panel" id="oe-3">
+          <h4>Add the conditional sums</h4>
+          <p>Use <code>SUM + CASE WHEN + modulo</code> to split odd vs even positions into two columns.</p>
+          <div class="cb" style="margin-top:0"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span></div>
+          <pre><code><span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> <span class="cl">position</span> % <span class="nu">2</span> = <span class="nu">1</span>
+         <span class="kw">THEN</span> <span class="cl">measurement_value</span> <span class="kw">ELSE</span> <span class="nu">0</span>
+    <span class="kw">END</span>) <span class="kw">AS</span> <span class="cl">odd_sum</span>,
+
+<span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> <span class="cl">position</span> % <span class="nu">2</span> = <span class="nu">0</span>
+         <span class="kw">THEN</span> <span class="cl">measurement_value</span> <span class="kw">ELSE</span> <span class="nu">0</span>
+    <span class="kw">END</span>) <span class="kw">AS</span> <span class="cl">even_sum</span></code></pre></div>
+        </div>
+
+        <div class="stab-panel" id="oe-4">
+          <h4>The complete query</h4>
+          <p>All four steps assembled. This is the full solution you'd write in the interview.</p>
+          <div class="cb" style="margin-top:0"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · Full Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">WITH</span> <span class="tb">numbered</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>
+        <span class="cl">measurement_value</span>,
+        <span class="fn">DATE</span>(<span class="cl">measurement_time</span>) <span class="kw">AS</span> <span class="cl">measurement_day</span>,
+        <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+            <span class="kw">PARTITION BY</span> <span class="fn">DATE</span>(<span class="cl">measurement_time</span>)
+            <span class="kw">ORDER BY</span>     <span class="cl">measurement_time</span>
+        ) <span class="kw">AS</span> <span class="cl">position</span>
+    <span class="kw">FROM</span> <span class="tb">measurements</span>
+)
+<span class="kw">SELECT</span>
+    <span class="cl">measurement_day</span>,
+    <span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> <span class="cl">position</span> % <span class="nu">2</span> = <span class="nu">1</span>
+             <span class="kw">THEN</span> <span class="cl">measurement_value</span> <span class="kw">ELSE</span> <span class="nu">0</span>
+        <span class="kw">END</span>) <span class="kw">AS</span> <span class="cl">odd_sum</span>,
+    <span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> <span class="cl">position</span> % <span class="nu">2</span> = <span class="nu">0</span>
+             <span class="kw">THEN</span> <span class="cl">measurement_value</span> <span class="kw">ELSE</span> <span class="nu">0</span>
+        <span class="kw">END</span>) <span class="kw">AS</span> <span class="cl">even_sum</span>
+<span class="kw">FROM</span>     <span class="tb">numbered</span>
+<span class="kw">GROUP BY</span> <span class="cl">measurement_day</span>
+<span class="kw">ORDER BY</span> <span class="cl">measurement_day</span>;</code></pre></div>
+
+          <div class="tbl-wrap" style="margin-top:16px">
+            <table><thead><tr><th>measurement_day</th><th>odd_sum</th><th>even_sum</th></tr></thead>
+            <tbody>
+              <tr><td>07/10/2022</td><td><span class="tag tag-g">2355.75</span></td><td><span class="tag tag-b">1662.74</span></td></tr>
+              <tr><td>07/11/2022</td><td><span class="tag tag-g">1124.50</span></td><td><span class="tag tag-b">1234.14</span></td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reusable Pattern -->
+      <div class="pattern-box reveal">
+        <h4>The Reusable Skeleton</h4>
+        <p class="s-body" style="margin-bottom:18px">Whenever you see <em>"number rows within a group, then aggregate/filter based on that number"</em>, use this template:</p>
+        <div class="cb" style="margin:0"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Template</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+        <pre><code><span class="kw">WITH</span> <span class="tb">ranked</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>
+        *,
+        <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+            <span class="kw">PARTITION BY</span> <span class="cm">[ what defines the group ]</span>
+            <span class="kw">ORDER BY</span>     <span class="cm">[ what defines the order ]</span>
+        ) <span class="kw">AS</span> <span class="cl">rn</span>
+    <span class="kw">FROM</span> <span class="tb">your_table</span>
+)
+<span class="kw">SELECT</span>  ...
+<span class="kw">FROM</span>    <span class="tb">ranked</span>
+<span class="kw">WHERE</span>   <span class="cl">rn</span> = <span class="nu">1</span>     <span class="cm">-- filter by rank (top 1 per group)</span>
+<span class="cm">-- OR --</span>
+<span class="kw">GROUP BY</span> ...        <span class="cm">-- aggregate by rank (odd vs even)</span></code></pre></div>
+      </div>
+
+      <!-- Master checklist -->
+      <div class="reveal">
+        <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">7-Day Mastery Checklist</span><div class="dvd-line"></div></div>
+        <ul class="chk">
+          <li onclick="chk(this)"><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt"><strong>Day 1</strong> — I can write SELECT, WHERE, ORDER BY, LIMIT from memory</span></li>
+          <li onclick="chk(this)"><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt"><strong>Day 2</strong> — I know what INNER / LEFT / RIGHT / FULL OUTER JOIN each return</span></li>
+          <li onclick="chk(this)"><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt"><strong>Day 2</strong> — I can find "missing data" with LEFT JOIN + WHERE right.id IS NULL</span></li>
+          <li onclick="chk(this)"><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt"><strong>Day 3</strong> — I know the difference between WHERE (pre-group) and HAVING (post-group)</span></li>
+          <li onclick="chk(this)"><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt"><strong>Day 4</strong> — I always use IS NULL / IS NOT NULL (never = NULL)</span></li>
+          <li onclick="chk(this)"><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt"><strong>Day 4</strong> — I can write a self-join by aliasing a table twice</span></li>
+          <li onclick="chk(this)"><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt"><strong>Day 5</strong> — I know when a CTE is needed (referencing a window function result)</span></li>
+          <li onclick="chk(this)"><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt"><strong>Day 6</strong> — I can explain the difference between ROW_NUMBER, RANK, and DENSE_RANK</span></li>
+          <li onclick="chk(this)"><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt"><strong>Day 6</strong> — I can write ROW_NUMBER() OVER (PARTITION BY … ORDER BY …) fluently</span></li>
+          <li onclick="chk(this)"><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt"><strong>Day 7</strong> — I can write the complete odd/even solution from a blank page</span></li>
+        </ul>
+      </div>
+    </div>
+    </div>
+    <div class="day-right">
+      <div class="practice-wrap">
+        <div class="practice-prompt"><div><p class="practice-q">Write the complete odd/even measurements solution from memory — no peeking at the solution above.</p><p class="practice-hint">Table: measurements (measurement_id, measurement_value, measurement_time) — output: measurement_day, odd_sum, even_sum</p></div></div>
+        <div class="practice-cb">
+          <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="clearTa(this)">clear</button><button class="cp-btn" onclick="toggleAns(this)">show answer</button></div></div>
+          <textarea class="practice-ta" style="min-height:240px" placeholder="-- Write your SQL here...&#10;-- Press Tab to indent" spellcheck="false"></textarea>
+        </div>
+        <div class="practice-answer">
+          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Answer</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">WITH</span> <span class="tb">numbered</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>
+        <span class="cl">measurement_value</span>,
+        <span class="fn">DATE</span>(<span class="cl">measurement_time</span>) <span class="kw">AS</span> <span class="cl">measurement_day</span>,
+        <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+            <span class="kw">PARTITION BY</span> <span class="fn">DATE</span>(<span class="cl">measurement_time</span>)
+            <span class="kw">ORDER BY</span>     <span class="cl">measurement_time</span>
+        ) <span class="kw">AS</span> <span class="cl">position</span>
+    <span class="kw">FROM</span> <span class="tb">measurements</span>
+)
+<span class="kw">SELECT</span>
+    <span class="cl">measurement_day</span>,
+    <span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> <span class="cl">position</span> % <span class="nu">2</span> = <span class="nu">1</span>
+             <span class="kw">THEN</span> <span class="cl">measurement_value</span> <span class="kw">ELSE</span> <span class="nu">0</span>
+        <span class="kw">END</span>) <span class="kw">AS</span> <span class="cl">odd_sum</span>,
+    <span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> <span class="cl">position</span> % <span class="nu">2</span> = <span class="nu">0</span>
+             <span class="kw">THEN</span> <span class="cl">measurement_value</span> <span class="kw">ELSE</span> <span class="nu">0</span>
+        <span class="kw">END</span>) <span class="kw">AS</span> <span class="cl">even_sum</span>
+<span class="kw">FROM</span>     <span class="tb">numbered</span>
+<span class="kw">GROUP BY</span> <span class="cl">measurement_day</span>
+<span class="kw">ORDER BY</span> <span class="cl">measurement_day</span>;</code></pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ CASE STUDIES ════════════════════════════ -->
+<section id="cases">
+  <div class="wrap">
+  <div class="reveal">
+    <p class="s-label">Case Studies</p>
+    <h2 class="s-title">CASE<br><em>STUDIES</em></h2>
+    <p class="s-body">Real Google SQL interview questions sourced from DataLemur. Pick a problem, write your query in the editor, then reveal the solution and walkthrough.</p>
+  </div>
+
+  <div class="cases-layout reveal">
+
+    <!-- ── Question list ── -->
+    <div class="cases-list">
+      <button class="case-btn on" onclick="selCase(this,'c1')">
+        <span class="case-btn-title">Filter Google Ads</span>
+        <div class="case-btn-meta"><span class="diff easy">Easy</span><span class="ctag">WHERE · AND</span></div>
+      </button>
+      <button class="case-btn" onclick="selCase(this,'c2')">
+        <span class="case-btn-title">Most Popular Search Category</span>
+        <div class="case-btn-meta"><span class="diff easy">Easy</span><span class="ctag">JOIN · GROUP BY</span></div>
+      </button>
+      <button class="case-btn" onclick="selCase(this,'c3')">
+        <span class="case-btn-title">Google Maps Flagged UGC</span>
+        <div class="case-btn-meta"><span class="diff medium">Medium</span><span class="ctag">JOIN · LIMIT</span></div>
+      </button>
+      <button class="case-btn" onclick="selCase(this,'c4')">
+        <span class="case-btn-title">Ad Campaign Performance</span>
+        <div class="case-btn-meta"><span class="diff medium">Medium</span><span class="ctag">GROUP BY · SUM</span></div>
+      </button>
+      <button class="case-btn" onclick="selCase(this,'c5')">
+        <span class="case-btn-title">Ad Click-Through &amp; Conversion</span>
+        <div class="case-btn-meta"><span class="diff medium">Medium</span><span class="ctag">JOIN · Computed</span></div>
+      </button>
+      <button class="case-btn" onclick="selCase(this,'c6')">
+        <span class="case-btn-title">Android In-App Purchases</span>
+        <div class="case-btn-meta"><span class="diff medium">Medium</span><span class="ctag">CTE · ROW_NUMBER</span></div>
+      </button>
+      <button class="case-btn" onclick="selCase(this,'c7')">
+        <span class="case-btn-title">Odd &amp; Even Measurements</span>
+        <div class="case-btn-meta"><span class="diff medium">Medium</span><span class="ctag">CTE · CASE WHEN</span></div>
+      </button>
+      <button class="case-btn" onclick="selCase(this,'c8')">
+        <span class="case-btn-title">Median Search Frequency</span>
+        <div class="case-btn-meta"><span class="diff hard">Hard</span><span class="ctag">PERCENTILE · CTE</span></div>
+      </button>
+    </div>
+
+    <!-- ── Detail panels ── -->
+    <div class="cases-detail">
+
+      <!-- C1: Filter Google Ads -->
+      <div class="case-panel on" id="c1">
+        <div class="case-title-row">
+          <span class="diff easy">Easy</span>
+          <span class="case-h">Filter Google Ads</span>
+        </div>
+        <p class="s-body">Return the <strong>ad_id</strong> and <strong>name</strong> of all ads that are <em>active</em>, have more than <em>500,000 impressions</em>, and were last updated in <em>2024</em>.</p>
+        <div class="tbl-wrap">
+          <table><thead><tr><th colspan="2">ads</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <tbody>
+            <tr><td>ad_id</td><td>integer</td></tr>
+            <tr><td>name</td><td>varchar</td></tr>
+            <tr><td>status</td><td>varchar — 'active', 'paused', 'deleted'</td></tr>
+            <tr><td>impressions</td><td>integer</td></tr>
+            <tr><td>last_updated</td><td>date</td></tr>
+          </tbody></table>
+        </div>
+        <div class="case-approach">
+          <h5>Approach</h5>
+          <ol>
+            <li><strong>SELECT</strong> ad_id, name — only the columns asked for.</li>
+            <li>Filter <strong>status = 'active'</strong> with WHERE.</li>
+            <li>Add <strong>AND impressions &gt; 500000</strong>.</li>
+            <li>Add <strong>AND EXTRACT(YEAR FROM last_updated) = 2024</strong> for the year filter.</li>
+          </ol>
+        </div>
+        <div class="case-ta-head"><span>SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="this.closest('.case-panel').querySelector('.case-ta').value=''">clear</button></div></div>
+        <textarea class="case-ta" placeholder="-- Write your SQL here...&#10;-- Press Tab to indent" spellcheck="false"></textarea>
+        <button class="case-sol-btn" onclick="toggleCaseSol(this)">▶ Show solution</button>
+        <div class="case-sol">
+          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">SELECT</span>  <span class="cl">ad_id</span>, <span class="cl">name</span>, <span class="cl">impressions</span>
+<span class="kw">FROM</span>    <span class="tb">ads</span>
+<span class="kw">WHERE</span>   <span class="cl">status</span> = <span class="st">'active'</span>
+  <span class="kw">AND</span>   <span class="cl">impressions</span> > <span class="nu">500000</span>
+  <span class="kw">AND</span>   <span class="fn">EXTRACT</span>(<span class="kw">YEAR FROM</span> <span class="cl">last_updated</span>) = <span class="nu">2024</span>;</code></pre></div>
+          <div class="callout" style="margin-top:12px">
+            <p class="callout-lbl">Why EXTRACT?</p>
+            <p>You could also write <code>last_updated &gt;= '2024-01-01' AND last_updated &lt; '2025-01-01'</code> — this is actually faster on indexed columns because it avoids wrapping the column in a function. Both are correct for an interview.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- C2: Most Popular Search Category -->
+      <div class="case-panel" id="c2">
+        <div class="case-title-row">
+          <span class="diff easy">Easy</span>
+          <span class="case-h">Most Popular Search Category</span>
+        </div>
+        <p class="s-body">For each month in 2024, count the total searches per category. Return <strong>category_name</strong>, <strong>month</strong>, and <strong>total_searches</strong>, ordered by month then by count descending.</p>
+        <div class="tbl-wrap">
+          <table><thead><tr><th colspan="2">searches</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <tbody>
+            <tr><td>search_id</td><td>integer</td></tr>
+            <tr><td>user_id</td><td>integer</td></tr>
+            <tr><td>search_date</td><td>date</td></tr>
+            <tr><td>category_id</td><td>integer</td></tr>
+          </tbody></table>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th colspan="2">categories</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <tbody>
+            <tr><td>category_id</td><td>integer</td></tr>
+            <tr><td>category_name</td><td>varchar</td></tr>
+          </tbody></table>
+        </div>
+        <div class="case-approach">
+          <h5>Approach</h5>
+          <ol>
+            <li><strong>JOIN</strong> searches to categories on category_id to get the category name.</li>
+            <li>Filter to 2024: <strong>WHERE EXTRACT(YEAR FROM search_date) = 2024</strong>.</li>
+            <li>Use <strong>DATE_TRUNC('month', search_date)</strong> to group by month.</li>
+            <li><strong>GROUP BY</strong> category_name and the truncated month, then <strong>COUNT(*)</strong>.</li>
+            <li><strong>ORDER BY</strong> month ASC, total_searches DESC.</li>
+          </ol>
+        </div>
+        <div class="case-ta-head"><span>SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="this.closest('.case-panel').querySelector('.case-ta').value=''">clear</button></div></div>
+        <textarea class="case-ta" placeholder="-- Write your SQL here..." spellcheck="false"></textarea>
+        <button class="case-sol-btn" onclick="toggleCaseSol(this)">▶ Show solution</button>
+        <div class="case-sol">
+          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">SELECT</span>   <span class="cl">c.category_name</span>,
+         <span class="fn">DATE_TRUNC</span>(<span class="st">'month'</span>, <span class="cl">s.search_date</span>) <span class="kw">AS</span> <span class="cl">month</span>,
+         <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="cl">total_searches</span>
+<span class="kw">FROM</span>     <span class="tb">searches</span>   <span class="cl">s</span>
+<span class="kw">JOIN</span>     <span class="tb">categories</span> <span class="cl">c</span> <span class="kw">ON</span> <span class="cl">s.category_id</span> = <span class="cl">c.category_id</span>
+<span class="kw">WHERE</span>    <span class="fn">EXTRACT</span>(<span class="kw">YEAR FROM</span> <span class="cl">s.search_date</span>) = <span class="nu">2024</span>
+<span class="kw">GROUP BY</span> <span class="cl">c.category_name</span>,
+         <span class="fn">DATE_TRUNC</span>(<span class="st">'month'</span>, <span class="cl">s.search_date</span>)
+<span class="kw">ORDER BY</span> <span class="cl">month</span> <span class="kw">ASC</span>, <span class="cl">total_searches</span> <span class="kw">DESC</span>;</code></pre></div>
+        </div>
+      </div>
+
+      <!-- C3: Google Maps Flagged UGC -->
+      <div class="case-panel" id="c3">
+        <div class="case-title-row">
+          <span class="diff medium">Medium</span>
+          <span class="case-h">Google Maps Flagged UGC</span>
+        </div>
+        <p class="s-body">Find the <strong>single place category</strong> with the highest number of "off-topic" user-generated content reviews. Return the category name and its off-topic count.</p>
+        <div class="tbl-wrap">
+          <table><thead><tr><th colspan="2">maps_ugc_review</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <tbody>
+            <tr><td>review_id</td><td>integer</td></tr>
+            <tr><td>place_id</td><td>integer</td></tr>
+            <tr><td>content_tag</td><td>varchar — e.g. 'off-topic', 'relevant'</td></tr>
+          </tbody></table>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th colspan="2">place_info</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <tbody>
+            <tr><td>place_id</td><td>integer</td></tr>
+            <tr><td>place_category</td><td>varchar — e.g. 'restaurant', 'park'</td></tr>
+          </tbody></table>
+        </div>
+        <div class="case-approach">
+          <h5>Approach</h5>
+          <ol>
+            <li><strong>JOIN</strong> maps_ugc_review to place_info on place_id.</li>
+            <li>Filter: <strong>WHERE content_tag = 'off-topic'</strong>.</li>
+            <li><strong>GROUP BY place_category</strong> and <strong>COUNT(*)</strong>.</li>
+            <li><strong>ORDER BY</strong> count <strong>DESC</strong> then <strong>LIMIT 1</strong> to get the top category.</li>
+          </ol>
+        </div>
+        <div class="case-ta-head"><span>SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="this.closest('.case-panel').querySelector('.case-ta').value=''">clear</button></div></div>
+        <textarea class="case-ta" placeholder="-- Write your SQL here..." spellcheck="false"></textarea>
+        <button class="case-sol-btn" onclick="toggleCaseSol(this)">▶ Show solution</button>
+        <div class="case-sol">
+          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">SELECT</span>   <span class="cl">p.place_category</span>,
+         <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="cl">off_topic_count</span>
+<span class="kw">FROM</span>     <span class="tb">maps_ugc_review</span> <span class="cl">r</span>
+<span class="kw">JOIN</span>     <span class="tb">place_info</span>      <span class="cl">p</span> <span class="kw">ON</span> <span class="cl">r.place_id</span> = <span class="cl">p.place_id</span>
+<span class="kw">WHERE</span>    <span class="cl">r.content_tag</span> = <span class="st">'off-topic'</span>
+<span class="kw">GROUP BY</span> <span class="cl">p.place_category</span>
+<span class="kw">ORDER BY</span> <span class="cl">off_topic_count</span> <span class="kw">DESC</span>
+<span class="kw">LIMIT</span>    <span class="nu">1</span>;</code></pre></div>
+          <div class="callout" style="margin-top:12px">
+            <p class="callout-lbl">LIMIT 1 vs subquery</p>
+            <p>LIMIT 1 is the simplest approach. An alternative is wrapping in a subquery with <code>WHERE off_topic_count = MAX(off_topic_count)</code>, but LIMIT 1 is cleaner and equally valid in an interview.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- C4: Ad Campaign Performance -->
+      <div class="case-panel" id="c4">
+        <div class="case-title-row">
+          <span class="diff medium">Medium</span>
+          <span class="case-h">Ad Campaign Performance</span>
+        </div>
+        <p class="s-body">Calculate the <strong>average cost-per-click (CPC)</strong> for each campaign and ad group combination. CPC = total cost ÷ total clicks. Round to 2 decimal places.</p>
+        <div class="tbl-wrap">
+          <table><thead><tr><th colspan="2">ad_clicks</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <tbody>
+            <tr><td>click_id</td><td>integer</td></tr>
+            <tr><td>date</td><td>date</td></tr>
+            <tr><td>campaign_id</td><td>integer</td></tr>
+            <tr><td>ad_group_id</td><td>integer</td></tr>
+            <tr><td>clicks</td><td>integer</td></tr>
+            <tr><td>cost</td><td>decimal</td></tr>
+          </tbody></table>
+        </div>
+        <div class="case-approach">
+          <h5>Approach</h5>
+          <ol>
+            <li><strong>GROUP BY campaign_id, ad_group_id</strong> — two-column grouping.</li>
+            <li>CPC = <strong>SUM(cost) / SUM(clicks)</strong> — aggregate both before dividing.</li>
+            <li>Wrap in <strong>NULLIF(SUM(clicks), 0)</strong> to avoid division-by-zero errors.</li>
+            <li><strong>ROUND(..., 2)</strong> for 2 decimal places.</li>
+          </ol>
+        </div>
+        <div class="case-ta-head"><span>SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="this.closest('.case-panel').querySelector('.case-ta').value=''">clear</button></div></div>
+        <textarea class="case-ta" placeholder="-- Write your SQL here..." spellcheck="false"></textarea>
+        <button class="case-sol-btn" onclick="toggleCaseSol(this)">▶ Show solution</button>
+        <div class="case-sol">
+          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">SELECT</span>   <span class="cl">campaign_id</span>,
+         <span class="cl">ad_group_id</span>,
+         <span class="fn">ROUND</span>(
+             <span class="fn">SUM</span>(<span class="cl">cost</span>) / <span class="fn">NULLIF</span>(<span class="fn">SUM</span>(<span class="cl">clicks</span>), <span class="nu">0</span>),
+         <span class="nu">2</span>) <span class="kw">AS</span> <span class="cl">avg_cpc</span>
+<span class="kw">FROM</span>     <span class="tb">ad_clicks</span>
+<span class="kw">GROUP BY</span> <span class="cl">campaign_id</span>, <span class="cl">ad_group_id</span>
+<span class="kw">ORDER BY</span> <span class="cl">campaign_id</span>, <span class="cl">ad_group_id</span>;</code></pre></div>
+          <div class="callout" style="margin-top:12px">
+            <p class="callout-lbl">Why SUM(cost) / SUM(clicks), not AVG(cost/clicks)?</p>
+            <p>Dividing aggregates — <code>SUM(cost)/SUM(clicks)</code> — gives the true weighted average CPC across the group. <code>AVG(cost/clicks)</code> would average the per-row ratios, which is mathematically different and usually wrong.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- C5: Ad Click-Through & Conversion Rates -->
+      <div class="case-panel" id="c5">
+        <div class="case-title-row">
+          <span class="diff medium">Medium</span>
+          <span class="case-h">Ad Click-Through &amp; Conversion Rates</span>
+        </div>
+        <p class="s-body">For each ad, calculate total <strong>clicks</strong>, total <strong>conversions</strong>, <strong>click-through rate</strong> (clicks ÷ impressions × 100), and <strong>conversion rate</strong> (conversions ÷ clicks × 100). Round rates to 2 decimal places.</p>
+        <div class="tbl-wrap">
+          <table><thead><tr><th colspan="2">ad_performance</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <tbody>
+            <tr><td>ad_id</td><td>integer</td></tr>
+            <tr><td>impressions</td><td>integer</td></tr>
+            <tr><td>clicks</td><td>integer</td></tr>
+            <tr><td>conversions</td><td>integer</td></tr>
+          </tbody></table>
+        </div>
+        <div class="case-approach">
+          <h5>Approach</h5>
+          <ol>
+            <li><strong>SELECT ad_id</strong>, clicks, and conversions directly.</li>
+            <li>CTR = <strong>clicks * 100.0 / NULLIF(impressions, 0)</strong> — multiply by 100.0 (not 100) to force decimal division.</li>
+            <li>Conversion rate = <strong>conversions * 100.0 / NULLIF(clicks, 0)</strong>.</li>
+            <li>Wrap both in <strong>ROUND(..., 2)</strong>.</li>
+          </ol>
+        </div>
+        <div class="case-ta-head"><span>SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="this.closest('.case-panel').querySelector('.case-ta').value=''">clear</button></div></div>
+        <textarea class="case-ta" placeholder="-- Write your SQL here..." spellcheck="false"></textarea>
+        <button class="case-sol-btn" onclick="toggleCaseSol(this)">▶ Show solution</button>
+        <div class="case-sol">
+          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">SELECT</span>
+    <span class="cl">ad_id</span>,
+    <span class="cl">clicks</span>,
+    <span class="cl">conversions</span>,
+    <span class="fn">ROUND</span>(<span class="cl">clicks</span> * <span class="nu">100.0</span> / <span class="fn">NULLIF</span>(<span class="cl">impressions</span>, <span class="nu">0</span>), <span class="nu">2</span>) <span class="kw">AS</span> <span class="cl">ctr</span>,
+    <span class="fn">ROUND</span>(<span class="cl">conversions</span> * <span class="nu">100.0</span> / <span class="fn">NULLIF</span>(<span class="cl">clicks</span>, <span class="nu">0</span>),      <span class="nu">2</span>) <span class="kw">AS</span> <span class="cl">conversion_rate</span>
+<span class="kw">FROM</span>  <span class="tb">ad_performance</span>;</code></pre></div>
+          <div class="callout" style="margin-top:12px">
+            <p class="callout-lbl">Integer division trap</p>
+            <p><code>clicks / impressions</code> in SQL returns <strong>0</strong> when both are integers and clicks &lt; impressions. Always multiply by <code>100.0</code> (float) first, or cast: <code>clicks::numeric / impressions</code>.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- C6: Android In-App Purchases -->
+      <div class="case-panel" id="c6">
+        <div class="case-title-row">
+          <span class="diff medium">Medium</span>
+          <span class="case-h">Android In-App Purchases</span>
+        </div>
+        <p class="s-body">For each customer, return their <strong>most recent purchase</strong> details — customer_id, first_name, last_name, product, and purchase_date.</p>
+        <div class="tbl-wrap">
+          <table><thead><tr><th colspan="2">customers</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <tbody>
+            <tr><td>customer_id</td><td>integer</td></tr>
+            <tr><td>first_name</td><td>varchar</td></tr>
+            <tr><td>last_name</td><td>varchar</td></tr>
+          </tbody></table>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th colspan="2">playstore_purchases</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <tbody>
+            <tr><td>purchase_id</td><td>integer</td></tr>
+            <tr><td>customer_id</td><td>integer</td></tr>
+            <tr><td>product</td><td>varchar</td></tr>
+            <tr><td>purchase_date</td><td>date</td></tr>
+          </tbody></table>
+        </div>
+        <div class="case-approach">
+          <h5>Approach — "Top N per group" pattern (Day 6)</h5>
+          <ol>
+            <li>Open a <strong>CTE</strong>. Inside it, use <strong>ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY purchase_date DESC)</strong> to rank each customer's purchases newest-first.</li>
+            <li>In the outer query, <strong>filter WHERE rn = 1</strong> to keep only the most recent purchase per customer.</li>
+            <li><strong>JOIN</strong> back to customers to get first_name and last_name.</li>
+          </ol>
+        </div>
+        <div class="case-ta-head"><span>SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="this.closest('.case-panel').querySelector('.case-ta').value=''">clear</button></div></div>
+        <textarea class="case-ta" style="min-height:180px" placeholder="-- Write your SQL here..." spellcheck="false"></textarea>
+        <button class="case-sol-btn" onclick="toggleCaseSol(this)">▶ Show solution</button>
+        <div class="case-sol">
+          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">WITH</span> <span class="tb">latest</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>
+        <span class="cl">customer_id</span>,
+        <span class="cl">product</span>,
+        <span class="cl">purchase_date</span>,
+        <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+            <span class="kw">PARTITION BY</span> <span class="cl">customer_id</span>
+            <span class="kw">ORDER BY</span>     <span class="cl">purchase_date</span> <span class="kw">DESC</span>
+        ) <span class="kw">AS</span> <span class="cl">rn</span>
+    <span class="kw">FROM</span>  <span class="tb">playstore_purchases</span>
+)
+<span class="kw">SELECT</span>
+    <span class="cl">c.customer_id</span>,
+    <span class="cl">c.first_name</span>,
+    <span class="cl">c.last_name</span>,
+    <span class="cl">l.product</span>,
+    <span class="cl">l.purchase_date</span>
+<span class="kw">FROM</span>     <span class="tb">customers</span> <span class="cl">c</span>
+<span class="kw">JOIN</span>     <span class="tb">latest</span>    <span class="cl">l</span> <span class="kw">ON</span> <span class="cl">c.customer_id</span> = <span class="cl">l.customer_id</span>
+<span class="kw">WHERE</span>    <span class="cl">l.rn</span> = <span class="nu">1</span>;</code></pre></div>
+        </div>
+      </div>
+
+      <!-- C7: Odd & Even Measurements -->
+      <div class="case-panel" id="c7">
+        <div class="case-title-row">
+          <span class="diff medium">Medium</span>
+          <span class="case-h">Odd &amp; Even Measurements</span>
+        </div>
+        <p class="s-body">The capstone problem from <strong>Day 7</strong>. Within each day, measurements arrive in time order. Sum the values at <em>odd positions</em> (1st, 3rd, 5th…) and <em>even positions</em> (2nd, 4th, 6th…) separately. Output one row per day with measurement_day, odd_sum, even_sum.</p>
+        <div class="tbl-wrap">
+          <table><thead><tr><th colspan="2">measurements</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <tbody>
+            <tr><td>measurement_id</td><td>integer</td></tr>
+            <tr><td>measurement_value</td><td>decimal</td></tr>
+            <tr><td>measurement_time</td><td>timestamp</td></tr>
+          </tbody></table>
+        </div>
+        <div class="case-approach">
+          <h5>Approach — three tools combined</h5>
+          <ol>
+            <li><strong>CTE:</strong> use <code>ROW_NUMBER() OVER (PARTITION BY DATE(measurement_time) ORDER BY measurement_time)</code> to number each measurement within its day.</li>
+            <li><strong>Outer query:</strong> GROUP BY measurement_day.</li>
+            <li><strong>CASE WHEN + modulo:</strong> <code>SUM(CASE WHEN position % 2 = 1 THEN value ELSE 0 END)</code> for odd_sum, same with <code>= 0</code> for even_sum.</li>
+          </ol>
+        </div>
+        <div class="case-ta-head"><span>SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="this.closest('.case-panel').querySelector('.case-ta').value=''">clear</button></div></div>
+        <textarea class="case-ta" style="min-height:200px" placeholder="-- Write the full solution from memory..." spellcheck="false"></textarea>
+        <button class="case-sol-btn" onclick="toggleCaseSol(this)">▶ Show solution</button>
+        <div class="case-sol">
+          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">WITH</span> <span class="tb">numbered</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>
+        <span class="cl">measurement_value</span>,
+        <span class="fn">DATE</span>(<span class="cl">measurement_time</span>) <span class="kw">AS</span> <span class="cl">measurement_day</span>,
+        <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+            <span class="kw">PARTITION BY</span> <span class="fn">DATE</span>(<span class="cl">measurement_time</span>)
+            <span class="kw">ORDER BY</span>     <span class="cl">measurement_time</span>
+        ) <span class="kw">AS</span> <span class="cl">position</span>
+    <span class="kw">FROM</span> <span class="tb">measurements</span>
+)
+<span class="kw">SELECT</span>
+    <span class="cl">measurement_day</span>,
+    <span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> <span class="cl">position</span> % <span class="nu">2</span> = <span class="nu">1</span>
+             <span class="kw">THEN</span> <span class="cl">measurement_value</span> <span class="kw">ELSE</span> <span class="nu">0</span>
+        <span class="kw">END</span>) <span class="kw">AS</span> <span class="cl">odd_sum</span>,
+    <span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> <span class="cl">position</span> % <span class="nu">2</span> = <span class="nu">0</span>
+             <span class="kw">THEN</span> <span class="cl">measurement_value</span> <span class="kw">ELSE</span> <span class="nu">0</span>
+        <span class="kw">END</span>) <span class="kw">AS</span> <span class="cl">even_sum</span>
+<span class="kw">FROM</span>     <span class="tb">numbered</span>
+<span class="kw">GROUP BY</span> <span class="cl">measurement_day</span>
+<span class="kw">ORDER BY</span> <span class="cl">measurement_day</span>;</code></pre></div>
+        </div>
+      </div>
+
+      <!-- C8: Median Search Frequency -->
+      <div class="case-panel" id="c8">
+        <div class="case-title-row">
+          <span class="diff hard">Hard</span>
+          <span class="case-h">Median Google Search Frequency</span>
+        </div>
+        <p class="s-body">Calculate the <strong>median number of searches per user</strong>, rounded to 1 decimal place. The tricky part: the table is pre-aggregated — each row represents many users with the same search count.</p>
+        <div class="tbl-wrap">
+          <table><thead><tr><th colspan="2">search_frequency</th></tr><tr><th>column</th><th>type / meaning</th></tr></thead>
+          <tbody>
+            <tr><td>searches</td><td>integer — number of searches per session</td></tr>
+            <tr><td>num_users</td><td>integer — how many users had this many searches</td></tr>
+          </tbody></table>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th>searches</th><th>num_users</th><th>meaning</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>2</td><td>2 users searched exactly once</td></tr>
+            <tr><td>2</td><td>3</td><td>3 users searched exactly twice</td></tr>
+            <tr><td>3</td><td>1</td><td>1 user searched 3 times</td></tr>
+          </tbody></table>
+        </div>
+        <div class="case-approach">
+          <h5>Approach</h5>
+          <ol>
+            <li>The data is <strong>aggregated</strong> — you need to "expand" it. Row (searches=2, num_users=3) represents 3 individual data points each equal to 2.</li>
+            <li>Use <strong>CROSS JOIN GENERATE_SERIES(1, num_users)</strong> to repeat each row the correct number of times, creating one row per user.</li>
+            <li>Then apply <strong>PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY searches)</strong> — this is the SQL median function.</li>
+            <li>Cast to numeric and <strong>ROUND(..., 1)</strong>.</li>
+          </ol>
+        </div>
+        <div class="callout">
+          <p class="callout-lbl">New functions here</p>
+          <p><code>GENERATE_SERIES(1, n)</code> generates n rows (PostgreSQL). <code>PERCENTILE_CONT(0.5)</code> returns the exact median interpolating between values. This is a Hard problem because it requires knowing these less-common functions.</p>
+        </div>
+        <div class="case-ta-head"><span>SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="this.closest('.case-panel').querySelector('.case-ta').value=''">clear</button></div></div>
+        <textarea class="case-ta" style="min-height:160px" placeholder="-- Write your SQL here..." spellcheck="false"></textarea>
+        <button class="case-sol-btn" onclick="toggleCaseSol(this)">▶ Show solution</button>
+        <div class="case-sol">
+          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">WITH</span> <span class="tb">expanded</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>   <span class="cl">searches</span>
+    <span class="kw">FROM</span>     <span class="tb">search_frequency</span>
+    <span class="kw">CROSS JOIN</span> <span class="fn">GENERATE_SERIES</span>(<span class="nu">1</span>, <span class="cl">num_users</span>)  <span class="cm">-- one row per user</span>
+)
+<span class="kw">SELECT</span>
+    <span class="fn">ROUND</span>(
+        <span class="fn">PERCENTILE_CONT</span>(<span class="nu">0.5</span>) <span class="kw">WITHIN GROUP</span> (<span class="kw">ORDER BY</span> <span class="cl">searches</span>)::<span class="cl">numeric</span>,
+    <span class="nu">1</span>) <span class="kw">AS</span> <span class="cl">median</span>
+<span class="kw">FROM</span>  <span class="tb">expanded</span>;</code></pre></div>
+          <div class="callout" style="margin-top:12px">
+            <p class="callout-lbl">If GENERATE_SERIES isn't available</p>
+            <p>In MySQL or older systems, you can use a numbers table or write a manual median with <code>ROW_NUMBER()</code> — count total rows, find the middle position(s), then average them. That approach is more complex but demonstrates the same logical thinking.</p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- .cases-detail -->
+  </div><!-- .cases-layout -->
+  </div><!-- .wrap -->
+</section>
+
+
+
+<script>
+  // ── Sidebar toggle ──
+  const sidebar   = document.getElementById('sidebar');
+  const backdrop  = document.getElementById('sb-backdrop');
+  let sbOpen = false;
+
+  function toggleSb() {
+    sbOpen = !sbOpen;
+    sidebar.classList.toggle('open', sbOpen);
+    backdrop.classList.toggle('show', sbOpen && window.innerWidth < 900);
+  }
+
+  // Close sidebar on mobile when navigating
+  document.querySelectorAll('.sb-item').forEach(a => {
+    a.addEventListener('click', () => { if (window.innerWidth < 900) { sbOpen = false; sidebar.classList.remove('open'); backdrop.classList.remove('show'); } });
+  });
+
+  // ── Highlight active section in sidebar ──
+  const sections = document.querySelectorAll('section[id]');
+  const ioSb = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        document.querySelectorAll('.sb-item').forEach(a => a.classList.remove('active'));
+        const link = document.querySelector(`.sb-item[data-day="${e.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin:'-40% 0px -55% 0px' });
+  sections.forEach(s => ioSb.observe(s));
+
+  // ── Progress tracking ──
+  // Map checklist items to days by their "Day N" text
+  const dayMap = { 'Day 1':['day1'], 'Day 2':['day2'], 'Day 3':['day3'], 'Day 4':['day4'], 'Day 5':['day5'], 'Day 6':['day6'], 'Day 7':['day7'] };
+  // Count items per day
+  const dayItemCount = {};
+  const dayDoneCount = {};
+
+  function initProgress() {
+    document.querySelectorAll('.chk li').forEach(li => {
+      const strong = li.querySelector('strong');
+      if (!strong) return;
+      const day = strong.textContent.trim(); // "Day 1" etc
+      dayItemCount[day] = (dayItemCount[day] || 0) + 1;
+      dayDoneCount[day] = 0;
+    });
+  }
+
+  function updateProgress() {
+    // Reset counts
+    Object.keys(dayDoneCount).forEach(k => dayDoneCount[k] = 0);
+    let totalDone = 0, totalAll = 0;
+
+    document.querySelectorAll('.chk li').forEach(li => {
+      const strong = li.querySelector('strong');
+      if (!strong) return;
+      const day = strong.textContent.trim();
+      totalAll++;
+      if (li.classList.contains('done')) { dayDoneCount[day]++; totalDone++; }
+    });
+
+    // Update sidebar dots
+    Object.entries(dayMap).forEach(([dayLabel, [sectionId]]) => {
+      const dot = document.getElementById(`dot-${sectionId}`);
+      if (!dot) return;
+      const total = dayItemCount[dayLabel] || 0;
+      const done  = dayDoneCount[dayLabel] || 0;
+      dot.classList.toggle('done', total > 0 && done === total);
+    });
+
+    // Update overall bar
+    document.getElementById('sb-count').textContent = `${totalDone} / ${totalAll} complete`;
+    document.getElementById('sb-overall-fill').style.width = totalAll ? (totalDone / totalAll * 100) + '%' : '0%';
+  }
+
+  initProgress();
+
+  // ── Progress bar (scroll) ──
+  window.addEventListener('scroll', () => {
+    const d = document.documentElement;
+    document.getElementById('prog-bar').style.width = (d.scrollTop / (d.scrollHeight - d.clientHeight) * 100) + '%';
+  });
+
+  // ── Scroll reveal ──
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); obs.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  // ── Tab switcher ──
+  function stab(btn, idx, ns) {
+    btn.closest('.stab-row').querySelectorAll('.stab').forEach((t, i) => t.classList.toggle('on', i === idx));
+    document.querySelectorAll(`[id^="${ns}-"]`).forEach((p, i) => p.classList.toggle('on', i === idx));
+  }
+
+  // ── Checklist toggle ──
+  function chk(el) { el.classList.toggle('done'); updateProgress(); }
+
+  // ── Practice block helpers ──
+  function toggleAns(btn) {
+    const wrap = btn.closest('.practice-wrap');
+    const ans  = wrap.querySelector('.practice-answer');
+    const show = ans.classList.toggle('show');
+    btn.textContent = show ? 'hide answer' : 'show answer';
+  }
+  function clearTa(btn) {
+    btn.closest('.practice-wrap').querySelector('.practice-ta').value = '';
+  }
+  // ── Case study helpers ──
+  function selCase(btn, id) {
+    const container = btn.closest('.cases-layout');
+    container.querySelectorAll('.case-btn').forEach(b => b.classList.remove('on'));
+    container.querySelectorAll('.case-panel').forEach(p => p.classList.remove('on'));
+    btn.classList.add('on');
+    document.getElementById(id).classList.add('on');
+  }
+  function toggleCaseSol(btn) {
+    const sol = btn.nextElementSibling;
+    const show = sol.classList.toggle('show');
+    btn.textContent = show ? '▼ Hide solution' : '▶ Show solution';
+  }
+
+  // Tab → 4 spaces in practice textareas
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Tab' && (e.target.classList.contains('practice-ta') || e.target.classList.contains('case-ta'))) {
+      e.preventDefault();
+      const ta = e.target, s = ta.selectionStart, end = ta.selectionEnd;
+      ta.value = ta.value.substring(0, s) + '    ' + ta.value.substring(end);
+      ta.selectionStart = ta.selectionEnd = s + 4;
+    }
+  });
+
+  // ── Hint data per day ──
+  const practiceHints = {
+    'practice-day1': [
+      'Start with SELECT name, salary — list exactly the columns you need.',
+      "Add WHERE department = 'Engineering' to filter rows, then ORDER BY salary DESC to sort highest first."
+    ],
+    'practice-day2': [
+      'Use LEFT JOIN to keep all employees even when they have no matching department row.',
+      'After the LEFT JOIN, add WHERE d.dept_id IS NULL — this catches employees with no match on the right side.'
+    ],
+    'practice-day3': [
+      'SELECT department, COUNT(*) AS headcount, AVG(salary) AS avg_salary — then GROUP BY department.',
+      "Use HAVING AVG(salary) > 90000 after GROUP BY — not WHERE, because you're filtering an aggregate result."
+    ],
+    'practice-day4': [
+      'JOIN employees to itself: FROM employees e INNER JOIN employees m ON e.manager_id = m.employee_id.',
+      'Then filter: WHERE e.salary > m.salary keeps only employees earning more than their manager.'
+    ],
+    'practice-day5': [
+      'Open with: WITH dept_totals AS ( SELECT department, SUM(salary) AS total FROM employees GROUP BY department )',
+      'Then query the CTE below it: SELECT department FROM dept_totals WHERE total > 200000'
+    ],
+    'practice-day6': [
+      'Use DENSE_RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS salary_rank in your SELECT.',
+      'Include name, department, salary alongside the rank — no subquery needed, it ranks every row directly.'
+    ],
+    'practice-day7': [
+      'CTE first: ROW_NUMBER() OVER (PARTITION BY DATE(measurement_time) ORDER BY measurement_time) AS position.',
+      'Main query: SUM(CASE WHEN position % 2 = 1 THEN measurement_value ELSE 0 END) AS odd_sum, same for even. GROUP BY measurement_day.'
+    ]
+  };
+
+  const practiceAttempts = {};
+
+  function checkQuery(btn) {
+    const wrap    = btn.closest('.practice-wrap');
+    const id      = wrap.id;
+    const ta      = wrap.querySelector('.practice-ta');
+    const status  = wrap.querySelector('.practice-status');
+    const hintBox = wrap.querySelector('.hint-box');
+
+    if (!ta.value.trim()) {
+      status.textContent = 'Write something first — even a rough attempt helps!';
+      status.className = 'practice-status show neutral';
+      return;
+    }
+
+    practiceAttempts[id] = (practiceAttempts[id] || 0) + 1;
+    const n = practiceAttempts[id];
+    const hints = practiceHints[id] || [];
+
+    if (n === 3 && hints[0]) {
+      hintBox.innerHTML = `<div class="hint-label">Hint 1 of ${hints.length}</div><div class="hint-item">${hints[0]}</div>`;
+      hintBox.classList.add('show');
+      status.textContent = `Attempt ${n} — first hint unlocked below.`;
+      status.className = 'practice-status show neutral';
+    } else if (n === 5 && hints[1]) {
+      if (!hintBox.querySelector('.hint-item:nth-child(2), .hint-item ~ .hint-item')) {
+        const h2 = document.createElement('div');
+        h2.className = 'hint-item';
+        h2.textContent = hints[1];
+        hintBox.appendChild(h2);
+      }
+      hintBox.classList.add('show');
+      status.textContent = `Attempt ${n} — second hint unlocked.`;
+      status.className = 'practice-status show neutral';
+    } else if (n >= 7) {
+      status.innerHTML = `Attempt ${n} — you've really tried! `;
+      const rb = document.createElement('button');
+      rb.className = 'cp-btn';
+      rb.textContent = 'reveal answer';
+      rb.style.cssText = 'margin-left:6px;color:var(--green);border-color:rgba(111,207,151,0.4)';
+      rb.onclick = function(){ toggleAns(this); };
+      status.appendChild(rb);
+      status.className = 'practice-status show neutral';
+    } else {
+      const nudges = [
+        'Good start — keep going.',
+        "Getting there. Re-read the example above if stuck.",
+        null, // hint unlocked — handled above
+        'Check clause order: SELECT → FROM → WHERE/JOIN → GROUP BY → HAVING.',
+        null, // hint 2 — handled above
+        "Almost — check for typos and that column names match the table schema.",
+        "You're close. A fresh read of the hint might spark the last piece."
+      ];
+      const msg = nudges[n - 1] || `Attempt ${n} — keep at it!`;
+      if (msg) {
+        status.textContent = `Attempt ${n} — ${msg}`;
+        status.className = 'practice-status show neutral';
+      }
+    }
+  }
+
+  // ── Init: wrap day-right content, inject ids + Check buttons + status/hint divs ──
+  document.querySelectorAll('.day-right').forEach(dr => {
+    const inner = document.createElement('div');
+    inner.className = 'day-right-inner';
+    while (dr.firstChild) inner.appendChild(dr.firstChild);
+    dr.appendChild(inner);
+  });
+
+  document.querySelectorAll('.practice-wrap').forEach(wrap => {
+    const section = wrap.closest('section');
+    if (section) wrap.id = 'practice-' + section.id;
+
+    // Add Check button before clear button
+    const btnRow = wrap.querySelector('.cb-head div[style]');
+    if (btnRow) {
+      const cb = document.createElement('button');
+      cb.className = 'check-btn';
+      cb.textContent = 'Check';
+      cb.onclick = function(){ checkQuery(this); };
+      btnRow.insertBefore(cb, btnRow.firstChild);
+    }
+
+    // Inject status + hint-box after the practice-cb div
+    const practCb = wrap.querySelector('.practice-cb');
+    if (practCb) {
+      const status = document.createElement('div');
+      status.className = 'practice-status';
+      const hintBox = document.createElement('div');
+      hintBox.className = 'hint-box';
+      practCb.after(status);
+      status.after(hintBox);
+    }
+  });
+
+  // ── Day 3: context strip — updates as you scroll through concepts ──
+  const d3wrap = document.getElementById('practice-day3');
+  if (d3wrap) {
+    const ctxDiv = document.createElement('div');
+    ctxDiv.className = 'practice-context';
+    ctxDiv.textContent = 'Scroll through the concepts on the left...';
+    d3wrap.prepend(ctxDiv);
+
+    const d3items = [
+      { sel: '#day3 .card-grid', msg: '↑ Which aggregate functions will your query need?' },
+      { sel: '#day3 .compare',   msg: '↑ Seen WHERE vs HAVING? Your filter belongs in one of those.' },
+      { sel: '#day3 .callout',   msg: "↑ Rule above: aggregate result → HAVING, row value → WHERE." }
+    ];
+    const ctxObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const info = d3items.find(i => document.querySelector(i.sel) === e.target);
+        if (info) {
+          ctxDiv.textContent = info.msg;
+          ctxDiv.classList.add('lit');
+          setTimeout(() => ctxDiv.classList.remove('lit'), 2200);
+        }
+      });
+    }, { threshold: 0.5 });
+    d3items.forEach(({ sel }) => { const el = document.querySelector(sel); if (el) ctxObs.observe(el); });
+  }
+
+  // ── Floating draggable practice panel ──
+  const floatPanel = document.createElement('div');
+  floatPanel.id = 'float-panel';
+  floatPanel.innerHTML = `
+    <div id="float-handle">
+      <span id="float-grip">
+        <svg width="12" height="9" viewBox="0 0 12 9" fill="currentColor">
+          <rect y="0"   width="12" height="1.5" rx="0.75"/>
+          <rect y="3.5" width="12" height="1.5" rx="0.75"/>
+          <rect y="7"   width="12" height="1.5" rx="0.75"/>
+        </svg>
+      </span>
+      <span id="float-day-label" style="flex:1;font-size:11px;color:var(--text2);letter-spacing:0.04em;text-transform:uppercase;">Day 1 · Practice</span>
+      <button id="float-min-btn" title="Minimize">—</button>
+    </div>
+    <div id="float-tabs">
+      <button class="float-tab on" id="ftab-practice">Practice</button>
+      <button class="float-tab"    id="ftab-ref">Cheat Sheet</button>
+    </div>
+    <div id="float-body"></div>
+    <div id="float-ref-body">
+      <div class="fref-tabs">
+        <button class="fref-tab on" onclick="selFref(this,'fref-dates')">Dates</button>
+        <button class="fref-tab"    onclick="selFref(this,'fref-strings')">Strings</button>
+        <button class="fref-tab"    onclick="selFref(this,'fref-patterns')">Patterns</button>
+      </div>
+      <!-- Dates -->
+      <div class="fref-panel on" id="fref-dates">
+        <div class="fref-fn"><h5>DATE_TRUNC(unit, col)</h5><p>Truncate to month/week/day/hour. Group events by month: <code>DATE_TRUNC('month', created_at)</code>.</p></div>
+        <div class="fref-fn"><h5>EXTRACT / DATE_PART</h5><p>Pull one component: <code>EXTRACT(YEAR FROM date_col)</code>. Works for month, day, hour.</p></div>
+        <div class="fref-fn"><h5>DATEDIFF / DATE_DIFF</h5><p>Days between dates. MySQL: <code>DATEDIFF(end,start)</code>. PG: <code>end - start</code> → interval.</p></div>
+        <div class="fref-fn"><h5>CURRENT_DATE / NOW()</h5><p><code>CURRENT_DATE</code> = today. <code>NOW()</code> = timestamp. Use for "days since X" or filtering recent rows.</p></div>
+        <div class="fref-fn"><h5>DATE_ADD / INTERVAL</h5><p>PG: <code>created_at + INTERVAL '7 days'</code>. MySQL: <code>DATE_ADD(col, INTERVAL 7 DAY)</code>.</p></div>
+        <div class="fref-fn"><h5>DATE(timestamp)</h5><p>Strips time, returns date only. <code>DATE(measurement_time)</code>.</p></div>
+        <div class="fref-pat-lbl" style="margin-top:12px">Examples</div>
+        <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Date Examples</span><button class="cp-btn" onclick="cp(this)">copy</button></div><pre><code><span class="cm">-- Events per month</span>
+<span class="kw">SELECT</span>   <span class="fn">DATE_TRUNC</span>(<span class="st">'month'</span>, <span class="cl">created_at</span>) <span class="kw">AS</span> <span class="cl">month</span>,
+         <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="cl">events</span>
+<span class="kw">FROM</span>     <span class="tb">orders</span>
+<span class="kw">GROUP BY</span> <span class="nu">1</span> <span class="kw">ORDER BY</span> <span class="nu">1</span>;
+
+<span class="cm">-- Filter to a specific year</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tb">orders</span>
+<span class="kw">WHERE</span>  <span class="fn">EXTRACT</span>(<span class="kw">YEAR FROM</span> <span class="cl">created_at</span>) = <span class="nu">2024</span>;
+
+<span class="cm">-- Days since signup</span>
+<span class="kw">SELECT</span> <span class="cl">name</span>, <span class="fn">CURRENT_DATE</span> - <span class="cl">signup_date</span> <span class="kw">AS</span> <span class="cl">days_active</span>
+<span class="kw">FROM</span>   <span class="tb">users</span>;</code></pre></div>
+      </div>
+      <!-- Strings -->
+      <div class="fref-panel" id="fref-strings">
+        <div class="fref-fn"><h5>UPPER / LOWER</h5><p>Normalise case: <code>WHERE LOWER(email) = 'alice@example.com'</code>.</p></div>
+        <div class="fref-fn"><h5>TRIM / LTRIM / RTRIM</h5><p>Remove leading/trailing whitespace or a specific character.</p></div>
+        <div class="fref-fn"><h5>CONCAT / ||</h5><p><code>CONCAT(first_name,' ',last_name)</code>. PG also supports <code>||</code>.</p></div>
+        <div class="fref-fn"><h5>LEFT / RIGHT / SUBSTRING</h5><p><code>LEFT(phone,3)</code> gets area code. <code>SUBSTRING(col,1,5)</code> = first 5 chars.</p></div>
+        <div class="fref-fn"><h5>LENGTH / LEN</h5><p>Number of characters: <code>WHERE LENGTH(password) >= 8</code>.</p></div>
+        <div class="fref-fn"><h5>REPLACE</h5><p><code>REPLACE(phone,'-','')</code> strips dashes.</p></div>
+        <div class="fref-fn"><h5>LIKE / ILIKE</h5><p><code>%</code>=any chars, <code>_</code>=one char. <code>ILIKE</code> is case-insensitive (PG).</p></div>
+        <div class="fref-fn"><h5>POSITION / STRPOS</h5><p>Find substring index: <code>POSITION('@' IN email)</code>. Returns 0 if not found.</p></div>
+        <div class="fref-pat-lbl" style="margin-top:12px">Examples</div>
+        <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">String Examples</span><button class="cp-btn" onclick="cp(this)">copy</button></div><pre><code><span class="cm">-- Full name</span>
+<span class="kw">SELECT</span> <span class="fn">CONCAT</span>(<span class="cl">first_name</span>,<span class="st">' '</span>,<span class="cl">last_name</span>) <span class="kw">AS</span> <span class="cl">full_name</span> <span class="kw">FROM</span> <span class="tb">users</span>;
+
+<span class="cm">-- Case-insensitive search</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tb">users</span>
+<span class="kw">WHERE</span>  <span class="fn">LOWER</span>(<span class="cl">email</span>) <span class="kw">LIKE</span> <span class="st">'%@gmail.com'</span>;
+
+<span class="cm">-- Extract domain from email</span>
+<span class="kw">SELECT</span> <span class="fn">SUBSTRING</span>(<span class="cl">email</span>, <span class="fn">POSITION</span>(<span class="st">'@'</span> <span class="kw">IN</span> <span class="cl">email</span>)+<span class="nu">1</span>) <span class="kw">AS</span> <span class="cl">domain</span>
+<span class="kw">FROM</span>   <span class="tb">users</span>;</code></pre></div>
+      </div>
+      <!-- Patterns -->
+      <div class="fref-panel" id="fref-patterns">
+        <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">Match the problem shape → apply the template.</p>
+        <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">1 · Find Duplicates</span><button class="cp-btn" onclick="cp(this)">copy</button></div><pre><code><span class="kw">SELECT</span>   <span class="cl">email</span>, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="cl">occurrences</span>
+<span class="kw">FROM</span>     <span class="tb">users</span>
+<span class="kw">GROUP BY</span> <span class="cl">email</span>
+<span class="kw">HAVING</span>   <span class="fn">COUNT</span>(*) > <span class="nu">1</span>;</code></pre></div>
+        <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">2 · Top N per Group</span><button class="cp-btn" onclick="cp(this)">copy</button></div><pre><code><span class="kw">WITH</span> <span class="tb">ranked</span> <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> *, <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+    <span class="kw">PARTITION BY</span> <span class="cl">dept</span> <span class="kw">ORDER BY</span> <span class="cl">salary</span> <span class="kw">DESC</span>) <span class="kw">AS</span> <span class="cl">rn</span>
+  <span class="kw">FROM</span> <span class="tb">employees</span>
+)
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tb">ranked</span> <span class="kw">WHERE</span> <span class="cl">rn</span> = <span class="nu">1</span>;</code></pre></div>
+        <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">3 · Never Did X</span><button class="cp-btn" onclick="cp(this)">copy</button></div><pre><code><span class="kw">SELECT</span>    <span class="cl">c.name</span>
+<span class="kw">FROM</span>      <span class="tb">customers</span> <span class="cl">c</span>
+<span class="kw">LEFT JOIN</span> <span class="tb">orders</span>    <span class="cl">o</span> <span class="kw">ON</span> <span class="cl">c.id</span> = <span class="cl">o.customer_id</span>
+<span class="kw">WHERE</span>     <span class="cl">o.id</span> <span class="kw">IS NULL</span>;</code></pre></div>
+        <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">4 · Running Total</span><button class="cp-btn" onclick="cp(this)">copy</button></div><pre><code><span class="kw">SELECT</span> <span class="cl">order_date</span>, <span class="cl">revenue</span>,
+  <span class="fn">SUM</span>(<span class="cl">revenue</span>) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> <span class="cl">order_date</span>) <span class="kw">AS</span> <span class="cl">running_total</span>
+<span class="kw">FROM</span> <span class="tb">orders</span>;</code></pre></div>
+        <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">5 · Month-over-Month</span><button class="cp-btn" onclick="cp(this)">copy</button></div><pre><code><span class="kw">WITH</span> <span class="tb">m</span> <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> <span class="fn">DATE_TRUNC</span>(<span class="st">'month'</span>,<span class="cl">order_date</span>) <span class="kw">AS</span> <span class="cl">mo</span>, <span class="fn">SUM</span>(<span class="cl">revenue</span>) <span class="kw">AS</span> <span class="cl">rev</span>
+  <span class="kw">FROM</span> <span class="tb">orders</span> <span class="kw">GROUP BY</span> <span class="nu">1</span>
+)
+<span class="kw">SELECT</span> <span class="cl">mo</span>, <span class="cl">rev</span>,
+  <span class="cl">rev</span> - <span class="fn">LAG</span>(<span class="cl">rev</span>) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> <span class="cl">mo</span>) <span class="kw">AS</span> <span class="cl">change</span>
+<span class="kw">FROM</span> <span class="tb">m</span>;</code></pre></div>
+        <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">6 · % of Total</span><button class="cp-btn" onclick="cp(this)">copy</button></div><pre><code><span class="kw">SELECT</span> <span class="cl">department</span>, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="cl">headcount</span>,
+  <span class="fn">ROUND</span>(<span class="fn">COUNT</span>(*)*<span class="nu">100.0</span>/<span class="fn">SUM</span>(<span class="fn">COUNT</span>(*)) <span class="kw">OVER</span>(),<span class="nu">1</span>) <span class="kw">AS</span> <span class="cl">pct</span>
+<span class="kw">FROM</span>     <span class="tb">employees</span>
+<span class="kw">GROUP BY</span> <span class="cl">department</span>;</code></pre></div>
+      </div>
+    </div>`;
+  document.body.appendChild(floatPanel);
+
+  const floatBody    = document.getElementById('float-body');
+  const floatLabel   = document.getElementById('float-day-label');
+  const floatHandle  = document.getElementById('float-handle');
+
+  // ── Float tab switching ──
+  document.getElementById('ftab-practice').addEventListener('click', () => {
+    document.getElementById('ftab-practice').classList.add('on');
+    document.getElementById('ftab-ref').classList.remove('on');
+    floatBody.style.display = '';
+    document.getElementById('float-ref-body').classList.remove('on');
+  });
+  document.getElementById('ftab-ref').addEventListener('click', () => {
+    document.getElementById('ftab-ref').classList.add('on');
+    document.getElementById('ftab-practice').classList.remove('on');
+    floatBody.style.display = 'none';
+    document.getElementById('float-ref-body').classList.add('on');
+  });
+
+  function selFref(btn, id) {
+    btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    document.getElementById('float-ref-body').querySelectorAll('.fref-panel').forEach(p => p.classList.remove('on'));
+    document.getElementById(id).classList.add('on');
+  }
+  let currentDayId   = null;
+
+  // ── Content swap: move practice-wrap into float panel ──
+  function switchToDay(sectionId) {
+    if (currentDayId === sectionId) return;
+    // Sections without a practice panel (e.g. bonus) keep showing the last day's panel
+    const dr   = document.querySelector('#' + sectionId + ' .day-right');
+    const wrap = dr && dr.querySelector('.practice-wrap');
+    if (!wrap) return;
+    // Return current wrap to its day-right
+    if (currentDayId) {
+      const cur = floatBody.querySelector('.practice-wrap');
+      const oldDr = document.querySelector('#' + currentDayId + ' .day-right');
+      if (cur && oldDr) oldDr.appendChild(cur);
+    }
+    // Move new wrap into float body
+    floatBody.appendChild(wrap);
+    const n = sectionId.replace('day', '');
+    floatLabel.textContent = 'Day ' + n + ' · Practice';
+    currentDayId = sectionId;
+  }
+
+  // ── Scroll-based day detection ──
+  let rafPending = false;
+  function pickVisibleDay() {
+    const sections = document.querySelectorAll('section[id^="day"]');
+    let bestId = null, bestVis = 0;
+    sections.forEach(s => {
+      const r   = s.getBoundingClientRect();
+      const vis = Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 68);
+      if (vis > bestVis) { bestVis = vis; bestId = s.id; }
+    });
+    if (bestId) switchToDay(bestId);
+  }
+  window.addEventListener('scroll', () => {
+    if (!rafPending) { rafPending = true; requestAnimationFrame(() => { pickVisibleDay(); rafPending = false; }); }
+  }, { passive:true });
+  switchToDay('day1');
+
+  // ── Minimize toggle ──
+  document.getElementById('float-min-btn').addEventListener('click', () => {
+    const min = floatPanel.classList.toggle('minimized');
+    document.getElementById('float-min-btn').textContent = min ? '+' : '—';
+  });
+
+  // ── Drag logic ──
+  let dragging = false, dragOX = 0, dragOY = 0;
+
+  function startDrag(cx, cy) {
+    dragging = true;
+    const r = floatPanel.getBoundingClientRect();
+    dragOX = cx - r.left;
+    dragOY = cy - r.top;
+    floatPanel.style.transition = 'none';
+    floatPanel.style.right = 'auto';
+  }
+  function moveDrag(cx, cy) {
+    if (!dragging) return;
+    const x = Math.max(0, Math.min(cx - dragOX, window.innerWidth  - floatPanel.offsetWidth));
+    const y = Math.max(0, Math.min(cy - dragOY, window.innerHeight - 50));
+    floatPanel.style.left = x + 'px';
+    floatPanel.style.top  = y + 'px';
+  }
+  function endDrag() { dragging = false; }
+
+  floatHandle.addEventListener('mousedown',  e => { startDrag(e.clientX, e.clientY); e.preventDefault(); });
+  document.addEventListener('mousemove',     e => moveDrag(e.clientX, e.clientY));
+  document.addEventListener('mouseup',       endDrag);
+
+  floatHandle.addEventListener('touchstart', e => { const t = e.touches[0]; startDrag(t.clientX, t.clientY); }, { passive:false });
+  document.addEventListener('touchmove',     e => { if (!dragging) return; const t = e.touches[0]; moveDrag(t.clientX, t.clientY); e.preventDefault(); }, { passive:false });
+  document.addEventListener('touchend',      endDrag);
+
+  // Copy button
+  function cp(btn) {
+    const txt = btn.closest('.cb').querySelector('pre').innerText;
+    navigator.clipboard.writeText(txt).then(() => {
+      btn.textContent = 'copied!';
+      btn.style.color = 'var(--green)';
+      btn.style.borderColor = 'var(--green)';
+      setTimeout(() => { btn.textContent = 'copy'; btn.style.color = ''; btn.style.borderColor = ''; }, 1800);
+    });
+  }
+</script>
+</body>
+</html>
