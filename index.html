@@ -415,6 +415,7 @@
   }
   .practice-status.show { display:block; }
   .practice-status.neutral { background:var(--bg3); color:var(--text2); }
+  .practice-status.correct { background:rgba(111,207,151,0.12); color:var(--green); border:1px solid rgba(111,207,151,0.25); }
 
   /* ── HINT BOX ── */
   .hint-box {
@@ -2273,6 +2274,65 @@
     ]
   };
 
+  // ── Required keyword patterns per practice question ──
+  // All patterns must be present (case-insensitive) for the answer to be marked correct.
+  // Each entry is an array of alternatives — at least ONE alternative per group must match.
+  const practiceAnswers = {
+    'practice-day1': [
+      ['select'],
+      ['from employees'],
+      ["department = 'engineering'", 'department="engineering"'],
+      ['order by salary desc']
+    ],
+    'practice-day2': [
+      ['select'],
+      ['left join'],
+      ['dept_id is null', 'd.dept_id is null', 'departments.dept_id is null']
+    ],
+    'practice-day3': [
+      ['select'],
+      ['count('],
+      ['avg(salary'],
+      ['group by department', 'group by 1'],
+      ['having avg(salary', 'having avg(salary)']
+    ],
+    'practice-day4': [
+      ['select'],
+      ['join employees', 'inner join employees'],
+      ['manager_id'],
+      ['e.salary > m.salary', 'emp.salary > mgr.salary', 'employees.salary > m.salary']
+    ],
+    'practice-day5': [
+      ['with'],
+      ['sum(salary'],
+      ['group by'],
+      ['200000']
+    ],
+    'practice-day6': [
+      ['dense_rank()'],
+      ['partition by department', 'partition by employees.department'],
+      ['order by salary desc'],
+      ['select']
+    ],
+    'practice-day7': [
+      ['row_number()'],
+      ['partition by date(measurement_time)', 'partition by date('],
+      ['case when', 'case  when'],
+      ['group by']
+    ]
+  };
+
+  function normaliseSQL(s) {
+    return s.toLowerCase().replace(/\s+/g, ' ').replace(/;/g, '').trim();
+  }
+
+  function isCorrect(id, input) {
+    const groups = practiceAnswers[id];
+    if (!groups) return null; // no answer defined — can't validate
+    const n = normaliseSQL(input);
+    return groups.every(group => group.some(pat => n.includes(pat)));
+  }
+
   const practiceAttempts = {};
 
   function checkQuery(btn) {
@@ -2288,6 +2348,16 @@
       return;
     }
 
+    const correct = isCorrect(id, ta.value);
+
+    // ── Correct answer ──
+    if (correct === true) {
+      status.textContent = '✓ Correct! Well done.';
+      status.className = 'practice-status show correct';
+      return;
+    }
+
+    // ── Incorrect or unvalidatable — count attempt ──
     practiceAttempts[id] = (practiceAttempts[id] || 0) + 1;
     const n = practiceAttempts[id];
     const hints = practiceHints[id] || [];
@@ -2295,7 +2365,7 @@
     if (n === 3 && hints[0]) {
       hintBox.innerHTML = `<div class="hint-label">Hint 1 of ${hints.length}</div><div class="hint-item">${hints[0]}</div>`;
       hintBox.classList.add('show');
-      status.textContent = `Attempt ${n} — first hint unlocked below.`;
+      status.textContent = `Not quite — first hint unlocked below.`;
       status.className = 'practice-status show neutral';
     } else if (n === 5 && hints[1]) {
       if (!hintBox.querySelector('.hint-item:nth-child(2), .hint-item ~ .hint-item')) {
@@ -2305,10 +2375,10 @@
         hintBox.appendChild(h2);
       }
       hintBox.classList.add('show');
-      status.textContent = `Attempt ${n} — second hint unlocked.`;
+      status.textContent = `Not quite — second hint unlocked.`;
       status.className = 'practice-status show neutral';
     } else if (n >= 7) {
-      status.innerHTML = `Attempt ${n} — you've really tried! `;
+      status.innerHTML = `Still not matching — don't give up! `;
       const rb = document.createElement('button');
       rb.className = 'cp-btn';
       rb.textContent = 'reveal answer';
@@ -2318,17 +2388,17 @@
       status.className = 'practice-status show neutral';
     } else {
       const nudges = [
-        'Good start — keep going.',
-        "Getting there. Re-read the example above if stuck.",
-        null, // hint unlocked — handled above
+        'Not quite — check your clauses and column names.',
+        "Getting closer. Re-read the example above if stuck.",
+        null,
         'Check clause order: SELECT → FROM → WHERE/JOIN → GROUP BY → HAVING.',
-        null, // hint 2 — handled above
+        null,
         "Almost — check for typos and that column names match the table schema.",
         "You're close. A fresh read of the hint might spark the last piece."
       ];
       const msg = nudges[n - 1] || `Attempt ${n} — keep at it!`;
       if (msg) {
-        status.textContent = `Attempt ${n} — ${msg}`;
+        status.textContent = msg;
         status.className = 'practice-status show neutral';
       }
     }
