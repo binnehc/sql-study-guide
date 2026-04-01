@@ -2589,17 +2589,6 @@
     document.getElementById('float-ref-body').classList.add('on');
   });
 
-  // ── Map each day to the most relevant cheat sheet tab ──
-  const dayRefMap = {
-    'day1': 'fref-patterns',  // WHERE / filtering
-    'day2': 'fref-patterns',  // LEFT JOIN + IS NULL → Pattern 3
-    'day3': 'fref-patterns',  // GROUP BY / HAVING → Pattern 1
-    'day4': 'fref-patterns',  // self-join → patterns
-    'day5': 'fref-patterns',  // CTEs → Pattern 2 / 5
-    'day6': 'fref-patterns',  // window functions → Pattern 2 / 4 / 6
-    'day7': 'fref-dates',     // DATE() / measurement_time → Dates tab
-  };
-
   function selFref(btn, id) {
     btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach(b => b.classList.remove('on'));
     btn.classList.add('on');
@@ -2607,13 +2596,25 @@
     document.getElementById(id).classList.add('on');
   }
 
-  function syncRefTab(sectionId) {
-    const targetPanel = dayRefMap[sectionId];
-    if (!targetPanel) return;
+  // ── Detect the most relevant cheat sheet tab from question text ──
+  function refTabForQuestion(wrap) {
+    const q = (wrap.querySelector('.practice-q, .practice-prompt p') || {}).textContent || '';
+    const h = (wrap.querySelector('.practice-hint') || {}).textContent || '';
+    const text = (q + ' ' + h).toLowerCase();
+
+    const dateKw    = ['date', 'timestamp', 'measurement_time', 'month', 'year', 'interval', 'time', 'datediff'];
+    const stringKw  = ['concat', 'upper', 'lower', 'trim', 'like', 'substring', 'length', 'string', 'email', 'replace', 'position'];
+
+    if (dateKw.some(k => text.includes(k)))   return 'fref-dates';
+    if (stringKw.some(k => text.includes(k))) return 'fref-strings';
+    return 'fref-patterns';
+  }
+
+  function syncRefTab(wrap) {
+    const targetPanel = refTabForQuestion(wrap);
     const refBody = document.getElementById('float-ref-body');
     refBody.querySelectorAll('.fref-panel').forEach(p => p.classList.remove('on'));
     document.getElementById(targetPanel).classList.add('on');
-    // Sync the tab buttons
     const tabMap = { 'fref-dates': 0, 'fref-strings': 1, 'fref-patterns': 2 };
     const idx = tabMap[targetPanel];
     refBody.querySelectorAll('.fref-tab').forEach((t, i) => t.classList.toggle('on', i === idx));
@@ -2639,7 +2640,7 @@
     const n = sectionId.replace('day', '');
     floatLabel.textContent = 'Day ' + n + ' · Practice';
     currentDayId = sectionId;
-    syncRefTab(sectionId);
+    syncRefTab(wrap);
   }
 
   // ── Scroll-based day detection ──
