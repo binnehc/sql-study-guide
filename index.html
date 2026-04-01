@@ -2589,12 +2589,36 @@
     document.getElementById('float-ref-body').classList.add('on');
   });
 
+  // ── Map each day to the most relevant cheat sheet tab ──
+  const dayRefMap = {
+    'day1': 'fref-patterns',  // WHERE / filtering
+    'day2': 'fref-patterns',  // LEFT JOIN + IS NULL → Pattern 3
+    'day3': 'fref-patterns',  // GROUP BY / HAVING → Pattern 1
+    'day4': 'fref-patterns',  // self-join → patterns
+    'day5': 'fref-patterns',  // CTEs → Pattern 2 / 5
+    'day6': 'fref-patterns',  // window functions → Pattern 2 / 4 / 6
+    'day7': 'fref-dates',     // DATE() / measurement_time → Dates tab
+  };
+
   function selFref(btn, id) {
     btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach(b => b.classList.remove('on'));
     btn.classList.add('on');
     document.getElementById('float-ref-body').querySelectorAll('.fref-panel').forEach(p => p.classList.remove('on'));
     document.getElementById(id).classList.add('on');
   }
+
+  function syncRefTab(sectionId) {
+    const targetPanel = dayRefMap[sectionId];
+    if (!targetPanel) return;
+    const refBody = document.getElementById('float-ref-body');
+    refBody.querySelectorAll('.fref-panel').forEach(p => p.classList.remove('on'));
+    document.getElementById(targetPanel).classList.add('on');
+    // Sync the tab buttons
+    const tabMap = { 'fref-dates': 0, 'fref-strings': 1, 'fref-patterns': 2 };
+    const idx = tabMap[targetPanel];
+    refBody.querySelectorAll('.fref-tab').forEach((t, i) => t.classList.toggle('on', i === idx));
+  }
+
   let currentDayId   = null;
 
   // ── Content swap: move practice-wrap into float panel ──
@@ -2615,6 +2639,7 @@
     const n = sectionId.replace('day', '');
     floatLabel.textContent = 'Day ' + n + ' · Practice';
     currentDayId = sectionId;
+    syncRefTab(sectionId);
   }
 
   // ── Scroll-based day detection ──
