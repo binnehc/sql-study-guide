@@ -61,6 +61,36 @@
   #sb-btn:hover { background:var(--hover); color:var(--text); }
   .nav-title { font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; color:var(--text2); }
 
+  /* ── MUSIC PLAYER ── */
+  #music-btn {
+    width:32px; height:32px; border-radius:6px; border:none;
+    background:none; color:var(--text3); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:background 0.15s, color 0.15s; flex-shrink:0;
+    margin-left:auto;
+  }
+  #music-btn:hover { background:var(--hover); color:var(--text); }
+  #music-btn.playing { color:var(--green); }
+  #music-label {
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3);
+    transition:color 0.15s; white-space:nowrap;
+  }
+  #music-label.playing { color:var(--green); }
+  #music-vol {
+    width:52px; height:3px; accent-color:var(--text3); cursor:pointer;
+    transition:accent-color 0.15s;
+  }
+  #music-vol.playing { accent-color:var(--green); }
+  #autoplay-hint {
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    background:var(--bg2); border:1px solid var(--bdr2);
+    color:var(--text2); font-family:'JetBrains Mono',monospace; font-size:12px;
+    padding:8px 16px; border-radius:8px; z-index:500;
+    pointer-events:none; opacity:0;
+    transition:opacity 0.4s;
+  }
+  #autoplay-hint.show { opacity:1; }
+
 
   /* ── SIDEBAR ── */
   #sidebar {
@@ -522,6 +552,21 @@
       <rect x="1" y="11.5" width="14" height="1.5" rx="0.75" fill="currentColor"/>
     </svg>
   </button>
+
+  <audio id="lofi-audio" loop preload="none">
+    <source src="https://stream.zeno.fm/0r0xa792kwzuv" type="audio/mpeg">
+  </audio>
+  <button id="music-btn" onclick="toggleMusic()" title="Toggle lofi music">
+    <svg id="music-icon-play" width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+      <polygon points="2,1 13,7 2,13"/>
+    </svg>
+    <svg id="music-icon-pause" width="14" height="14" viewBox="0 0 14 14" fill="currentColor" style="display:none">
+      <rect x="2" y="1" width="3.5" height="12" rx="1"/>
+      <rect x="8.5" y="1" width="3.5" height="12" rx="1"/>
+    </svg>
+  </button>
+  <span id="music-label">lofi</span>
+  <input id="music-vol" type="range" min="0" max="1" step="0.05" value="0.25" title="Volume" oninput="setMusicVol(this.value)">
 
 </nav>
 
@@ -2694,6 +2739,52 @@
   document.addEventListener('touchmove',     e => { if (!dragging) return; const t = e.touches[0]; moveDrag(t.clientX, t.clientY); e.preventDefault(); }, { passive:false });
   document.addEventListener('touchend',      endDrag);
 
+  // ── Music player ──
+  const lofiAudio   = document.getElementById('lofi-audio');
+  const musicBtn    = document.getElementById('music-btn');
+  const musicLbl    = document.getElementById('music-label');
+  const musicVol    = document.getElementById('music-vol');
+  const iconPlay    = document.getElementById('music-icon-play');
+  const iconPause   = document.getElementById('music-icon-pause');
+  const autoHint    = document.getElementById('autoplay-hint');
+  lofiAudio.volume  = 0.25;
+
+  function setPlayingState(playing) {
+    musicBtn.classList.toggle('playing', playing);
+    musicLbl.classList.toggle('playing', playing);
+    musicVol.classList.toggle('playing', playing);
+    iconPlay.style.display  = playing ? 'none' : '';
+    iconPause.style.display = playing ? '' : 'none';
+  }
+
+  function toggleMusic() {
+    if (lofiAudio.paused) {
+      lofiAudio.play().then(() => setPlayingState(true)).catch(() => {});
+    } else {
+      lofiAudio.pause();
+      setPlayingState(false);
+    }
+  }
+  function setMusicVol(v) { lofiAudio.volume = v; }
+
+  // Attempt autoplay on load; if blocked, show hint and start on first interaction
+  lofiAudio.play().then(() => {
+    setPlayingState(true);
+  }).catch(() => {
+    // Autoplay blocked — show hint and wait for first user interaction
+    autoHint.classList.add('show');
+    function startOnInteraction() {
+      lofiAudio.play().then(() => {
+        setPlayingState(true);
+        autoHint.classList.remove('show');
+      }).catch(() => {});
+      document.removeEventListener('click',   startOnInteraction);
+      document.removeEventListener('keydown', startOnInteraction);
+    }
+    document.addEventListener('click',   startOnInteraction);
+    document.addEventListener('keydown', startOnInteraction);
+  });
+
   // Copy button
   function cp(btn) {
     const txt = btn.closest('.cb').querySelector('pre').innerText;
@@ -2705,5 +2796,6 @@
     });
   }
 </script>
+<div id="autoplay-hint">♫ click anywhere to start lofi music</div>
 </body>
 </html>
