@@ -2281,7 +2281,6 @@
   }
 
   initProgress();
-  updateProgress(); // sets initial lock state
 
   // ── Progress bar (scroll) ──
   window.addEventListener('scroll', () => {
@@ -2823,6 +2822,7 @@
     if (!rafPending) { rafPending = true; requestAnimationFrame(() => { pickVisibleDay(); rafPending = false; }); }
   }, { passive:true });
   switchToDay('day1');
+  updateLocks(); // set initial lock state now that currentDayId is defined
 
   // ── Float day nav click handlers ──
   document.querySelectorAll('.fday-btn').forEach(btn => {
