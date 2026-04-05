@@ -91,6 +91,51 @@
   }
   #autoplay-hint.show { opacity:1; }
 
+  /* ── DAY LOCKING ── */
+  .section-locked { position:relative; }
+  .section-locked > .wrap { opacity:0.18; filter:blur(2px); pointer-events:none; user-select:none; }
+  .lock-banner {
+    position:sticky; top:60px; z-index:50;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    margin:0 auto 0; max-width:740px; padding:0 28px;
+  }
+  .lock-banner-inner {
+    display:flex; align-items:center; gap:10px;
+    background:var(--bg2); border:1px solid var(--bdr2);
+    border-radius:10px; padding:12px 20px;
+    font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text2);
+    box-shadow:0 4px 24px rgba(0,0,0,0.4);
+  }
+  .lock-banner-inner svg { flex-shrink:0; color:var(--text3); }
+  .sb-item.locked { pointer-events:none; opacity:0.45; }
+  .sb-item.locked .sb-check { background:none; border-color:var(--bdr2); }
+  .sb-item.locked .sb-check::after {
+    content:''; display:block; width:8px; height:10px; margin:3px auto;
+    background:var(--text3);
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 10'%3E%3Crect x='1' y='4' width='6' height='6' rx='1'/%3E%3Cpath d='M2 4V3a2 2 0 0 1 4 0v1' stroke='currentColor' fill='none' stroke-width='1.2'/%3E%3C/svg%3E") no-repeat center;
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 10'%3E%3Crect x='1' y='4' width='6' height='6' rx='1'/%3E%3Cpath d='M2 4V3a2 2 0 0 1 4 0v1' stroke='currentColor' fill='none' stroke-width='1.2'/%3E%3C/svg%3E") no-repeat center;
+    -webkit-mask-size:contain; mask-size:contain;
+  }
+
+  /* ── PRACTICE DAY NAVIGATOR ── */
+  #float-day-nav {
+    display:flex; align-items:center; gap:4px;
+    padding:6px 10px; border-bottom:1px solid var(--bdr); flex-shrink:0;
+    background:var(--bg2);
+  }
+  .fday-lbl { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); margin-right:4px; flex-shrink:0; }
+  .fday-btn {
+    font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500;
+    width:26px; height:26px; border-radius:5px; border:1px solid transparent;
+    background:none; color:var(--text3); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .fday-btn:hover:not(.locked):not(.on) { background:var(--hover); color:var(--text2); }
+  .fday-btn.on { background:var(--hover); color:var(--blue); border-color:rgba(121,184,255,0.3); }
+  .fday-btn.locked { opacity:0.3; cursor:not-allowed; }
+
+
 
   /* ── SIDEBAR ── */
   #sidebar {
@@ -2170,7 +2215,10 @@
 
   // Close sidebar on mobile when navigating
   document.querySelectorAll('.sb-item').forEach(a => {
-    a.addEventListener('click', () => { if (window.innerWidth < 900) { sbOpen = false; sidebar.classList.remove('open'); backdrop.classList.remove('show'); } });
+    a.addEventListener('click', e => {
+      if (a.classList.contains('locked')) { e.preventDefault(); return; }
+      if (window.innerWidth < 900) { sbOpen = false; sidebar.classList.remove('open'); backdrop.classList.remove('show'); }
+    });
   });
 
   // ── Highlight active section in sidebar ──
@@ -2228,9 +2276,12 @@
     // Update overall bar
     document.getElementById('sb-count').textContent = `${totalDone} / ${totalAll} complete`;
     document.getElementById('sb-overall-fill').style.width = totalAll ? (totalDone / totalAll * 100) + '%' : '0%';
+
+    updateLocks();
   }
 
   initProgress();
+  updateProgress(); // sets initial lock state
 
   // ── Progress bar (scroll) ──
   window.addEventListener('scroll', () => {
@@ -2529,6 +2580,16 @@
       <button class="float-tab on" id="ftab-practice">Practice</button>
       <button class="float-tab"    id="ftab-ref">Cheat Sheet</button>
     </div>
+    <div id="float-day-nav">
+      <span class="fday-lbl">Day:</span>
+      <button class="fday-btn on" data-day="day1">1</button>
+      <button class="fday-btn locked" data-day="day2">2</button>
+      <button class="fday-btn locked" data-day="day3">3</button>
+      <button class="fday-btn locked" data-day="day4">4</button>
+      <button class="fday-btn locked" data-day="day5">5</button>
+      <button class="fday-btn locked" data-day="day6">6</button>
+      <button class="fday-btn locked" data-day="day7">7</button>
+    </div>
     <div id="float-body"></div>
     <div id="float-ref-body">
       <div class="fref-tabs">
@@ -2667,9 +2728,65 @@
 
   let currentDayId   = null;
 
+  // ── Day lock helpers ──
+  function isDayComplete(n) {
+    const k = 'Day ' + n;
+    return (dayItemCount[k] || 0) > 0 && (dayDoneCount[k] || 0) === (dayItemCount[k] || 0);
+  }
+  function isDayUnlocked(n) {
+    return n <= 1 || isDayComplete(n - 1);
+  }
+
+  function updateLocks() {
+    for (let n = 1; n <= 7; n++) {
+      const id       = 'day' + n;
+      const unlocked = isDayUnlocked(n);
+      const section  = document.getElementById(id);
+
+      // Sidebar item
+      const sbItem = document.querySelector(`.sb-item[data-day="${id}"]`);
+      if (sbItem) sbItem.classList.toggle('locked', !unlocked);
+
+      // Section lock banner + blur
+      if (section) {
+        section.classList.toggle('section-locked', !unlocked);
+        let banner = section.querySelector('.lock-banner');
+        if (!unlocked) {
+          if (!banner) {
+            banner = document.createElement('div');
+            banner.className = 'lock-banner';
+            banner.innerHTML = `<div class="lock-banner-inner">
+              <svg width="14" height="16" viewBox="0 0 14 16" fill="none">
+                <rect x="1" y="7" width="12" height="9" rx="2" fill="currentColor" opacity=".5"/>
+                <path d="M3 7V5a4 4 0 0 1 8 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+              </svg>
+              Complete Day ${n - 1} to unlock Day ${n}
+            </div>`;
+            section.prepend(banner);
+          }
+        } else {
+          if (banner) banner.remove();
+        }
+      }
+
+      // Float nav button
+      const fBtn = document.querySelector(`.fday-btn[data-day="${id}"]`);
+      if (fBtn) fBtn.classList.toggle('locked', !unlocked);
+    }
+
+    // If current float panel is now locked (shouldn't happen, but safety), fall back to day1
+    if (currentDayId) {
+      const n = parseInt(currentDayId.replace('day', ''));
+      if (!isDayUnlocked(n)) switchToDay('day1');
+    }
+  }
+
   // ── Content swap: move practice-wrap into float panel ──
   function switchToDay(sectionId) {
     if (currentDayId === sectionId) return;
+    // Check lock
+    const dayNum = parseInt(sectionId.replace('day', ''));
+    if (!isNaN(dayNum) && !isDayUnlocked(dayNum)) return;
     // Sections without a practice panel (e.g. bonus) keep showing the last day's panel
     const dr   = document.querySelector('#' + sectionId + ' .day-right');
     const wrap = dr && dr.querySelector('.practice-wrap');
@@ -2686,6 +2803,8 @@
     floatLabel.textContent = 'Day ' + n + ' · Practice';
     currentDayId = sectionId;
     syncRefTab(wrap);
+    // Update nav highlight
+    document.querySelectorAll('.fday-btn').forEach(b => b.classList.toggle('on', b.dataset.day === sectionId));
   }
 
   // ── Scroll-based day detection ──
@@ -2704,6 +2823,14 @@
     if (!rafPending) { rafPending = true; requestAnimationFrame(() => { pickVisibleDay(); rafPending = false; }); }
   }, { passive:true });
   switchToDay('day1');
+
+  // ── Float day nav click handlers ──
+  document.querySelectorAll('.fday-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.classList.contains('locked')) return;
+      switchToDay(btn.dataset.day);
+    });
+  });
 
   // ── Minimize toggle ──
   document.getElementById('float-min-btn').addEventListener('click', () => {
