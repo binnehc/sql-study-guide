@@ -373,6 +373,42 @@
   /* ── ANIMATIONS ── */
   @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
 
+  /* ── EXECUTION ORDER VIZ ── */
+  .eo-viz { margin:20px 0; }
+  .eo-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media(max-width:560px){ .eo-grid { grid-template-columns:1fr; } }
+  .eo-col { background:var(--bg2); border:1px solid var(--bdr); border-radius:8px; padding:14px; }
+  .eo-col-lbl { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px; font-family:'JetBrains Mono',monospace; }
+  .eo-clause { display:flex; align-items:center; gap:9px; padding:5px 6px; border-radius:5px; cursor:pointer; transition:background 0.12s; user-select:none; }
+  .eo-clause:hover { background:var(--hover); }
+  .eo-clause.eo-on { background:rgba(255,255,255,0.05); }
+  .eo-badge { width:21px; height:21px; min-width:21px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; font-family:'JetBrains Mono',monospace; transition:transform 0.12s; }
+  .eo-clause.eo-on .eo-badge { transform:scale(1.18); }
+  .eo-kw { font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; color:var(--blue); }
+  .eo-ex { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text3); }
+  .eo-step { display:flex; align-items:center; gap:9px; padding:5px 8px; border-radius:5px; margin:2px 0; border:1px solid transparent; transition:border-color 0.18s, background 0.18s; }
+  .eo-step .sn { font-family:'JetBrains Mono',monospace; font-size:11px; min-width:16px; font-weight:600; }
+  .eo-step .st { font-size:13px; font-weight:500; }
+  .eo-step .sd { font-size:11px; color:var(--text3); margin-left:auto; }
+  .eo-arr { text-align:center; font-size:10px; color:var(--text3); padding:1px 8px; line-height:1.4; }
+  .eo-hint { font-size:12px; color:var(--text3); margin-top:12px; padding-top:10px; border-top:1px solid var(--bdr); }
+  .eo-hint strong { color:var(--red); }
+  /* per-step colors */
+  .eo-c1 .eo-badge,.eo-c1.eo-on { background:rgba(111,207,151,.18); } .eo-c1 .eo-badge { color:#6fcf97; }
+  .eo-c2 .eo-badge,.eo-c2.eo-on { background:rgba(121,184,255,.18); } .eo-c2 .eo-badge { color:#79b8ff; }
+  .eo-c3 .eo-badge,.eo-c3.eo-on { background:rgba(255,171,112,.18); } .eo-c3 .eo-badge { color:#ffab70; }
+  .eo-c4 .eo-badge,.eo-c4.eo-on { background:rgba(179,146,240,.18); } .eo-c4 .eo-badge { color:#b392f0; }
+  .eo-c5 .eo-badge,.eo-c5.eo-on { background:rgba(255,123,123,.18); } .eo-c5 .eo-badge { color:#ff7b7b; }
+  .eo-c6 .eo-badge,.eo-c6.eo-on { background:rgba(111,207,151,.18); } .eo-c6 .eo-badge { color:#6fcf97; }
+  .eo-c7 .eo-badge,.eo-c7.eo-on { background:rgba(121,184,255,.18); } .eo-c7 .eo-badge { color:#79b8ff; }
+  #eo-step-1.eo-on{border-color:rgba(111,207,151,.3);background:rgba(111,207,151,.07);} #eo-step-1 .sn{color:#6fcf97;}
+  #eo-step-2.eo-on{border-color:rgba(121,184,255,.3);background:rgba(121,184,255,.07);} #eo-step-2 .sn{color:#79b8ff;}
+  #eo-step-3.eo-on{border-color:rgba(255,171,112,.3);background:rgba(255,171,112,.07);} #eo-step-3 .sn{color:#ffab70;}
+  #eo-step-4.eo-on{border-color:rgba(179,146,240,.3);background:rgba(179,146,240,.07);} #eo-step-4 .sn{color:#b392f0;}
+  #eo-step-5.eo-on{border-color:rgba(255,123,123,.3);background:rgba(255,123,123,.07);} #eo-step-5 .sn{color:#ff7b7b;}
+  #eo-step-6.eo-on{border-color:rgba(111,207,151,.3);background:rgba(111,207,151,.07);} #eo-step-6 .sn{color:#6fcf97;}
+  #eo-step-7.eo-on{border-color:rgba(121,184,255,.3);background:rgba(121,184,255,.07);} #eo-step-7 .sn{color:#79b8ff;}
+
   /* ── FOOTER ── */
   footer { padding:48px 0; border-top:1px solid var(--bdr); text-align:center; }
   footer p { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text3); }
@@ -792,9 +828,37 @@
   <span class="kw">AND</span>  <span class="cl">salary</span> > <span class="nu">90000</span>;</code></pre>
       </div>
 
-      <div class="callout">
-        <p class="callout-lbl">Query Execution Order</p>
-        <p>SQL does NOT run in the order you write it. The real order is: <strong>FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT</strong>. This matters — it's why you can't use a SELECT alias inside a WHERE clause.</p>
+      <!-- Execution Order interactive visualization -->
+      <div class="eo-viz">
+        <div class="eo-grid">
+          <div class="eo-col">
+            <div class="eo-col-lbl">← Click a clause to see when it runs</div>
+            <div class="eo-clause eo-c5" data-step="5"><span class="eo-badge">5</span><span class="eo-kw">SELECT</span><span class="eo-ex">name, salary</span></div>
+            <div class="eo-clause eo-c1" data-step="1"><span class="eo-badge">1</span><span class="eo-kw">FROM</span><span class="eo-ex">employees</span></div>
+            <div class="eo-clause eo-c2" data-step="2"><span class="eo-badge">2</span><span class="eo-kw">WHERE</span><span class="eo-ex">salary &gt; 80000</span></div>
+            <div class="eo-clause eo-c3" data-step="3"><span class="eo-badge">3</span><span class="eo-kw">GROUP BY</span><span class="eo-ex">department</span></div>
+            <div class="eo-clause eo-c4" data-step="4"><span class="eo-badge">4</span><span class="eo-kw">HAVING</span><span class="eo-ex">COUNT(*) &gt; 1</span></div>
+            <div class="eo-clause eo-c6" data-step="6"><span class="eo-badge">6</span><span class="eo-kw">ORDER BY</span><span class="eo-ex">salary DESC</span></div>
+            <div class="eo-clause eo-c7" data-step="7"><span class="eo-badge">7</span><span class="eo-kw">LIMIT</span><span class="eo-ex">5</span></div>
+          </div>
+          <div class="eo-col">
+            <div class="eo-col-lbl">Actual execution order</div>
+            <div class="eo-step" id="eo-step-1"><span class="sn">①</span><span class="st">FROM</span><span class="sd">load the table</span></div>
+            <div class="eo-arr">↓</div>
+            <div class="eo-step" id="eo-step-2"><span class="sn">②</span><span class="st">WHERE</span><span class="sd">filter rows</span></div>
+            <div class="eo-arr">↓</div>
+            <div class="eo-step" id="eo-step-3"><span class="sn">③</span><span class="st">GROUP BY</span><span class="sd">form groups</span></div>
+            <div class="eo-arr">↓</div>
+            <div class="eo-step" id="eo-step-4"><span class="sn">④</span><span class="st">HAVING</span><span class="sd">filter groups</span></div>
+            <div class="eo-arr">↓</div>
+            <div class="eo-step" id="eo-step-5"><span class="sn">⑤</span><span class="st">SELECT</span><span class="sd">choose columns</span></div>
+            <div class="eo-arr">↓</div>
+            <div class="eo-step" id="eo-step-6"><span class="sn">⑥</span><span class="st">ORDER BY</span><span class="sd">sort results</span></div>
+            <div class="eo-arr">↓</div>
+            <div class="eo-step" id="eo-step-7"><span class="sn">⑦</span><span class="st">LIMIT</span><span class="sd">cap rows</span></div>
+          </div>
+        </div>
+        <p class="eo-hint">Notice <strong>SELECT is written first but runs 5th</strong> — that's why a SELECT alias (like <code>salary AS pay</code>) can't be used inside WHERE, which runs at step ②</p>
       </div>
 
     </div>
@@ -1043,6 +1107,17 @@
   }
 
   initChecklist();
+
+  // ── Execution order interactive ──
+  document.querySelectorAll('.eo-clause').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('.eo-clause').forEach(x => x.classList.remove('eo-on'));
+      document.querySelectorAll('.eo-step').forEach(x => x.classList.remove('eo-on'));
+      c.classList.add('eo-on');
+      const target = document.getElementById('eo-step-' + c.dataset.step);
+      if (target) target.classList.add('eo-on');
+    });
+  });
 
   // ── Scroll reveal ──
   const obs = new IntersectionObserver(entries => {

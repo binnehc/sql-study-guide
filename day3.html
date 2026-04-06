@@ -373,6 +373,22 @@
   /* ── ANIMATIONS ── */
   @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
 
+  /* ── GROUP BY VIZ ── */
+  .groupby-viz { display:flex; align-items:center; gap:12px; margin:20px 0; overflow-x:auto; }
+  @media(max-width:600px){ .groupby-viz { flex-direction:column; align-items:stretch; } }
+  .gv-part { flex:1; min-width:160px; }
+  .gv-lbl { font-size:10.5px; font-family:'JetBrains Mono',monospace; color:var(--text3); margin-bottom:6px; }
+  .gv-wrap { border:1px solid var(--bdr); border-radius:8px; overflow:hidden; background:var(--bg2); }
+  .gv-tbl { border-collapse:collapse; width:100%; font-size:12.5px; }
+  .gv-tbl th { background:var(--bg3); color:var(--text3); font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:500; padding:5px 10px; text-align:left; white-space:nowrap; }
+  .gv-tbl td { padding:5px 10px; border-top:1px solid var(--bdr); white-space:nowrap; }
+  .gv-a td { background:rgba(121,184,255,0.07); border-left:3px solid rgba(121,184,255,0.5); }
+  .gv-b td { background:rgba(111,207,151,0.07); border-left:3px solid rgba(111,207,151,0.5); }
+  .gv-mid { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; flex-shrink:0; padding:0 4px; }
+  .gv-mid .gv-op { font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text3); text-align:center; white-space:nowrap; }
+  .gv-mid .gv-ar { font-size:20px; color:var(--text3); }
+  @media(max-width:600px){ .gv-mid { flex-direction:row; } }
+
   /* ── FOOTER ── */
   footer { padding:48px 0; border-top:1px solid var(--bdr); text-align:center; }
   footer p { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text3); }
@@ -705,6 +721,41 @@
       <p class="s-label">Day 03 · Summarizing Data</p>
       <h2 class="s-title">GROUP BY <em>&amp; HAVING</em></h2>
       <p class="s-body">Aggregation functions collapse many rows into a single summary value. <code>GROUP BY</code> controls <strong>which rows are grouped together</strong> before the summary is computed.</p>
+
+      <!-- GROUP BY before/after visualization -->
+      <div class="groupby-viz">
+        <div class="gv-part">
+          <div class="gv-lbl">employees — 5 individual rows</div>
+          <div class="gv-wrap">
+            <table class="gv-tbl">
+              <thead><tr><th>name</th><th>department</th><th>salary</th></tr></thead>
+              <tbody>
+                <tr class="gv-a"><td>Alice</td><td>Engineering</td><td>$120k</td></tr>
+                <tr class="gv-a"><td>Bob</td><td>Engineering</td><td>$95k</td></tr>
+                <tr class="gv-a"><td>Eve</td><td>Engineering</td><td>$110k</td></tr>
+                <tr class="gv-b"><td>Carol</td><td>Marketing</td><td>$88k</td></tr>
+                <tr class="gv-b"><td>Dave</td><td>Marketing</td><td>$72k</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="gv-mid">
+          <span class="gv-op">GROUP BY<br>department</span>
+          <span class="gv-ar">→</span>
+        </div>
+        <div class="gv-part">
+          <div class="gv-lbl">result — 2 summary rows</div>
+          <div class="gv-wrap">
+            <table class="gv-tbl">
+              <thead><tr><th>department</th><th>COUNT(*)</th><th>AVG(salary)</th></tr></thead>
+              <tbody>
+                <tr class="gv-a"><td>Engineering</td><td>3</td><td>$108,333</td></tr>
+                <tr class="gv-b"><td>Marketing</td><td>2</td><td>$80,000</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
       <div class="card-grid">
         <div class="card"><h5>COUNT(*)</h5><p>Number of rows in each group. <code>COUNT(col)</code> ignores NULLs.</p></div>

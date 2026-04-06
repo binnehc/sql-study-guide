@@ -373,6 +373,20 @@
   /* ── ANIMATIONS ── */
   @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
 
+  /* ── SUBQUERY FLOW VIZ ── */
+  .subq-flow { margin:20px 0; display:flex; flex-direction:column; gap:0; max-width:500px; }
+  .sf-box { border:1px solid var(--bdr); border-radius:8px; padding:14px 16px; background:var(--bg2); }
+  .sf-inner { border-color:rgba(121,184,255,0.4); }
+  .sf-outer { border-color:rgba(111,207,151,0.4); }
+  .sf-lbl { font-size:10px; font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px; }
+  .sf-inner .sf-lbl { color:#79b8ff; }
+  .sf-outer .sf-lbl { color:#6fcf97; }
+  .sf-code { font-family:'JetBrains Mono',monospace; font-size:12.5px; background:var(--bg3); padding:6px 10px; border-radius:5px; margin-bottom:8px; color:var(--text); }
+  .sf-result { font-size:12px; color:var(--text3); }
+  .sf-result em { color:var(--yel); font-style:normal; font-weight:600; font-family:'JetBrains Mono',monospace; }
+  .sf-conn { text-align:center; padding:5px 0; font-size:11.5px; font-family:'JetBrains Mono',monospace; color:var(--text3); display:flex; align-items:center; justify-content:center; gap:8px; }
+  .sf-conn::before,.sf-conn::after { content:''; flex:1; height:1px; background:var(--bdr); max-width:50px; }
+
   /* ── FOOTER ── */
   footer { padding:48px 0; border-top:1px solid var(--bdr); text-align:center; }
   footer p { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text3); }
@@ -749,6 +763,21 @@
       <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Part 2 · Subqueries</span><div class="dvd-line"></div></div>
 
       <p class="s-body">A <strong>subquery</strong> is a query nested inside another query. They work but can get hard to read — CTEs (Day 5) are the cleaner alternative. Knowing subqueries helps you read legacy code and understand how CTEs improve on them.</p>
+
+      <!-- Subquery inside-out flow visualization -->
+      <div class="subq-flow">
+        <div class="sf-box sf-inner">
+          <div class="sf-lbl">① Inner query — runs first</div>
+          <div class="sf-code">SELECT AVG(salary) FROM employees</div>
+          <div class="sf-result">evaluates to a single value → <em>97,000</em></div>
+        </div>
+        <div class="sf-conn">result passed to outer query ↓</div>
+        <div class="sf-box sf-outer">
+          <div class="sf-lbl">② Outer query — uses the result</div>
+          <div class="sf-code">WHERE salary &gt; <em>97,000</em></div>
+          <div class="sf-result">returns only employees above the average</div>
+        </div>
+      </div>
 
       <div class="cb">
         <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · Subqueries</span><button class="cp-btn" onclick="cp(this)">copy</button></div>

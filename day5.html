@@ -373,6 +373,22 @@
   /* ── ANIMATIONS ── */
   @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
 
+  /* ── CTE PIPELINE VIZ ── */
+  .cte-pipe { display:flex; align-items:stretch; margin:20px 0; overflow-x:auto; }
+  @media(max-width:560px){ .cte-pipe { flex-direction:column; } }
+  .cp-box { flex:1; min-width:120px; border:1px solid var(--bdr); padding:14px; background:var(--bg2); }
+  .cp-box:first-child { border-radius:8px 0 0 8px; }
+  .cp-box:last-child  { border-radius:0 8px 8px 0; border-left:none; }
+  @media(max-width:560px){ .cp-box:first-child { border-radius:8px 8px 0 0; } .cp-box:last-child { border-radius:0 0 8px 8px; border-left:1px solid var(--bdr); border-top:none; } }
+  .cp-num  { font-size:10px; font-family:'JetBrains Mono',monospace; color:var(--text3); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; }
+  .cp-name { font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; margin-bottom:5px; }
+  .cp-body { font-size:12px; color:var(--text3); line-height:1.55; }
+  .cp-arr  { display:flex; align-items:center; padding:0 4px; color:var(--text3); font-size:18px; flex-shrink:0; }
+  @media(max-width:560px){ .cp-arr { justify-content:center; padding:4px 0; } }
+  .cp-src  .cp-name { color:var(--text2); }
+  .cp-cte  { border-color:rgba(121,184,255,0.35); } .cp-cte  .cp-name { color:#79b8ff; }
+  .cp-fin  { border-color:rgba(111,207,151,0.35); } .cp-fin  .cp-name { color:#6fcf97; }
+
   /* ── FOOTER ── */
   footer { padding:48px 0; border-top:1px solid var(--bdr); text-align:center; }
   footer p { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text3); }
@@ -705,6 +721,27 @@
       <p class="s-label">Day 05 · Readable Queries</p>
       <h2 class="s-title">COMMON TABLE<br><em>EXPRESSIONS</em></h2>
       <p class="s-body">A CTE is a <strong>named temporary result set</strong> defined at the top of your query. It only exists for the duration of that query. The main benefit: breaking complex logic into readable, named steps instead of deeply nested subqueries.</p>
+
+      <!-- CTE pipeline visualization -->
+      <div class="cte-pipe">
+        <div class="cp-box cp-src">
+          <div class="cp-num">① Source</div>
+          <div class="cp-name">employees</div>
+          <div class="cp-body">raw table<br>all rows</div>
+        </div>
+        <div class="cp-arr">→</div>
+        <div class="cp-box cp-cte">
+          <div class="cp-num">② Your CTE</div>
+          <div class="cp-name">dept_totals</div>
+          <div class="cp-body">GROUP BY dept<br>SUM(salary) AS total</div>
+        </div>
+        <div class="cp-arr">→</div>
+        <div class="cp-box cp-fin">
+          <div class="cp-num">③ Final SELECT</div>
+          <div class="cp-name">result</div>
+          <div class="cp-body">WHERE total<br>&gt; 200,000</div>
+        </div>
+      </div>
 
       <div class="compare">
         <div class="compare-col">
