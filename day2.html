@@ -373,6 +373,15 @@
   /* ── ANIMATIONS ── */
   @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
 
+  /* ── JOIN VENN VIZ ── */
+  .join-viz { margin:24px 0; }
+  .join-venn-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  @media(max-width:620px){ .join-venn-grid { grid-template-columns:repeat(2,1fr); } }
+  .venn-item { display:flex; flex-direction:column; align-items:center; background:var(--bg2); border:1px solid var(--bdr); border-radius:10px; padding:12px 8px 10px; gap:4px; }
+  .venn-item svg { width:100%; max-width:110px; height:auto; }
+  .venn-label { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text); font-weight:600; text-align:center; }
+  .venn-desc { font-size:11px; color:var(--text3); text-align:center; line-height:1.4; }
+
   /* ── FOOTER ── */
   footer { padding:48px 0; border-top:1px solid var(--bdr); text-align:center; }
   footer p { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text3); }
@@ -705,6 +714,62 @@
       <p class="s-label">Day 02 · Combining Tables</p>
       <h2 class="s-title">JOIN <em>TYPES</em></h2>
       <p class="s-body">A JOIN combines rows from two tables based on a matching column — usually a shared ID. The type of JOIN controls <strong>what happens to rows that don't match</strong>.</p>
+
+      <!-- JOIN Venn diagram visualization -->
+      <div class="join-viz">
+        <div class="join-venn-grid">
+          <!-- INNER JOIN: only intersection highlighted -->
+          <div class="venn-item">
+            <svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <clipPath id="venn-inner-cl">
+                  <circle cx="44" cy="40" r="28"/>
+                </clipPath>
+              </defs>
+              <circle cx="44" cy="40" r="28" fill="rgba(111,207,151,0.07)" stroke="rgba(111,207,151,0.45)" stroke-width="1.5"/>
+              <circle cx="76" cy="40" r="28" fill="rgba(111,207,151,0.07)" stroke="rgba(111,207,151,0.45)" stroke-width="1.5"/>
+              <circle cx="76" cy="40" r="28" fill="rgba(111,207,151,0.42)" clip-path="url(#venn-inner-cl)"/>
+              <text x="27" y="43" fill="rgba(232,232,232,0.45)" font-size="8.5" font-family="DM Sans,sans-serif" text-anchor="middle">Left</text>
+              <text x="93" y="43" fill="rgba(232,232,232,0.45)" font-size="8.5" font-family="DM Sans,sans-serif" text-anchor="middle">Right</text>
+            </svg>
+            <div class="venn-label">INNER JOIN</div>
+            <div class="venn-desc">Matching rows only</div>
+          </div>
+          <!-- LEFT JOIN: full left circle highlighted -->
+          <div class="venn-item">
+            <svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="44" cy="40" r="28" fill="rgba(121,184,255,0.35)" stroke="rgba(121,184,255,0.55)" stroke-width="1.5"/>
+              <circle cx="76" cy="40" r="28" fill="rgba(121,184,255,0.07)" stroke="rgba(121,184,255,0.35)" stroke-width="1.5"/>
+              <text x="27" y="43" fill="rgba(232,232,232,0.8)" font-size="8.5" font-family="DM Sans,sans-serif" text-anchor="middle">Left</text>
+              <text x="93" y="43" fill="rgba(232,232,232,0.35)" font-size="8.5" font-family="DM Sans,sans-serif" text-anchor="middle">Right</text>
+            </svg>
+            <div class="venn-label">LEFT JOIN</div>
+            <div class="venn-desc">All left + matched right</div>
+          </div>
+          <!-- RIGHT JOIN: full right circle highlighted -->
+          <div class="venn-item">
+            <svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="44" cy="40" r="28" fill="rgba(121,184,255,0.07)" stroke="rgba(121,184,255,0.35)" stroke-width="1.5"/>
+              <circle cx="76" cy="40" r="28" fill="rgba(121,184,255,0.35)" stroke="rgba(121,184,255,0.55)" stroke-width="1.5"/>
+              <text x="27" y="43" fill="rgba(232,232,232,0.35)" font-size="8.5" font-family="DM Sans,sans-serif" text-anchor="middle">Left</text>
+              <text x="93" y="43" fill="rgba(232,232,232,0.8)" font-size="8.5" font-family="DM Sans,sans-serif" text-anchor="middle">Right</text>
+            </svg>
+            <div class="venn-label">RIGHT JOIN</div>
+            <div class="venn-desc">All right + matched left</div>
+          </div>
+          <!-- FULL OUTER JOIN: both circles highlighted -->
+          <div class="venn-item">
+            <svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="44" cy="40" r="28" fill="rgba(179,146,240,0.32)" stroke="rgba(179,146,240,0.55)" stroke-width="1.5"/>
+              <circle cx="76" cy="40" r="28" fill="rgba(179,146,240,0.32)" stroke="rgba(179,146,240,0.55)" stroke-width="1.5"/>
+              <text x="27" y="43" fill="rgba(232,232,232,0.8)" font-size="8.5" font-family="DM Sans,sans-serif" text-anchor="middle">Left</text>
+              <text x="93" y="43" fill="rgba(232,232,232,0.8)" font-size="8.5" font-family="DM Sans,sans-serif" text-anchor="middle">Right</text>
+            </svg>
+            <div class="venn-label">FULL OUTER JOIN</div>
+            <div class="venn-desc">All rows from both tables</div>
+          </div>
+        </div>
+      </div>
 
       <p class="s-body">Our two example tables:</p>
       <div class="compare">

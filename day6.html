@@ -373,6 +373,36 @@
   /* ── ANIMATIONS ── */
   @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
 
+  /* ── WINDOW FUNCTION VIZ ── */
+  .win-viz { margin:24px 0; }
+  .partition-groups { display:flex; gap:8px; margin:14px 0 6px; flex-wrap:wrap; }
+  .pg-group { flex:1; min-width:130px; border-radius:8px; overflow:hidden; border:1px solid var(--bdr2); }
+  .pg-label { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; padding:5px 10px; }
+  .pg-blue .pg-label  { background:rgba(121,184,255,0.15); color:#79b8ff; }
+  .pg-green .pg-label { background:rgba(111,207,151,0.15); color:#6fcf97; }
+  .pg-purp  .pg-label { background:rgba(179,146,240,0.15); color:#b392f0; }
+  .pg-yel   .pg-label { background:rgba(255,171,112,0.15); color:#ffab70; }
+  .pg-rows  { background:var(--bg2); }
+  .pg-row { display:flex; justify-content:space-between; align-items:center; padding:4px 10px; font-size:12px; border-top:1px solid var(--bdr); }
+  .pg-row:first-child { border-top:none; }
+  .pg-row .rk { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); }
+  .pg-blue  .pg-row .rk { color:#79b8ff; }
+  .pg-green .pg-row .rk { color:#6fcf97; }
+  .pg-purp  .pg-row .rk { color:#b392f0; }
+  .win-viz-note { text-align:center; font-size:11.5px; color:var(--text3); margin-top:4px; }
+
+  /* LAG/LEAD viz */
+  .lag-viz { margin:24px 0; }
+  .lag-table { border:1px solid var(--bdr); border-radius:8px; overflow:hidden; background:var(--bg2); font-size:13px; }
+  .lt-row, .lt-header { display:grid; grid-template-columns:1fr 1fr 1.2fr 1.2fr; }
+  .lt-header { background:var(--bg3); font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); }
+  .lt-header > span, .lt-row > span { padding:7px 12px; }
+  .lt-row { border-top:1px solid var(--bdr); }
+  .lt-row.lt-active { background:rgba(255,255,255,0.03); }
+  .lt-null { color:var(--text3) !important; font-style:italic; }
+  .lt-lag  { color:#79b8ff; }
+  .lt-lead { color:#ffab70; }
+
   /* ── FOOTER ── */
   footer { padding:48px 0; border-top:1px solid var(--bdr); text-align:center; }
   footer p { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text3); }
@@ -712,6 +742,36 @@
         <strong>PARTITION BY</strong> = reset the calculation for each group &nbsp;·&nbsp; <strong>ORDER BY</strong> = define the sequence within each partition.</p>
       </div>
 
+      <!-- PARTITION BY visualization -->
+      <div class="win-viz">
+        <p class="s-body" style="margin-bottom:10px">Think of <code>PARTITION BY department</code> as splitting the table into separate groups — the window function runs independently inside each one:</p>
+        <div class="partition-groups">
+          <div class="pg-group pg-blue">
+            <div class="pg-label">dept = 'Engineering'</div>
+            <div class="pg-rows">
+              <div class="pg-row"><span>Alice</span><span>$120k</span><span class="rk">rank 1</span></div>
+              <div class="pg-row"><span>Bob</span><span>$110k</span><span class="rk">rank 2</span></div>
+              <div class="pg-row"><span>Eve</span><span>$110k</span><span class="rk">rank 2 (tie)</span></div>
+              <div class="pg-row"><span>Carol</span><span>$80k</span><span class="rk">rank 4</span></div>
+            </div>
+          </div>
+          <div class="pg-group pg-green">
+            <div class="pg-label">dept = 'Marketing'</div>
+            <div class="pg-rows">
+              <div class="pg-row"><span>Dave</span><span>$90k</span><span class="rk">rank 1 ← resets</span></div>
+              <div class="pg-row"><span>Grace</span><span>$72k</span><span class="rk">rank 2</span></div>
+            </div>
+          </div>
+          <div class="pg-group pg-purp">
+            <div class="pg-label">dept = 'Finance'</div>
+            <div class="pg-rows">
+              <div class="pg-row"><span>Frank</span><span>$95k</span><span class="rk">rank 1 ← resets</span></div>
+            </div>
+          </div>
+        </div>
+        <p class="win-viz-note">Each partition gets its own independent ranking — no mixing between groups</p>
+      </div>
+
       <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">ROW_NUMBER vs RANK vs DENSE_RANK</span><div class="dvd-line"></div></div>
 
       <p class="s-body">All three assign a number to each row within a group. The difference appears when there are <strong>ties</strong> (equal values).</p>
@@ -777,6 +837,37 @@
           <h5>FIRST_VALUE() / LAST_VALUE()</h5>
           <p>Get the first or last value in the window. Useful for comparing each row against the group leader.</p>
         </div>
+      </div>
+
+      <!-- LAG / LEAD visualization -->
+      <div class="lag-viz">
+        <p class="s-body" style="margin-bottom:10px"><strong>LAG</strong> looks back one row · <strong>LEAD</strong> looks forward one row · rows at the boundary return <code>NULL</code>:</p>
+        <div class="lag-table">
+          <div class="lt-header">
+            <span>month</span><span>revenue</span><span>LAG(revenue)</span><span>LEAD(revenue)</span>
+          </div>
+          <div class="lt-row">
+            <span>Jan</span><span>$50k</span>
+            <span class="lt-null">NULL ←boundary</span>
+            <span class="lt-lead">$60k ↓</span>
+          </div>
+          <div class="lt-row lt-active">
+            <span>Feb</span><span>$60k</span>
+            <span class="lt-lag">$50k ↑</span>
+            <span class="lt-lead">$45k ↓</span>
+          </div>
+          <div class="lt-row">
+            <span>Mar</span><span>$45k</span>
+            <span class="lt-lag">$60k ↑</span>
+            <span class="lt-lead">$80k ↓</span>
+          </div>
+          <div class="lt-row">
+            <span>Apr</span><span>$80k</span>
+            <span class="lt-lag">$45k ↑</span>
+            <span class="lt-null">NULL →boundary</span>
+          </div>
+        </div>
+        <p class="win-viz-note" style="margin-top:8px">Use <code>revenue - LAG(revenue) OVER (ORDER BY month)</code> to compute month-over-month change</p>
       </div>
 
       <div class="cb">
