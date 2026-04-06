@@ -169,8 +169,21 @@
   .sb-sub { display:block; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
   .sb-check { width:16px; height:16px; border-radius:50%; border:1px solid var(--bdr2); flex-shrink:0; transition:all 0.2s; }
   .sb-check.done { background:var(--green); border-color:var(--green); }
-  .sb-footer { padding:14px 16px; border-top:1px solid var(--bdr); flex-shrink:0; }
-  .sb-overall { display:flex; flex-direction:column; gap:7px; }
+  .sb-footer { padding:14px 16px; border-top:1px solid var(--bdr); flex-shrink:0; display:flex; flex-direction:column; gap:12px; }
+  .sb-track-lbl { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; color:var(--text3); letter-spacing:0.05em; text-transform:uppercase; }
+  .sb-day-dots { display:flex; gap:5px; margin-top:7px; }
+  .sb-day-dot {
+    flex:1; height:32px; border-radius:6px; border:1px solid var(--bdr2);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+    font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; color:var(--text3);
+    background:var(--bg3); transition:all 0.2s; position:relative; cursor:default;
+  }
+  .sb-day-dot.active { border-color:rgba(121,184,255,0.4); color:var(--blue); background:rgba(121,184,255,0.08); }
+  .sb-day-dot.done   { border-color:rgba(111,207,151,0.4); color:var(--green); background:rgba(111,207,151,0.08); }
+  .sb-day-dot.done::after {
+    content:'✓'; position:absolute; top:-1px; right:2px; font-size:8px; color:var(--green); line-height:1;
+  }
+  .sb-overall { display:flex; flex-direction:column; gap:6px; }
   #sb-count { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); }
   .sb-overall-bar { height:3px; background:var(--bdr2); border-radius:2px; overflow:hidden; }
   #sb-overall-fill { height:100%; width:0%; background:var(--green); border-radius:2px; transition:width 0.3s ease; }
@@ -691,8 +704,20 @@
     </a>
   </div>
   <div class="sb-footer">
+    <div>
+      <span class="sb-track-lbl">Day tracker</span>
+      <div class="sb-day-dots">
+        <div class="sb-day-dot active" id="track-day1">1</div>
+        <div class="sb-day-dot" id="track-day2">2</div>
+        <div class="sb-day-dot" id="track-day3">3</div>
+        <div class="sb-day-dot" id="track-day4">4</div>
+        <div class="sb-day-dot" id="track-day5">5</div>
+        <div class="sb-day-dot" id="track-day6">6</div>
+        <div class="sb-day-dot" id="track-day7">7</div>
+      </div>
+    </div>
     <div class="sb-overall">
-      <span id="sb-count">0 / 10 complete</span>
+      <span id="sb-count">0 / 7 days complete</span>
       <div class="sb-overall-bar"><div id="sb-overall-fill"></div></div>
     </div>
   </div>
@@ -2274,8 +2299,21 @@
     });
 
     // Update overall bar
-    document.getElementById('sb-count').textContent = `${totalDone} / ${totalAll} complete`;
-    document.getElementById('sb-overall-fill').style.width = totalAll ? (totalDone / totalAll * 100) + '%' : '0%';
+    // Update day tracker dots
+    let daysComplete = 0;
+    for (let n = 1; n <= 7; n++) {
+      const k   = 'Day ' + n;
+      const dot = document.getElementById('track-day' + n);
+      if (!dot) continue;
+      const complete = (dayItemCount[k] || 0) > 0 && (dayDoneCount[k] || 0) === (dayItemCount[k] || 0);
+      const unlocked = n <= 1 || ((dayDoneCount['Day ' + (n-1)] || 0) === (dayItemCount['Day ' + (n-1)] || 0) && (dayItemCount['Day ' + (n-1)] || 0) > 0);
+      const inProgress = unlocked && !complete && (dayDoneCount[k] || 0) > 0;
+      dot.classList.toggle('done',   complete);
+      dot.classList.toggle('active', !complete && (unlocked || inProgress));
+      if (complete) daysComplete++;
+    }
+    document.getElementById('sb-count').textContent = `${daysComplete} / 7 days complete`;
+    document.getElementById('sb-overall-fill').style.width = (daysComplete / 7 * 100) + '%';
 
     updateLocks();
   }
