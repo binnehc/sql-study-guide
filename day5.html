@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 5 · CTEs — SQL Interview Prep</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:    #0f0f0f;
+    --bg2:   #1a1a1a;
+    --bg3:   #222222;
+    --text:  #e8e8e8;
+    --text2: #8b8b8b;
+    --text3: #4a4a4a;
+    --green: #6fcf97;
+    --blue:  #79b8ff;
+    --red:   #ff7b7b;
+    --purp:  #b392f0;
+    --yel:   #ffab70;
+    --bdr:   rgba(255,255,255,0.07);
+    --bdr2:  rgba(255,255,255,0.12);
+    --hover: rgba(255,255,255,0.04);
+    /* keep legacy aliases so existing HTML classes still work */
+    --cream: var(--text);
+    --crm2:  var(--text2);
+    --muted: var(--text3);
+    --amber: var(--text);
+    --amb2:  var(--text2);
+    --glow:  var(--hover);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; font-size:16px; line-height:1.7; }
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:var(--bg3); border-radius:4px; }
+  .wrap { max-width:740px; margin:0 auto; padding:0 28px; }
+
+  /* ── PROGRESS ── */
+  #prog-rail { position:fixed; top:0; left:0; right:0; height:2px; background:transparent; z-index:300; }
+  #prog-bar  { height:100%; width:0%; background:var(--text3); transition:width 0.1s; }
+
+  /* ── NAV ── */
+  nav {
+    position:fixed; top:0; left:0; right:0; height:48px;
+    padding:0 16px; display:flex; align-items:center; gap:10px;
+    z-index:199;
+    background:rgba(15,15,15,0.94);
+    -webkit-backdrop-filter:blur(12px);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--bdr);
+  }
+  #sb-btn {
+    width:32px; height:32px; border-radius:6px; border:none;
+    background:none; color:var(--text3); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:background 0.15s, color 0.15s; flex-shrink:0;
+  }
+  #sb-btn:hover { background:var(--hover); color:var(--text); }
+  .nav-title { font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; color:var(--text2); }
+
+  /* ── MUSIC PLAYER ── */
+  #music-btn {
+    width:32px; height:32px; border-radius:6px; border:none;
+    background:none; color:var(--text3); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:background 0.15s, color 0.15s; flex-shrink:0;
+    margin-left:auto;
+  }
+  #music-btn:hover { background:var(--hover); color:var(--text); }
+  #music-btn.playing { color:var(--green); }
+  #music-label {
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3);
+    transition:color 0.15s; white-space:nowrap;
+  }
+  #music-label.playing { color:var(--green); }
+  #music-vol {
+    width:52px; height:3px; accent-color:var(--text3); cursor:pointer;
+    transition:accent-color 0.15s;
+  }
+  #music-vol.playing { accent-color:var(--green); }
+  #autoplay-hint {
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    background:var(--bg2); border:1px solid var(--bdr2);
+    color:var(--text2); font-family:'JetBrains Mono',monospace; font-size:12px;
+    padding:8px 16px; border-radius:8px; z-index:500;
+    pointer-events:none; opacity:0;
+    transition:opacity 0.4s;
+  }
+  #autoplay-hint.show { opacity:1; }
+  /* ── CASE STUDY VARIANTS ── */
+  .case-next-btn {
+    display:block; width:100%; margin-top:16px;
+    background:rgba(121,184,255,0.08); border:1px solid rgba(121,184,255,0.25);
+    color:var(--blue); font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500;
+    padding:10px 16px; border-radius:8px; cursor:pointer; text-align:left;
+    transition:background 0.15s, border-color 0.15s;
+  }
+  .case-next-btn:hover { background:rgba(121,184,255,0.14); border-color:rgba(121,184,255,0.4); }
+  .case-back-btn {
+    display:inline-flex; align-items:center; gap:6px;
+    background:none; border:none; color:var(--text3); font-family:'DM Sans',sans-serif;
+    font-size:12px; cursor:pointer; margin-bottom:12px; padding:0;
+    transition:color 0.15s;
+  }
+  .case-back-btn:hover { color:var(--text2); }
+  .case-variant-badge {
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px;
+    color:var(--blue); background:rgba(121,184,255,0.1); border:1px solid rgba(121,184,255,0.2);
+    border-radius:4px; padding:2px 7px; margin-bottom:10px;
+  }
+
+
+  /* ── DAY LOCKING ── */
+  .section-locked { position:relative; }
+  .section-locked > .wrap { opacity:0.18; filter:blur(2px); pointer-events:none; user-select:none; }
+  .lock-banner {
+    position:sticky; top:60px; z-index:50;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    margin:0 auto 0; max-width:740px; padding:0 28px;
+  }
+  .lock-banner-inner {
+    display:flex; align-items:center; gap:10px;
+    background:var(--bg2); border:1px solid var(--bdr2);
+    border-radius:10px; padding:12px 20px;
+    font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text2);
+    box-shadow:0 4px 24px rgba(0,0,0,0.4);
+  }
+  .lock-banner-inner svg { flex-shrink:0; color:var(--text3); }
+  .sb-item.locked { pointer-events:none; opacity:0.45; }
+  .sb-item.locked .sb-check { background:none; border-color:var(--bdr2); }
+  .sb-item.locked .sb-check::after {
+    content:''; display:block; width:8px; height:10px; margin:3px auto;
+    background:var(--text3);
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 10'%3E%3Crect x='1' y='4' width='6' height='6' rx='1'/%3E%3Cpath d='M2 4V3a2 2 0 0 1 4 0v1' stroke='currentColor' fill='none' stroke-width='1.2'/%3E%3C/svg%3E") no-repeat center;
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 10'%3E%3Crect x='1' y='4' width='6' height='6' rx='1'/%3E%3Cpath d='M2 4V3a2 2 0 0 1 4 0v1' stroke='currentColor' fill='none' stroke-width='1.2'/%3E%3C/svg%3E") no-repeat center;
+    -webkit-mask-size:contain; mask-size:contain;
+  }
+
+  /* ── PRACTICE DAY NAVIGATOR ── */
+  #float-day-nav {
+    display:flex; align-items:center; gap:4px;
+    padding:6px 10px; border-bottom:1px solid var(--bdr); flex-shrink:0;
+    background:var(--bg2);
+  }
+  .fday-lbl { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); margin-right:4px; flex-shrink:0; }
+  .fday-btn {
+    font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500;
+    width:26px; height:26px; border-radius:5px; border:1px solid transparent;
+    background:none; color:var(--text3); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .fday-btn:hover:not(.locked):not(.on) { background:var(--hover); color:var(--text2); }
+  .fday-btn.on { background:var(--hover); color:var(--blue); border-color:rgba(121,184,255,0.3); }
+  .fday-btn.locked { opacity:0.3; cursor:not-allowed; }
+
+
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    position:fixed; top:48px; left:0; bottom:0; width:232px;
+    background:var(--bg2); border-right:1px solid var(--bdr);
+    display:flex; flex-direction:column;
+    transform:translateX(-232px);
+    transition:transform 0.22s ease;
+    z-index:198; overflow:hidden;
+  }
+  #sidebar.open { transform:translateX(0); }
+  .sb-head {
+    padding:16px 16px 12px; display:flex; align-items:center;
+    justify-content:space-between; border-bottom:1px solid var(--bdr); flex-shrink:0;
+  }
+  .sb-heading { font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; color:var(--text2); letter-spacing:0.04em; text-transform:uppercase; }
+  .sb-close { width:24px; height:24px; border:none; background:none; color:var(--text3); cursor:pointer; border-radius:4px; display:flex; align-items:center; justify-content:center; transition:background 0.15s, color 0.15s; }
+  .sb-close:hover { background:var(--hover); color:var(--text); }
+  .sb-days { flex:1; overflow-y:auto; padding:8px 0; }
+  .sb-item {
+    display:flex; align-items:center; gap:10px;
+    padding:8px 16px; text-decoration:none;
+    transition:background 0.15s; border-radius:0;
+  }
+  .sb-item:hover { background:var(--hover); }
+  .sb-item.active { background:var(--hover); }
+  .sb-num { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); flex-shrink:0; min-width:20px; }
+  .sb-info { flex:1; min-width:0; }
+  .sb-label { display:block; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; transition:color 0.15s; }
+  .sb-item:hover .sb-label { color:var(--text); }
+  .sb-sub { display:block; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+  .sb-check { width:16px; height:16px; border-radius:50%; border:1px solid var(--bdr2); flex-shrink:0; transition:all 0.2s; }
+  .sb-check.done { background:var(--green); border-color:var(--green); }
+  .sb-footer { padding:14px 16px; border-top:1px solid var(--bdr); flex-shrink:0; display:flex; flex-direction:column; gap:12px; }
+  .sb-track-lbl { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; color:var(--text3); letter-spacing:0.05em; text-transform:uppercase; }
+  .sb-day-dots { display:flex; gap:5px; margin-top:7px; }
+  .sb-day-dot {
+    flex:1; height:32px; border-radius:6px; border:1px solid var(--bdr2);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+    font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; color:var(--text3);
+    background:var(--bg3); transition:all 0.2s; position:relative; cursor:default;
+  }
+  .sb-day-dot.active { border-color:rgba(121,184,255,0.4); color:var(--blue); background:rgba(121,184,255,0.08); }
+  .sb-day-dot.done   { border-color:rgba(111,207,151,0.4); color:var(--green); background:rgba(111,207,151,0.08); }
+  .sb-day-dot.done::after {
+    content:'✓'; position:absolute; top:-1px; right:2px; font-size:8px; color:var(--green); line-height:1;
+  }
+  .sb-overall { display:flex; flex-direction:column; gap:6px; }
+  #sb-count { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); }
+  .sb-overall-bar { height:3px; background:var(--bdr2); border-radius:2px; overflow:hidden; }
+  #sb-overall-fill { height:100%; width:0%; background:var(--green); border-radius:2px; transition:width 0.3s ease; }
+  /* backdrop for mobile */
+  #sb-backdrop { display:none; position:fixed; inset:0; top:48px; background:rgba(0,0,0,0.5); z-index:197; }
+  #sb-backdrop.show { display:block; }
+
+  /* ── HERO — compact ── */
+  #hero { padding:88px 0 52px; border-top:none; }
+  .hero-eyebrow {
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    color:var(--text3); margin-bottom:16px;
+    opacity:0; animation:fadeUp 0.5s 0.1s forwards;
+  }
+  .hero-eyebrow span { display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--text3); }
+  .hero-title {
+    font-family:'DM Sans',sans-serif; font-size:clamp(32px,5vw,52px);
+    font-weight:700; line-height:1.1; letter-spacing:-0.025em;
+    color:var(--text); margin-bottom:14px;
+    opacity:0; animation:fadeUp 0.5s 0.2s forwards;
+  }
+  .hero-title em { color:var(--text2); font-style:normal; font-weight:300; }
+  .hero-sub { font-size:15px; color:var(--text2); max-width:500px; line-height:1.65; opacity:0; animation:fadeUp 0.5s 0.3s forwards; margin-bottom:0; }
+  .hero-grid { display:none; }
+
+  /* hide old roadmap styles — sidebar replaces them */
+  .roadmap, .roadmap-row, .roadmap-dot-col, .roadmap-vert,
+  .roadmap-item, .roadmap-day, .roadmap-topic { display:none; }
+
+  /* ── SECTION BASE ── */
+  section { padding:72px 0; border-top:1px solid var(--bdr); }
+  .s-label {
+    font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500;
+    color:var(--text3); letter-spacing:0.08em; margin-bottom:12px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .s-label::before { content:''; display:inline-block; width:16px; height:1px; background:var(--text3); }
+  .s-title {
+    font-family:'DM Sans',sans-serif; font-size:clamp(26px,4vw,36px);
+    font-weight:700; line-height:1.2; letter-spacing:-0.02em;
+    color:var(--text); margin-bottom:16px;
+  }
+  .s-title em { color:var(--text2); font-style:normal; font-weight:400; }
+  .s-body { font-size:16px; color:var(--text2); max-width:640px; margin-bottom:24px; line-height:1.7; }
+  .s-body strong { color:var(--text); font-weight:600; }
+  .s-body code, p code {
+    font-family:'JetBrains Mono',monospace; font-size:13px;
+    background:var(--bg2); color:var(--text);
+    padding:2px 6px; border-radius:4px; border:1px solid var(--bdr2);
+  }
+  .reveal { opacity:0; transform:translateY(10px); transition:opacity 0.45s ease,transform 0.45s ease; }
+  .reveal.vis { opacity:1; transform:translateY(0); }
+
+  /* ── TABLE ── */
+  .tbl-wrap { overflow-x:auto; border:1px solid var(--bdr); border-radius:8px; background:var(--bg2); margin:20px 0; }
+  table { width:100%; border-collapse:collapse; font-family:'JetBrains Mono',monospace; font-size:13px; }
+  thead tr { background:var(--bg3); border-bottom:1px solid var(--bdr2); }
+  th { padding:10px 16px; text-align:left; color:var(--text2); font-size:11px; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; white-space:nowrap; }
+  td { padding:10px 16px; color:var(--text2); border-bottom:1px solid var(--bdr); white-space:nowrap; transition:background 0.15s; }
+  tbody tr:last-child td { border-bottom:none; }
+  tbody tr:hover td { background:var(--hover); }
+  .hl  { color:var(--text) !important; font-weight:600; }
+  .red { color:var(--red) !important; }
+  .grn { color:var(--green) !important; }
+  .blu { color:var(--blue) !important; }
+  .null-cell { color:var(--text3) !important; font-style:italic; }
+  .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-family:'JetBrains Mono',monospace; }
+  .tag-g { background:rgba(111,207,151,0.1); color:var(--green); border:1px solid rgba(111,207,151,0.2); }
+  .tag-b { background:rgba(121,184,255,0.1); color:var(--blue);  border:1px solid rgba(121,184,255,0.2); }
+  .tag-r { background:rgba(255,123,123,0.1); color:var(--red);   border:1px solid rgba(255,123,123,0.2); }
+  .tag-a { background:var(--hover); color:var(--text); border:1px solid var(--bdr2); }
+
+  /* ── CODE BLOCK ── */
+  .cb { background:var(--bg2); border:1px solid var(--bdr); border-radius:8px; overflow:hidden; margin:20px 0; }
+  .cb-head { background:var(--bg3); border-bottom:1px solid var(--bdr); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .cb-dots { display:flex; gap:5px; }
+  .cb-dot { width:10px; height:10px; border-radius:50%; background:var(--bg); border:1px solid var(--bdr2); }
+  .cb-lang { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:500; color:var(--text3); letter-spacing:0.08em; text-transform:uppercase; }
+  .cp-btn { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); background:none; border:1px solid var(--bdr); padding:3px 9px; border-radius:4px; cursor:pointer; transition:all 0.15s; }
+  .cp-btn:hover { color:var(--text); border-color:var(--bdr2); }
+  pre { padding:18px; overflow-x:auto; font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.8; }
+  pre code { background:none; border:none; padding:0; font-size:13px; }
+  .kw  { color:var(--red);  }
+  .fn  { color:var(--blue); }
+  .st  { color:var(--green);}
+  .cm  { color:var(--text3); font-style:italic; }
+  .nu  { color:var(--yel);  }
+  .cl  { color:var(--purp); }
+  .tb  { color:var(--text); }
+
+  /* ── CALLOUT (Notion style) ── */
+  .callout { background:var(--bg2); border:1px solid var(--bdr); border-radius:8px; padding:14px 16px; margin:20px 0; display:flex; gap:12px; align-items:flex-start; }
+  .callout::before { content:'💡'; font-size:16px; flex-shrink:0; margin-top:1px; }
+  .callout-lbl { display:none; }
+  .callout p { font-size:15px; color:var(--text2); }
+  .callout p strong { color:var(--text); }
+
+  /* ── GRID CARDS ── */
+  .card-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1px; margin:20px 0; background:var(--bdr); border:1px solid var(--bdr); border-radius:8px; overflow:hidden; }
+  .card { background:var(--bg); padding:18px; transition:background 0.15s; }
+  .card:hover { background:var(--bg2); }
+  .card h5 { font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; color:var(--text); letter-spacing:0.04em; margin-bottom:6px; }
+  .card p { font-size:14px; color:var(--text2); line-height:1.6; }
+
+  /* ── STEP TABS ── */
+  .stabs { background:var(--bg2); border:1px solid var(--bdr); border-radius:8px; overflow:hidden; margin:24px 0; }
+  .stab-row { display:flex; background:var(--bg3); border-bottom:1px solid var(--bdr); overflow-x:auto; }
+  .stab { font-family:'DM Sans',sans-serif; font-size:13px; font-weight:400; padding:10px 16px; cursor:pointer; color:var(--text3); border:none; background:none; white-space:nowrap; border-bottom:1px solid transparent; transition:all 0.15s; }
+  .stab:hover { color:var(--text2); background:var(--hover); }
+  .stab.on { color:var(--text); border-bottom-color:var(--text); background:var(--bg2); }
+  .stab-panel { padding:24px; display:none; }
+  .stab-panel.on { display:block; }
+  .stab-panel h4 { font-family:'DM Sans',sans-serif; font-size:16px; font-weight:600; color:var(--text); margin-bottom:8px; }
+  .stab-panel > p { font-size:14px; color:var(--text2); margin-bottom:14px; }
+
+  /* ── MODULO ── */
+  .mod-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin:18px 0; }
+  @media(max-width:480px){ .mod-grid { grid-template-columns:repeat(3,1fr); } }
+  .mod-cell { background:var(--bg2); border:1px solid var(--bdr); border-radius:6px; padding:12px 6px; text-align:center; font-family:'JetBrains Mono',monospace; }
+  .mod-cell .n { font-size:20px; font-weight:600; color:var(--text); display:block; margin-bottom:2px; }
+  .mod-cell .r { font-size:10px; color:var(--text3); display:block; margin-bottom:5px; }
+  .mod-cell.odd  { border-color:rgba(111,207,151,0.25); background:rgba(111,207,151,0.04); }
+  .mod-cell.odd  .n { color:var(--green); }
+  .mod-cell.odd  .r { color:var(--green); }
+  .mod-cell.even { border-color:rgba(121,184,255,0.25); background:rgba(121,184,255,0.04); }
+  .mod-cell.even .n { color:var(--blue); }
+  .mod-cell.even .r { color:var(--blue); }
+
+  /* ── DIVIDER ── */
+  .dvd { display:flex; align-items:center; gap:12px; margin:28px 0; }
+  .dvd-line { flex:1; height:1px; background:var(--bdr); }
+  .dvd-txt { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); letter-spacing:0.06em; white-space:nowrap; }
+
+  /* ── PATTERN BOX ── */
+  .pattern-box { background:var(--bg2); border:1px solid var(--bdr); border-radius:8px; padding:28px; margin:24px 0; }
+  .pattern-box::before { display:none; }
+  .pattern-box h4 { font-family:'DM Sans',sans-serif; font-size:18px; font-weight:700; color:var(--text); letter-spacing:-0.01em; margin-bottom:12px; }
+
+  /* ── CHECKLIST ── */
+  .chk { list-style:none; margin:20px 0; }
+  .chk li { display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid var(--bdr); cursor:pointer; transition:background 0.15s; border-radius:4px; padding-left:4px; }
+  .chk li:last-child { border-bottom:none; }
+  .chk li:hover { background:var(--hover); }
+  .chk-box { width:18px; height:18px; min-width:18px; border:1px solid var(--bdr2); border-radius:3px; background:transparent; display:flex; align-items:center; justify-content:center; transition:all 0.15s; margin-top:3px; }
+  .chk-box svg { display:none; }
+  .chk li.done .chk-box { background:var(--text); border-color:var(--text); }
+  .chk li.done .chk-box svg { display:block; }
+  .chk li.done .chk-txt { color:var(--text3); text-decoration:line-through; }
+  .chk-txt { font-size:15px; color:var(--text2); transition:color 0.15s; }
+  .chk-txt strong { color:var(--text); font-weight:600; }
+
+  /* ── COMPARE TWO-COL ── */
+  .compare { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:20px 0; }
+  @media(max-width:600px){ .compare { grid-template-columns:1fr; } }
+  .compare-col h5 { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; color:var(--text3); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:8px; }
+  .compare-col h5.good { color:var(--green); }
+  .compare-col h5.bad  { color:var(--red); }
+
+  /* ── RANK TABLE ── */
+  .rank-compare { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; margin:20px 0; background:var(--bdr); border:1px solid var(--bdr); border-radius:8px; overflow:hidden; }
+  .rank-compare .card { border-radius:0; }
+  @media(max-width:580px){ .rank-compare { grid-template-columns:1fr; } }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── FOOTER ── */
+  footer { padding:48px 0; border-top:1px solid var(--bdr); text-align:center; }
+  footer p { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text3); }
+  footer span { color:var(--text2); }
+
+  /* ── PRACTICE BLOCK ── */
+  .practice-wrap { margin-top:40px; }
+  .practice-prompt {
+    background:var(--bg2); border:1px solid var(--bdr); border-bottom:none;
+    border-radius:8px 8px 0 0; padding:14px 16px;
+    display:flex; gap:12px; align-items:flex-start;
+  }
+  .practice-prompt::before { content:'✏️'; font-size:15px; flex-shrink:0; margin-top:2px; }
+  .practice-q { font-size:15px; color:var(--text); font-weight:500; line-height:1.5; margin-bottom:4px; }
+  .practice-hint { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); }
+  .practice-cb {
+    border:1px solid var(--bdr); border-top:1px solid var(--bdr2);
+    border-radius:0; overflow:hidden; background:var(--bg2);
+  }
+  .practice-cb .cb-head { background:var(--bg3); border-bottom:1px solid var(--bdr); padding:8px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .practice-ta {
+    display:block; width:100%; min-height:200px;
+    background:var(--bg2); color:var(--text);
+    font-family:'JetBrains Mono',monospace; font-size:13px;
+    line-height:1.8; padding:16px 18px;
+    border:none; outline:none; resize:vertical;
+    caret-color:var(--text);
+  }
+  @media(max-width:768px) {
+    .practice-ta { font-size:16px; }
+  }
+  .practice-ta::placeholder { color:var(--text3); font-style:italic; }
+  .practice-answer { display:none; }
+  .practice-answer.show { display:block; }
+  .practice-answer .cb {
+    margin:0; border-radius:0 0 8px 8px;
+    border:1px solid var(--bdr); border-top:1px solid var(--bdr2);
+  }
+
+  /* ── DAY LAYOUT — day-right is now a hidden store; content moves to float panel ── */
+  .day-layout { display:block; }
+  .day-right  { display:none; }
+
+  /* ── FLOATING PRACTICE PANEL ── */
+  #float-panel {
+    position:fixed; right:20px; top:68px;
+    width:340px; max-height:calc(100dvh - 88px);
+    background:var(--bg2);
+    border:1px solid var(--bdr2);
+    border-radius:10px;
+    box-shadow:0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+    z-index:500;
+    display:flex; flex-direction:column;
+    overflow:hidden;
+  }
+  @media(max-width:600px) {
+    #float-panel {
+      left:0; right:0; bottom:0; top:auto;
+      width:100%; max-height:55dvh;
+      border-radius:14px 14px 0 0;
+      border-bottom:none;
+    }
+    #float-panel.minimized {
+      max-height:none;
+    }
+    #float-handle { border-radius:14px 14px 0 0; cursor:default; }
+    #float-panel.minimized #float-handle { border-radius:14px 14px 0 0; }
+  }
+  #float-panel.minimized #float-body { display:none; }
+  #float-handle {
+    display:flex; align-items:center; gap:10px;
+    padding:9px 14px;
+    background:var(--bg3); border-bottom:1px solid var(--bdr);
+    cursor:grab; flex-shrink:0;
+    border-radius:10px 10px 0 0;
+  }
+  #float-panel.minimized #float-handle { border-radius:10px; border-bottom:none; }
+  #float-handle:active { cursor:grabbing; }
+  #float-grip { color:var(--text3); display:flex; align-items:center; }
+  @media(max-width:600px) { #float-grip { display:none; } }
+  #float-day-label { flex:1; font-size:11px; color:var(--text2); letter-spacing:0.04em; text-transform:uppercase; }
+  #float-min-btn {
+    background:none; border:none; color:var(--text3);
+    cursor:pointer; padding:2px 5px; border-radius:3px;
+    font-size:13px; line-height:1;
+  }
+  #float-min-btn:hover { background:var(--hover); color:var(--text); }
+  #float-tabs { display:flex; border-bottom:1px solid var(--bdr); flex-shrink:0; }
+  .float-tab {
+    flex:1; padding:7px 0; background:none; border:none; border-bottom:2px solid transparent;
+    font-family:'DM Sans',sans-serif; font-size:11px; font-weight:500; letter-spacing:0.05em;
+    text-transform:uppercase; color:var(--text3); cursor:pointer; transition:color 0.15s, border-color 0.15s;
+    margin-bottom:-1px;
+  }
+  .float-tab:hover { color:var(--text2); }
+  .float-tab.on { color:var(--text); border-bottom-color:var(--blue); }
+  #float-panel.minimized #float-tabs,
+  #float-panel.minimized #float-ref-body { display:none; }
+  #float-body { overflow-y:auto; flex:1; }
+  #float-body .practice-wrap { margin:0; }
+  #float-body .practice-wrap > .dvd { display:none; }
+  #float-ref-body { overflow-y:auto; flex:1; display:none; }
+  #float-ref-body.on { display:block; }
+  /* inner ref tabs */
+  .fref-tabs { display:flex; gap:4px; padding:10px 12px 8px; border-bottom:1px solid var(--bdr); }
+  .fref-tab {
+    padding:3px 9px; border:1px solid var(--bdr2); border-radius:20px; background:none;
+    font-family:'DM Sans',sans-serif; font-size:10px; font-weight:500; color:var(--text3);
+    cursor:pointer; transition:all 0.15s;
+  }
+  .fref-tab:hover { color:var(--text2); border-color:var(--text3); }
+  .fref-tab.on { background:var(--bg3); color:var(--text); border-color:var(--bdr2); }
+  .fref-panel { display:none; padding:12px 14px 16px; }
+  .fref-panel.on { display:block; }
+  .fref-fn { margin-bottom:10px; }
+  .fref-fn h5 { font-size:11px; font-weight:600; color:var(--blue); font-family:'JetBrains Mono',monospace; margin-bottom:3px; }
+  .fref-fn p { font-size:12px; color:var(--text2); line-height:1.5; }
+  .fref-fn code { font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--yel); background:var(--bg3); padding:1px 4px; border-radius:3px; }
+  .fref-pat { margin-bottom:14px; }
+  .fref-pat-lbl { font-size:10px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:var(--text3); margin-bottom:5px; }
+  #float-ref-body .cb { margin-bottom:10px; }
+  #float-ref-body .cb pre { font-size:11px; max-height:160px; overflow-y:auto; }
+  #float-ref-body .cb-lang { font-size:10px; }
+
+  /* ── PRACTICE CONTEXT STRIP ── */
+  .practice-context {
+    font-size:11px; padding:7px 14px 8px;
+    color:var(--text3); border-bottom:1px solid var(--bdr);
+    letter-spacing:0.03em; min-height:34px;
+    transition:color 0.35s;
+  }
+  .practice-context.lit { color:var(--blue); }
+
+  /* ── CHECK BUTTON ── */
+  .check-btn {
+    flex:1; padding:6px 10px;
+    background:rgba(121,184,255,0.08);
+    border:1px solid rgba(121,184,255,0.2);
+    color:var(--blue); border-radius:4px;
+    font-family:inherit; font-size:12px;
+    cursor:pointer; transition:background 0.15s;
+  }
+  .check-btn:hover { background:rgba(121,184,255,0.16); }
+
+  /* ── ATTEMPT FEEDBACK ── */
+  .practice-status {
+    margin:0 14px 6px; padding:8px 11px;
+    font-size:12px; line-height:1.5; border-radius:5px;
+    display:none;
+  }
+  .practice-status.show { display:block; }
+  .practice-status.neutral { background:var(--bg3); color:var(--text2); }
+  .practice-status.correct { background:rgba(111,207,151,0.12); color:var(--green); border:1px solid rgba(111,207,151,0.25); }
+
+  /* ── HINT BOX ── */
+  .hint-box {
+    margin:0 14px 10px; padding:10px 12px;
+    background:var(--bg3); border-radius:5px;
+    border-left:2px solid var(--yel);
+    display:none;
+  }
+  .hint-box.show { display:block; }
+  .hint-label {
+    font-size:10px; text-transform:uppercase;
+    letter-spacing:0.08em; color:var(--text3); margin-bottom:6px;
+  }
+  .hint-item {
+    font-size:12px; color:var(--yel); line-height:1.55;
+  }
+  .hint-item + .hint-item {
+    margin-top:8px; padding-top:8px;
+    border-top:1px solid rgba(255,255,255,0.06);
+  }
+
+  /* ── CASE STUDIES ── */
+  .cases-layout { display:flex; gap:28px; align-items:flex-start; margin-top:32px; }
+  .cases-list { width:208px; flex-shrink:0; position:sticky; top:68px; max-height:calc(100vh - 88px); overflow-y:auto; }
+  .case-btn {
+    display:block; width:100%; text-align:left;
+    padding:10px 12px 10px 14px;
+    background:transparent; border:none;
+    border-left:2px solid var(--bdr);
+    cursor:pointer; margin-bottom:1px;
+    transition:background 0.12s, border-color 0.12s;
+  }
+  .case-btn:hover { background:var(--hover); }
+  .case-btn.on { border-left-color:var(--text2); background:var(--bg2); }
+  .case-btn-title { display:block; font-size:13px; color:var(--text); font-family:inherit; line-height:1.4; }
+  .case-btn-meta  { display:flex; gap:6px; margin-top:5px; align-items:center; }
+  .diff { font-size:10px; text-transform:uppercase; letter-spacing:0.07em; padding:2px 6px; border-radius:3px; font-weight:600; }
+  .diff.easy   { background:rgba(111,207,151,0.12); color:var(--green); }
+  .diff.medium { background:rgba(255,171,112,0.12); color:var(--yel);   }
+  .diff.hard   { background:rgba(255,123,123,0.12); color:var(--red);   }
+  .cases-detail { flex:1; min-width:0; }
+  .case-panel { display:none; }
+  .case-panel.on { display:block; }
+  .case-title-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+  .case-h { font-size:20px; font-weight:600; color:var(--text); line-height:1.3; }
+  .ctag {
+    font-size:10px; padding:2px 7px; border-radius:3px;
+    background:var(--bg3); color:var(--text2); border:1px solid var(--bdr);
+    letter-spacing:0.02em;
+  }
+  .case-approach { margin:20px 0; }
+  .case-approach h5 { font-size:12px; text-transform:uppercase; letter-spacing:0.07em; color:var(--text3); margin-bottom:10px; }
+  .case-approach ol { padding-left:20px; }
+  .case-approach li { margin-bottom:8px; font-size:14px; color:var(--text2); line-height:1.65; }
+  .case-approach li strong { color:var(--text); }
+  .case-sol { display:none; margin-top:4px; }
+  .case-sol.show { display:block; }
+  .case-sol-btn {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:7px 14px; margin:14px 0 0;
+    background:var(--bg3); border:1px solid var(--bdr2);
+    color:var(--text2); border-radius:5px;
+    font-family:inherit; font-size:12px; cursor:pointer;
+    transition:background 0.12s, color 0.12s;
+  }
+  .case-sol-btn:hover { background:var(--hover); color:var(--text); }
+  .case-ta {
+    display:block; width:100%; min-height:130px;
+    background:var(--bg2); color:var(--text);
+    font-family:'JetBrains Mono',monospace; font-size:13px;
+    line-height:1.8; padding:14px 16px;
+    border:1px solid var(--bdr); border-top:none; border-radius:0 0 6px 6px;
+    outline:none; resize:vertical; caret-color:var(--text);
+  }
+  @media(max-width:768px) {
+    .case-ta { font-size:16px; }
+  }
+  .case-ta:focus { border-color:var(--bdr2); }
+  .case-ta-head {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 14px; background:var(--bg3);
+    border:1px solid var(--bdr); border-radius:6px 6px 0 0;
+    margin-top:16px;
+  }
+  .case-ta-head span { font-size:11px; color:var(--text3); letter-spacing:0.04em; }
+  @media(max-width:760px){
+    .cases-layout { flex-direction:column; }
+    .cases-list { width:100%; position:static; }
+  }
+  @media(max-width:600px){
+    body { padding-bottom:calc(55dvh + 16px); }
+  }
+
+  body { padding-top:0; }
+  .day-nav {
+    position:sticky; top:0; height:52px; z-index:200;
+    background:rgba(15,15,15,0.95); backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--bdr);
+    display:flex; align-items:center; gap:12px; padding:0 24px;
+  }
+  .day-nav-back {
+    display:flex; align-items:center; gap:6px; text-decoration:none;
+    color:var(--text3); font-size:13px; font-family:'DM Sans',sans-serif;
+    transition:color 0.15s; flex-shrink:0;
+  }
+  .day-nav-back:hover { color:var(--text); }
+  .day-nav-title { font-size:14px; font-weight:500; color:var(--text2); font-family:'DM Sans',sans-serif; flex:1; text-align:center; }
+  .day-nav-counter { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); flex-shrink:0; }
+  .day-layout { display:grid; grid-template-columns:1fr 380px; gap:40px; align-items:start; padding-top:48px; padding-bottom:80px; }
+  @media(max-width:900px){ .day-layout { grid-template-columns:1fr; } }
+  .day-right-inline { position:sticky; top:68px; }
+  .practice-panel {
+    background:var(--bg2); border:1px solid var(--bdr); border-radius:12px;
+    overflow:hidden; display:flex; flex-direction:column;
+  }
+  .pp-header {
+    padding:10px 14px 0; border-bottom:1px solid var(--bdr);
+    display:flex; flex-direction:column; gap:0;
+  }
+  .pp-tabs { display:flex; gap:0; }
+  .pp-tab {
+    font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500;
+    padding:8px 14px 9px; border:none; background:none; color:var(--text3);
+    cursor:pointer; border-bottom:2px solid transparent; transition:all 0.15s;
+  }
+  .pp-tab.on { color:var(--text); border-bottom-color:var(--blue); }
+  .pp-body { padding:14px; overflow-y:auto; max-height:calc(100vh - 200px); }
+  .pp-ref { display:none; padding:14px; overflow-y:auto; max-height:calc(100vh - 200px); }
+  .pp-ref.on { display:block; }
+  .day-checklist { margin-top:40px; }
+  .day-checklist h3 { font-size:13px; font-weight:600; color:var(--text3); letter-spacing:0.05em; text-transform:uppercase; margin-bottom:14px; }
+  .day-complete-banner {
+    display:none; margin-top:16px; padding:14px 18px; border-radius:10px;
+    background:rgba(111,207,151,0.1); border:1px solid rgba(111,207,151,0.3);
+    text-align:center;
+  }
+  .day-complete-banner.show { display:block; }
+  .day-complete-banner p { font-size:14px; color:var(--green); font-weight:500; margin-bottom:10px; }
+  .day-complete-banner a {
+    display:inline-block; padding:8px 18px; background:var(--green); color:#0f0f0f;
+    border-radius:7px; text-decoration:none; font-weight:600; font-size:13px;
+    transition:opacity 0.15s;
+  }
+  .day-complete-banner a:hover { opacity:0.85; }
+  .day-footer {
+    border-top:1px solid var(--bdr); padding:20px 28px;
+    display:flex; justify-content:space-between; align-items:center; margin-top:24px;
+  }
+  .day-footer a {
+    display:flex; align-items:center; gap:6px; text-decoration:none;
+    color:var(--text3); font-size:13px; font-family:'DM Sans',sans-serif;
+    transition:color 0.15s;
+  }
+  .day-footer a:hover { color:var(--text); }
+  .day-footer a.disabled { pointer-events:none; opacity:0.2; }
+</style>
+</head>
+<body>
+
+<nav class="day-nav">
+  <a href="index.html" class="day-nav-back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Overview
+  </a>
+  <span class="day-nav-title">Day 05 · CTEs</span>
+  <span class="day-nav-counter">5 / 7</span>
+</nav>
+
+<div class="wrap day-layout">
+
+  <!-- ── Left: theory ── -->
+  <div class="day-left-wrap">
+    
+    <div class="reveal">
+      <p class="s-label">Day 05 · Readable Queries</p>
+      <h2 class="s-title">COMMON TABLE<br><em>EXPRESSIONS</em></h2>
+      <p class="s-body">A CTE is a <strong>named temporary result set</strong> defined at the top of your query. It only exists for the duration of that query. The main benefit: breaking complex logic into readable, named steps instead of deeply nested subqueries.</p>
+
+      <div class="compare">
+        <div class="compare-col">
+          <h5 class="bad">Without CTE — hard to read</h5>
+          <div class="cb" style="margin:8px 0 0">
+            <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span></div>
+            <pre style="padding:14px 18px"><code><span class="kw">SELECT</span> <span class="cl">department</span>
+<span class="kw">FROM</span> (
+  <span class="kw">SELECT</span> <span class="cl">department</span>,
+         <span class="fn">SUM</span>(<span class="cl">salary</span>) <span class="kw">AS</span> <span class="cl">total</span>
+  <span class="kw">FROM</span>   <span class="tb">employees</span>
+  <span class="kw">GROUP BY</span> <span class="cl">department</span>
+) <span class="tb">dept_totals</span>
+<span class="kw">WHERE</span> <span class="cl">total</span> > <span class="nu">200000</span>;</code></pre>
+          </div>
+        </div>
+        <div class="compare-col">
+          <h5 class="good">With CTE — clean and named</h5>
+          <div class="cb" style="margin:8px 0 0">
+            <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span></div>
+            <pre style="padding:14px 18px"><code><span class="kw">WITH</span> <span class="tb">dept_totals</span> <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> <span class="cl">department</span>,
+         <span class="fn">SUM</span>(<span class="cl">salary</span>) <span class="kw">AS</span> <span class="cl">total</span>
+  <span class="kw">FROM</span>   <span class="tb">employees</span>
+  <span class="kw">GROUP BY</span> <span class="cl">department</span>
+)
+<span class="kw">SELECT</span> <span class="cl">department</span>
+<span class="kw">FROM</span>   <span class="tb">dept_totals</span>
+<span class="kw">WHERE</span>  <span class="cl">total</span> > <span class="nu">200000</span>;</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <p class="s-body" style="margin-top:28px">CTEs are essential for window functions. You <strong>cannot filter on a window function result</strong> in the same query — you must wrap it in a CTE first, then filter in the outer query.</p>
+
+      <div class="cb">
+        <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · Why CTEs Enable Window Functions</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+        <pre><code><span class="cm">-- This FAILS — you can't use ROW_NUMBER alias in WHERE of same query</span>
+<span class="kw">SELECT</span> *, <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (...) <span class="kw">AS</span> <span class="cl">rn</span>
+<span class="kw">FROM</span>   <span class="tb">employees</span>
+<span class="kw">WHERE</span>  <span class="cl">rn</span> = <span class="nu">1</span>;          <span class="cm">-- ❌ ERROR: rn doesn't exist yet</span>
+
+<span class="cm">-- This WORKS — CTE saves the result, outer query filters it</span>
+<span class="kw">WITH</span> <span class="tb">ranked</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> *, <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+        <span class="kw">PARTITION BY</span> <span class="cl">department</span>
+        <span class="kw">ORDER BY</span>     <span class="cl">salary</span> <span class="kw">DESC</span>
+    ) <span class="kw">AS</span> <span class="cl">rn</span>
+    <span class="kw">FROM</span> <span class="tb">employees</span>
+)
+<span class="kw">SELECT</span> <span class="cl">name</span>, <span class="cl">department</span>, <span class="cl">salary</span>
+<span class="kw">FROM</span>   <span class="tb">ranked</span>
+<span class="kw">WHERE</span>  <span class="cl">rn</span> = <span class="nu">1</span>;          <span class="cm">-- ✓ top earner per department</span></code></pre>
+      </div>
+
+      <p class="s-body">You can chain multiple CTEs with a comma — each can reference the ones above it:</p>
+
+      <div class="cb">
+        <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · Chained CTEs</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+        <pre><code><span class="kw">WITH</span>
+
+<span class="tb">step_one</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> ... <span class="kw">FROM</span> <span class="tb">raw_table</span>
+),
+
+<span class="tb">step_two</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> ... <span class="kw">FROM</span> <span class="tb">step_one</span>   <span class="cm">-- references the first CTE</span>
+    <span class="kw">WHERE</span>  ...
+)
+
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tb">step_two</span>;</code></pre>
+      </div>
+
+    </div>
+    
+
+    <!-- Day checklist -->
+    <div class="day-checklist">
+      <h3>Day 5 mastery checklist</h3>
+      <ul class="chk"><li><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt">I know when a CTE is needed (referencing a window function result)</span></li></ul>
+      <div class="day-complete-banner" id="day-complete-banner">
+        <p>Day 5 complete ✓</p>
+        <a href="index.html">Unlock Day 6 →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Right: practice + cheat sheet ── -->
+  <div class="day-right-inline">
+    <div class="practice-panel">
+      <div class="pp-header">
+        <div class="pp-tabs">
+          <button class="pp-tab on" id="pp-tab-practice">Practice</button>
+          <button class="pp-tab"    id="pp-tab-ref">Cheat Sheet</button>
+        </div>
+      </div>
+
+      <!-- Practice body -->
+      <div class="pp-body" id="pp-body">
+        <div class="practice-wrap">
+        <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Practice</span><div class="dvd-line"></div></div>
+        <div class="practice-prompt"><div><p class="practice-q">Rewrite this using a CTE: find departments where total salary exceeds 200,000.</p><p class="practice-hint">Table: employees (employee_id, name, department, salary) — replace the nested subquery with a named CTE</p></div></div>
+        <div class="practice-cb">
+          <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="clearTa(this)">clear</button><button class="cp-btn" onclick="toggleAns(this)">show answer</button></div></div>
+          <textarea class="practice-ta" placeholder="-- Write your SQL here...&#10;-- Press Tab to indent" spellcheck="false"></textarea>
+        </div>
+        <div class="practice-answer">
+          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Answer</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">WITH</span> <span class="tb">dept_totals</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>   <span class="cl">department</span>,
+             <span class="fn">SUM</span>(<span class="cl">salary</span>) <span class="kw">AS</span> <span class="cl">total</span>
+    <span class="kw">FROM</span>     <span class="tb">employees</span>
+    <span class="kw">GROUP BY</span> <span class="cl">department</span>
+)
+<span class="kw">SELECT</span> <span class="cl">department</span>
+<span class="kw">FROM</span>   <span class="tb">dept_totals</span>
+<span class="kw">WHERE</span>  <span class="cl">total</span> > <span class="nu">200000</span>;</code></pre></div>
+        </div>
+      </div>
+      </div>
+
+      <!-- Cheat sheet body -->
+      <div class="pp-ref" id="pp-ref">
+        <div class="fref-tabs"><button class="fref-tab on" onclick="selRef(this,0)">CTE syntax</button><button class="fref-tab" onclick="selRef(this,1)">Chaining</button><button class="fref-tab" onclick="selRef(this,2)">CTE vs Sub</button></div>
+        <div id="fref-panels"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="wrap day-footer">
+  <a href="day4.html">← Day 4</a>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3)">WITH · Chaining · CTE vs Subquery</span>
+  <a href="day6.html">Day 6 →</a>
+</div>
+
+<script>
+  const DAY_NUM = 5;
+
+  // ── Practice hints & answers ──
+  const practiceHints    = { 'practice-day5': ['Open with: WITH dept_totals AS ( SELECT department, SUM(salary) AS total FROM employees GROUP BY department )', 'Then query the CTE below it: SELECT department FROM dept_totals WHERE total > 200000'] };
+  const practiceAnswers  = { 'practice-day5': [['with'],['sum(salary'],['group by'],['200000']] };
+  const practiceAttempts = {};
+
+  function normaliseSQL(s) { return s.toLowerCase().replace(/\s+/g,' ').replace(/;/g,'').trim(); }
+  function isCorrect(id, input) {
+    const groups = practiceAnswers[id];
+    if (!groups) return null;
+    const n = normaliseSQL(input);
+    return groups.every(group => group.some(pat => n.includes(pat)));
+  }
+
+  function checkQuery(btn) {
+    const wrap    = btn.closest('.practice-wrap');
+    const id      = wrap.id;
+    const ta      = wrap.querySelector('.practice-ta');
+    const status  = wrap.querySelector('.practice-status');
+    const hintBox = wrap.querySelector('.hint-box');
+    if (!ta.value.trim()) {
+      status.textContent = 'Write something first — even a rough attempt helps!';
+      status.className = 'practice-status show neutral';
+      return;
+    }
+    const correct = isCorrect(id, ta.value);
+    if (correct === true) {
+      status.textContent = '✓ Correct! Well done.';
+      status.className = 'practice-status show correct';
+      return;
+    }
+    practiceAttempts[id] = (practiceAttempts[id] || 0) + 1;
+    const attempts = practiceAttempts[id];
+    const hints = practiceHints[id] || [];
+    if (attempts === 3 && hints[0]) {
+      hintBox.innerHTML = '<div class="hint-label">Hint 1 of ' + hints.length + '</div><div class="hint-item">' + hints[0] + '</div>';
+      hintBox.classList.add('show');
+      status.textContent = 'Not quite — first hint unlocked below.';
+      status.className = 'practice-status show neutral';
+    } else if (attempts === 5 && hints[1]) {
+      const h2 = document.createElement('div'); h2.className = 'hint-item'; h2.textContent = hints[1];
+      hintBox.appendChild(h2); hintBox.classList.add('show');
+      status.textContent = 'Not quite — second hint unlocked.';
+      status.className = 'practice-status show neutral';
+    } else if (attempts >= 7) {
+      status.innerHTML = 'Still not matching — don't give up! ';
+      const rb = document.createElement('button'); rb.className = 'cp-btn'; rb.textContent = 'reveal answer';
+      rb.style.cssText = 'margin-left:6px;color:var(--green);border-color:rgba(111,207,151,0.4)';
+      rb.onclick = function(){ toggleAns(this); }; status.appendChild(rb);
+      status.className = 'practice-status show neutral';
+    } else {
+      const nudges = ['Not quite — check your clauses and column names.','Getting closer. Re-read the example above if stuck.',null,'Check clause order: SELECT → FROM → WHERE/JOIN → GROUP BY → HAVING.',null,'Almost — check for typos and column names.',null];
+      const msg = nudges[(attempts-1) % nudges.length] || 'Keep at it!';
+      if (msg) { status.textContent = msg; status.className = 'practice-status show neutral'; }
+    }
+  }
+
+  // ── Init practice wraps (inject id, Check btn, status, hint-box) ──
+  document.querySelectorAll('.practice-wrap').forEach(wrap => {
+    wrap.id = 'practice-day5';
+    const btnRow = wrap.querySelector('.cb-head div[style]');
+    if (btnRow && !btnRow.querySelector('.check-btn')) {
+      const cb = document.createElement('button');
+      cb.className = 'check-btn'; cb.textContent = 'Check';
+      cb.onclick = function(){ checkQuery(this); };
+      btnRow.insertBefore(cb, btnRow.firstChild);
+    }
+    const practCb = wrap.querySelector('.practice-cb');
+    if (practCb && !wrap.querySelector('.practice-status')) {
+      const status = document.createElement('div'); status.className = 'practice-status';
+      const hintBox = document.createElement('div'); hintBox.className = 'hint-box';
+      practCb.after(status); status.after(hintBox);
+    }
+  });
+
+  // ── Cheat sheet panels (rendered from dayCheatSheets in main app) ──
+  // Panels are injected by the renderCheatSheet function below
+  (function renderCheatSheet() {
+    const wrap = document.getElementById('fref-panels');
+    if (!wrap) return;
+    // Panels populated from the main site's dayCheatSheets object would go here.
+    // For now we include a simplified inline version.
+    wrap.innerHTML = '<div class="fref-panel on" style="padding:12px 14px;font-family:var(--font-mono,monospace);font-size:12px;color:var(--text2)"><p>Open the Cheat Sheet to see Day 5 reference material.</p><p style="margin-top:8px;color:var(--text3)">Tip: the cheat sheet tabs match each concept you're studying today.</p></div>';
+  })();
+
+
+  // ── Copy button ──
+  function cp(btn) {
+    const txt = btn.closest('.cb').querySelector('pre').innerText;
+    navigator.clipboard.writeText(txt).then(() => {
+      btn.textContent = 'copied!';
+      btn.style.color = 'var(--green)';
+      btn.style.borderColor = 'var(--green)';
+      setTimeout(() => { btn.textContent = 'copy'; btn.style.color = ''; btn.style.borderColor = ''; }, 1800);
+    });
+  }
+
+  // ── Tab to spaces ──
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Tab' && e.target.classList.contains('practice-ta')) {
+      e.preventDefault();
+      const ta = e.target, s = ta.selectionStart, end = ta.selectionEnd;
+      ta.value = ta.value.substring(0,s) + '    ' + ta.value.substring(end);
+      ta.selectionStart = ta.selectionEnd = s + 4;
+    }
+  });
+
+  // ── Practice panel tabs ──
+  document.getElementById('pp-tab-practice').addEventListener('click', () => {
+    document.getElementById('pp-tab-practice').classList.add('on');
+    document.getElementById('pp-tab-ref').classList.remove('on');
+    document.getElementById('pp-body').style.display = '';
+    document.getElementById('pp-ref').classList.remove('on');
+  });
+  document.getElementById('pp-tab-ref').addEventListener('click', () => {
+    document.getElementById('pp-tab-ref').classList.add('on');
+    document.getElementById('pp-tab-practice').classList.remove('on');
+    document.getElementById('pp-body').style.display = 'none';
+    document.getElementById('pp-ref').classList.add('on');
+  });
+
+  // ── Cheat sheet sub-tabs ──
+  function selRef(btn, idx) {
+    btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach((b,i) => b.classList.toggle('on', i===idx));
+    document.querySelectorAll('.fref-panel').forEach((p,i) => p.classList.toggle('on', i===idx));
+  }
+
+  // ── Answer toggle ──
+  function toggleAns(btn) {
+    const wrap = btn.closest('.practice-wrap');
+    const ans  = wrap.querySelector('.practice-answer');
+    const show = ans.classList.toggle('show');
+    btn.textContent = show ? 'hide answer' : 'show answer';
+  }
+  function clearTa(btn) {
+    btn.closest('.practice-wrap').querySelector('.practice-ta').value = '';
+  }
+
+  // ── Checklist + localStorage ──
+  const STORAGE_KEY = 'sql7_progress';
+  function loadProgress() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+  }
+  function saveProgress(p) { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }
+
+  const DAY_ID = 'day' + DAY_NUM;
+  let progress = loadProgress();
+
+  function initChecklist() {
+    const items = document.querySelectorAll('.chk li');
+    const saved = (progress[DAY_ID] && progress[DAY_ID].items) || [];
+    items.forEach((li, i) => {
+      if (saved[i]) li.classList.add('done');
+      li.addEventListener('click', () => {
+        li.classList.toggle('done');
+        saveChecklist();
+        checkDayComplete();
+      });
+    });
+    checkDayComplete();
+  }
+
+  function saveChecklist() {
+    const items = [...document.querySelectorAll('.chk li')].map(li => li.classList.contains('done'));
+    if (!progress[DAY_ID]) progress[DAY_ID] = {};
+    progress[DAY_ID].items = items;
+    saveProgress(progress);
+  }
+
+  function checkDayComplete() {
+    const items = document.querySelectorAll('.chk li');
+    const allDone = items.length > 0 && [...items].every(li => li.classList.contains('done'));
+    if (allDone) {
+      if (!progress[DAY_ID]) progress[DAY_ID] = {};
+      progress[DAY_ID].complete = true;
+      saveProgress(progress);
+      document.getElementById('day-complete-banner').classList.add('show');
+    }
+  }
+
+  initChecklist();
+
+  // ── Scroll reveal ──
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); obs.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  // ── Tab switcher (stab) ──
+  function stab(btn, idx, ns) {
+    btn.closest('.stab-row').querySelectorAll('.stab').forEach((t,i) => t.classList.toggle('on', i===idx));
+    document.querySelectorAll('[id^="'+ns+'-"]').forEach((p,i) => p.classList.toggle('on', i===idx));
+  }
+
+</script>
+</body>
+</html>
