@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Day 4 · NULLs & Self-Joins — SQL Interview Prep</title>
+<title>Day 4 · NULLs & Self-Joins — SQL in 7 Days</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -716,7 +716,7 @@
         </div>
         <div class="card">
           <h5>COUNT(*) vs COUNT(col)</h5>
-          <p><code>COUNT(*)</code> counts all rows. <code>COUNT(col)</code> counts only non-NULL values in that column. This is a common interview trap.</p>
+          <p><code>COUNT(*)</code> counts all rows. <code>COUNT(col)</code> counts only non-NULL values in that column. These behave differently whenever NULLs are present — a very common source of subtle bugs.</p>
         </div>
         <div class="card">
           <h5>NULLs in JOINs</h5>
@@ -748,7 +748,7 @@
 
       <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Part 2 · Subqueries</span><div class="dvd-line"></div></div>
 
-      <p class="s-body">A <strong>subquery</strong> is a query nested inside another query. They work but can get hard to read — CTEs (Day 5) are the cleaner alternative. Knowing subqueries helps you understand legacy code and interview questions.</p>
+      <p class="s-body">A <strong>subquery</strong> is a query nested inside another query. They work but can get hard to read — CTEs (Day 5) are the cleaner alternative. Knowing subqueries helps you read legacy code and understand how CTEs improve on them.</p>
 
       <div class="cb">
         <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL · Subqueries</span><button class="cp-btn" onclick="cp(this)">copy</button></div>

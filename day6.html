@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Day 6 · Window Functions — SQL Interview Prep</title>
+<title>Day 6 · Window Functions — SQL in 7 Days</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -891,7 +891,7 @@
 <span class="kw">FROM</span> <span class="tb">employees</span>;</code></pre>
       </div>
 
-      <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">The "Top N per Group" Pattern — most common interview question</span><div class="dvd-line"></div></div>
+      <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">The "Top N per Group" Pattern — one of the most common real-world queries</span><div class="dvd-line"></div></div>
 
       <p class="s-body">"Return the top-earning employee per department" — this pattern appears constantly. The trick: <strong>ROW_NUMBER in a CTE, then filter in the outer query</strong>.</p>
 
@@ -913,7 +913,7 @@
 
       <div class="callout">
         <p class="callout-lbl">ROW_NUMBER vs DENSE_RANK here</p>
-        <p>If ties exist and you want <em>both</em> tied employees at rank 1, use <code>DENSE_RANK() ... WHERE rn &lt;= 1</code>. If you want exactly one row even when tied, use <code>ROW_NUMBER()</code>. The choice depends on the problem statement.</p>
+        <p>If ties exist and you want <em>all</em> tied employees at rank 1, replace <code>ROW_NUMBER()</code> with <code>DENSE_RANK()</code> in the CTE (alias it as <code>dr</code> to avoid confusion), then filter <code>WHERE dr &lt;= 1</code>. If you want exactly one row per group regardless of ties, keep <code>ROW_NUMBER()</code>. The choice depends on the problem.</p>
       </div>
 
       <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">CASE WHEN — SQL's if/else</span><div class="dvd-line"></div></div>
