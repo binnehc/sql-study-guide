@@ -910,7 +910,11 @@
     <!-- Day checklist -->
     <div class="day-checklist">
       <h3>Day 2 mastery checklist</h3>
-      <ul class="chk"><li><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt">I know what INNER / LEFT / RIGHT / FULL OUTER JOIN each return</span></li><li><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt">I can find "missing data" with LEFT JOIN + WHERE right.id IS NULL</span></li></ul>
+      <ul class="chk">
+        <li onclick="chk(this)"><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt">I know what INNER / LEFT / RIGHT / FULL OUTER JOIN each return</span></li>
+        <li onclick="chk(this)"><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt">I can find "missing data" with LEFT JOIN + WHERE right.id IS NULL</span></li>
+        <li onclick="chk(this)"><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt">I can join two tables on matching columns using a table alias</span></li>
+      </ul>
       <div class="day-complete-banner" id="day-complete-banner">
         <p>Day 2 complete ✓</p>
         <a href="index.html">Unlock Day 3 →</a>

@@ -1000,7 +1000,11 @@
     <!-- Day checklist -->
     <div class="day-checklist">
       <h3>Day 6 mastery checklist</h3>
-      <ul class="chk"><li><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt">I can explain the difference between ROW_NUMBER, RANK, and DENSE_RANK</span></li><li><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt">I can write ROW_NUMBER() OVER (PARTITION BY … ORDER BY …) fluently</span></li></ul>
+      <ul class="chk">
+        <li onclick="chk(this)"><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt">I can explain the difference between ROW_NUMBER, RANK, and DENSE_RANK</span></li>
+        <li onclick="chk(this)"><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt">I can write ROW_NUMBER() OVER (PARTITION BY … ORDER BY …) fluently</span></li>
+        <li onclick="chk(this)"><div class="chk-box"><svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="chk-txt">I understand that window functions keep all rows (unlike GROUP BY which collapses them)</span></li>
+      </ul>
       <div class="day-complete-banner" id="day-complete-banner">
         <p>Day 6 complete ✓</p>
         <a href="index.html">Unlock Day 7 →</a>
