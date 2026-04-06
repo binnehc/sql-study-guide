@@ -914,7 +914,7 @@
 <!-- ── Case studies divider ── -->
 <div class="wrap">
   <div class="cases-divider">
-    <span class="cases-divider-inner">↓ Complete all 7 days to unlock case studies</span>
+    <span class="cases-divider-inner">↓ Challenge problems — best attempted after Day 4</span>
   </div>
 </div>
 
@@ -922,10 +922,7 @@
 <section id="cases">
   <div class="wrap">
   <div class="cases-locked-overlay">
-    <div class="cases-locked-banner" id="cases-locked-banner">
-      <p>Case Studies are locked</p>
-      <span>Finish all 7 days to unlock the interview challenges</span>
-    </div>
+
     <section id="cases">
   <div class="wrap">
   <div class="reveal">
@@ -1401,16 +1398,12 @@
     for (let n = 1; n <= 7; n++) {
       const card    = document.getElementById('card-day' + n);
       const complete = progress['day'+n] && progress['day'+n].complete;
-      const prevComplete = n === 1 || (progress['day'+(n-1)] && progress['day'+(n-1)].complete);
 
       if (complete) {
         card.classList.add('complete');
         daysComplete++;
-      } else if (prevComplete) {
-        card.classList.add('available');
       } else {
-        card.classList.add('locked');
-        card.addEventListener('click', e => e.preventDefault());
+        card.classList.add('available');
       }
     }
 
@@ -1418,10 +1411,7 @@
     document.getElementById('lp-count').textContent = daysComplete + ' / 7 days complete';
     document.getElementById('lp-fill').style.width = (daysComplete / 7 * 100) + '%';
 
-    // Case studies lock
-    if (daysComplete < 7) {
-      document.getElementById('cases-locked-banner').classList.add('show');
-    }
+
   }
 
   initLanding();
