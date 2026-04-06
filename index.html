@@ -550,7 +550,7 @@
 
   /* ── CASE STUDIES ── */
   .cases-layout { display:flex; gap:28px; align-items:flex-start; margin-top:32px; }
-  .cases-list { width:208px; flex-shrink:0; position:sticky; top:68px; max-height:calc(100vh - 88px); overflow-y:auto; }
+  .cases-list { width:208px; flex-shrink:0; position:sticky; top:68px; max-height:calc(100dvh - 88px); overflow-y:auto; }
   .case-btn {
     display:block; width:100%; text-align:left;
     padding:10px 12px 10px 14px;
@@ -713,6 +713,39 @@
   .cases-locked-banner.show { display:flex; }
   .cases-locked-banner p { font-size:15px; color:var(--text2); font-family:'DM Sans',sans-serif; }
   .cases-locked-banner span { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text3); }
+
+  /* ── MOBILE / TOUCH ENHANCEMENTS ── */
+  /* :active states mirror :hover so touch devices get visual feedback */
+  #sb-btn:active { background:var(--hover); color:var(--text); }
+  #music-btn:active { background:var(--hover); color:var(--text); }
+  .sb-item:active { background:var(--hover); }
+  .sb-item:active .sb-label { color:var(--text); }
+  .sb-close:active { background:var(--hover); color:var(--text); }
+  .case-btn:active { background:var(--hover); }
+  .stab:active { color:var(--text2); background:var(--hover); }
+  .fday-btn:active:not(.locked):not(.on) { background:var(--hover); color:var(--text2); }
+  .chk li:active { background:var(--hover); }
+  .check-btn:active { background:rgba(121,184,255,0.16); }
+  .case-sol-btn:active { background:var(--hover); color:var(--text); }
+  .case-next-btn:active { background:rgba(121,184,255,0.14); border-color:rgba(121,184,255,0.4); }
+  .float-tab:active { color:var(--text2); }
+  .fref-tab:active { color:var(--text2); border-color:var(--text3); }
+  .cp-btn:active { color:var(--text); border-color:var(--bdr2); }
+  .day-nav-back:active { color:var(--text); }
+  .case-back-btn:active { color:var(--text2); }
+  /* Expand touch targets on coarse-pointer (touch) devices */
+  @media (pointer: coarse) {
+    #sb-btn  { width:44px; height:44px; }
+    #music-btn { width:44px; height:44px; }
+    .sb-close  { min-width:44px; min-height:44px; }
+    .fday-btn  { min-width:36px; min-height:36px; }
+    .chk li    { padding:12px 4px; }
+    .stab      { padding:12px 16px; }
+    .case-btn  { padding:14px 12px 14px 14px; }
+    .float-tab { padding:11px 0; }
+    .fref-tab  { padding:6px 12px; }
+    #float-min-btn { padding:8px 10px; }
+  }
 </style>
 </head>
 <body>
