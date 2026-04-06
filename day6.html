@@ -403,6 +403,27 @@
   .lt-lag  { color:#79b8ff; }
   .lt-lead { color:#ffab70; }
 
+  /* ── OVER() ANATOMY ── */
+  .over-anatomy { margin:20px 0; overflow-x:auto; }
+  .oa-row { display:inline-flex; gap:3px; align-items:stretch; min-width:max-content; }
+  .oa-seg { display:flex; flex-direction:column; align-items:center; padding:8px 10px; border-radius:6px; gap:6px; }
+  .oa-seg code { font-family:'JetBrains Mono',monospace; font-size:13px; white-space:nowrap; }
+  .oa-seg-lbl { font-size:10px; text-align:center; line-height:1.45; }
+  .oa-seg-lbl span { color:var(--text3); display:block; }
+  .oa-fn   { background:rgba(255,123,123,.12); } .oa-fn   code { color:#ff7b7b; } .oa-fn   .oa-seg-lbl { color:#ff7b7b; }
+  .oa-kw   { background:rgba(255,255,255,.03); } .oa-kw   code { color:var(--text2); }
+  .oa-part { background:rgba(121,184,255,.12); } .oa-part code { color:#79b8ff; } .oa-part .oa-seg-lbl { color:#79b8ff; }
+  .oa-ord  { background:rgba(111,207,151,.12); } .oa-ord  code { color:#6fcf97; } .oa-ord  .oa-seg-lbl { color:#6fcf97; }
+
+  /* ── RANK CARD INTERACTIVE ── */
+  .rank-compare .card { cursor:pointer; transition:border-color 0.15s, background 0.15s; border:1px solid transparent; }
+  .rank-compare .card:hover { border-color:var(--bdr2); background:rgba(255,255,255,0.03); }
+  .rank-compare .card.rk-on { border-color:rgba(255,255,255,0.18); background:rgba(255,255,255,0.05); }
+  .rank-compare .card .rk-hint { font-size:10.5px; color:var(--text3); margin-top:8px; font-style:italic; }
+  .rk-col-dim td { opacity:0.25; transition:opacity 0.2s; }
+  .rk-col-on  td { opacity:1 !important; }
+  th.rk-th-on { color:var(--text) !important; }
+
   /* ── FOOTER ── */
   footer { padding:48px 0; border-top:1px solid var(--bdr); text-align:center; }
   footer p { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text3); }
@@ -737,9 +758,41 @@
       <p class="s-body">Window functions calculate across a set of rows <strong>without collapsing them</strong>. Unlike GROUP BY which gives one row per group, window functions add a new column to every existing row.</p>
 
       <div class="callout">
-        <p class="callout-lbl">Core Syntax</p>
+        <p class="callout-lbl">GROUP BY vs PARTITION BY — the key distinction</p>
+        <p><strong>GROUP BY</strong> collapses rows. 5 employees → 2 rows (one per dept). Individual names disappear.<br><br>
+        <strong>PARTITION BY</strong> keeps all rows. 5 employees stay 5 rows. A new calculated column is added alongside — nothing is collapsed or lost.</p>
+      </div>
+
+      <div class="callout">
+        <p class="callout-lbl">Core Syntax — click each part below to understand it</p>
         <p><code>function() OVER ( PARTITION BY col ORDER BY col )</code><br>
         <strong>PARTITION BY</strong> = reset the calculation for each group &nbsp;·&nbsp; <strong>ORDER BY</strong> = define the sequence within each partition.</p>
+      </div>
+
+      <!-- OVER() clause anatomy -->
+      <div class="over-anatomy">
+        <div class="oa-row">
+          <div class="oa-seg oa-fn">
+            <code>RANK()</code>
+            <div class="oa-seg-lbl">function<br><span>what to compute</span></div>
+          </div>
+          <div class="oa-seg oa-kw">
+            <code>OVER&nbsp;(</code>
+            <div class="oa-seg-lbl">&nbsp;</div>
+          </div>
+          <div class="oa-seg oa-part">
+            <code>PARTITION BY department</code>
+            <div class="oa-seg-lbl">partition (optional)<br><span>reset per group</span></div>
+          </div>
+          <div class="oa-seg oa-ord">
+            <code>ORDER BY salary DESC</code>
+            <div class="oa-seg-lbl">order within group<br><span>defines the sequence</span></div>
+          </div>
+          <div class="oa-seg oa-kw">
+            <code>)</code>
+            <div class="oa-seg-lbl">&nbsp;</div>
+          </div>
+        </div>
       </div>
 
       <!-- PARTITION BY visualization -->
@@ -776,25 +829,28 @@
 
       <p class="s-body">All three assign a number to each row within a group. The difference appears when there are <strong>ties</strong> (equal values).</p>
 
-      <div class="rank-compare">
-        <div class="card">
+      <div class="rank-compare" id="rank-cards">
+        <div class="card" data-col="3">
           <h5>ROW_NUMBER()</h5>
           <p>Always unique. Ties get arbitrary order. No gaps. Use when you need exactly one row per group.</p>
+          <p class="rk-hint">Click to highlight in table ↓</p>
         </div>
-        <div class="card">
+        <div class="card" data-col="4">
           <h5>RANK()</h5>
           <p>Ties get the same rank. The next rank skips. E.g., two 2nds → next is 4th. Creates gaps.</p>
+          <p class="rk-hint">Click to highlight in table ↓</p>
         </div>
-        <div class="card">
+        <div class="card" data-col="5">
           <h5>DENSE_RANK()</h5>
           <p>Ties get the same rank. The next rank does NOT skip. E.g., two 2nds → next is 3rd. No gaps.</p>
+          <p class="rk-hint">Click to highlight in table ↓</p>
         </div>
       </div>
 
       <p class="s-body">Example — ranking employees by salary within each department:</p>
 
-      <div class="tbl-wrap">
-        <table><thead><tr><th>name</th><th>dept</th><th>salary</th><th>ROW_NUMBER</th><th>RANK</th><th>DENSE_RANK</th></tr></thead>
+      <div class="tbl-wrap" id="rank-tbl-wrap">
+        <table id="rank-tbl"><thead><tr><th>name</th><th>dept</th><th>salary</th><th>ROW_NUMBER</th><th>RANK</th><th>DENSE_RANK</th></tr></thead>
         <tbody>
           <tr><td>Alice</td><td>Eng</td><td class="hl">120000</td><td class="blu">1</td><td class="blu">1</td><td class="blu">1</td></tr>
           <tr><td>Eve</td><td>Eng</td><td class="hl">110000</td><td class="blu">2</td><td class="blu">2</td><td class="blu">2</td></tr>
@@ -1185,6 +1241,36 @@
   }
 
   initChecklist();
+
+  // ── Rank card interactive highlight ──
+  const rankCards = document.querySelectorAll('#rank-cards .card');
+  const rankTbl   = document.getElementById('rank-tbl');
+  rankCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const colIdx = parseInt(card.dataset.col); // 3=ROW_NUMBER, 4=RANK, 5=DENSE_RANK
+      const alreadyOn = card.classList.contains('rk-on');
+      // reset all
+      rankCards.forEach(c => c.classList.remove('rk-on'));
+      if (rankTbl) {
+        rankTbl.querySelectorAll('tr').forEach(row => {
+          row.querySelectorAll('td, th').forEach((cell, i) => {
+            cell.classList.remove('rk-col-on', 'rk-col-dim', 'rk-th-on');
+          });
+        });
+      }
+      if (!alreadyOn) {
+        card.classList.add('rk-on');
+        if (rankTbl) {
+          rankTbl.querySelectorAll('tr').forEach(row => {
+            row.querySelectorAll('td, th').forEach((cell, i) => {
+              if (i === colIdx) { cell.classList.add('rk-col-on', 'rk-th-on'); }
+              else if (i >= 3)  { cell.classList.add('rk-col-dim'); }
+            });
+          });
+        }
+      }
+    });
+  });
 
   // ── Scroll reveal ──
   const obs = new IntersectionObserver(entries => {

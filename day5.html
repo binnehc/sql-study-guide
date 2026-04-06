@@ -389,6 +389,27 @@
   .cp-cte  { border-color:rgba(121,184,255,0.35); } .cp-cte  .cp-name { color:#79b8ff; }
   .cp-fin  { border-color:rgba(111,207,151,0.35); } .cp-fin  .cp-name { color:#6fcf97; }
 
+  /* ── CTE MENTAL MODEL STEPS ── */
+  .cte-thought { margin:24px 0; display:flex; flex-direction:column; gap:0; }
+  .ct-step { display:flex; align-items:flex-start; gap:14px; background:var(--bg2); border:1px solid var(--bdr); border-radius:8px; padding:14px 16px; }
+  .ct-n { width:28px; height:28px; min-width:28px; border-radius:50%; background:rgba(121,184,255,0.15); color:#79b8ff; font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+  .ct-body strong { font-size:14px; color:var(--text); display:block; margin-bottom:4px; }
+  .ct-body span { font-size:13px; color:var(--text3); }
+  .ct-body code { font-family:'JetBrains Mono',monospace; font-size:12px; color:#79b8ff; }
+  .ct-arr { text-align:center; color:var(--text3); padding:3px 14px; font-size:16px; }
+
+  /* ── CTE SYNTAX ANNOTATION ── */
+  .cte-ann { background:var(--bg2); border:1px solid var(--bdr); border-radius:8px; padding:18px; margin:20px 0; }
+  .cte-ann code { font-family:'JetBrains Mono',monospace; }
+  .cte-ann .ca-line { font-size:13px; margin-bottom:12px; line-height:1.9; }
+  .cte-ann ul { font-size:13px; padding-left:0; list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .cte-ann li { display:flex; align-items:baseline; gap:8px; }
+  .cte-ann li code { white-space:nowrap; }
+  .cte-ann li span { color:var(--text3); }
+  .ca-name { color:#79b8ff !important; font-weight:600; }
+  .ca-inner { color:#ffab70 !important; }
+  .ca-final { color:#6fcf97 !important; }
+
   /* ── FOOTER ── */
   footer { padding:48px 0; border-top:1px solid var(--bdr); text-align:center; }
   footer p { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text3); }
@@ -743,6 +764,33 @@
         </div>
       </div>
 
+      <!-- "How to think about CTEs" mental model -->
+      <div class="cte-thought">
+        <div class="ct-step">
+          <div class="ct-n">1</div>
+          <div class="ct-body">
+            <strong>Ask: what intermediate result do I need first?</strong>
+            <span>e.g. "I need total salary per department before I can filter departments"</span>
+          </div>
+        </div>
+        <div class="ct-arr">↓</div>
+        <div class="ct-step">
+          <div class="ct-n">2</div>
+          <div class="ct-body">
+            <strong>Write that query and give it a name</strong>
+            <span><code>WITH dept_totals AS ( SELECT department, SUM(salary) AS total ... )</code></span>
+          </div>
+        </div>
+        <div class="ct-arr">↓</div>
+        <div class="ct-step">
+          <div class="ct-n">3</div>
+          <div class="ct-body">
+            <strong>Use the name in your final SELECT — it behaves exactly like a table</strong>
+            <span><code>SELECT department FROM dept_totals WHERE total &gt; 200000</code></span>
+          </div>
+        </div>
+      </div>
+
       <div class="compare">
         <div class="compare-col">
           <h5 class="bad">Without CTE — hard to read</h5>
@@ -773,6 +821,20 @@
 <span class="kw">WHERE</span>  <span class="cl">total</span> > <span class="nu">200000</span>;</code></pre>
           </div>
         </div>
+      </div>
+
+      <!-- Annotated WITH syntax -->
+      <div class="cte-ann">
+        <p class="callout-lbl" style="margin-bottom:12px">Reading the WITH syntax</p>
+        <p class="ca-line">
+          <code class="kw">WITH</code> <code class="ca-name">dept_totals</code> <code class="kw">AS (</code> <code class="ca-inner">SELECT department, SUM(salary) AS total FROM employees GROUP BY department</code> <code class="kw">)</code><br>
+          <code class="ca-final">SELECT department FROM dept_totals WHERE total &gt; 200000</code>
+        </p>
+        <ul>
+          <li><code class="ca-name">dept_totals</code> <span>— the name you give the CTE. Use anything descriptive. This is what you reference later.</span></li>
+          <li><code class="ca-inner">inner query</code> <span>— any valid SELECT. This is your intermediate step — write it exactly as you would a normal query.</span></li>
+          <li><code class="ca-final">final SELECT</code> <span>— your actual query. Reads from the CTE name like it's a real table. Only this part produces visible output.</span></li>
+        </ul>
       </div>
 
       <p class="s-body" style="margin-top:28px">CTEs are essential for window functions. You <strong>cannot filter on a window function result</strong> in the same query — you must wrap it in a CTE first, then filter in the outer query.</p>
