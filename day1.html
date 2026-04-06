@@ -706,8 +706,13 @@
       <h2 class="s-title">SQL <em>BASICS</em></h2>
       <p class="s-body">SQL (Structured Query Language) is how you talk to a database. Every query follows the same basic anatomy — you tell the database <strong>what to get</strong>, <strong>where to get it from</strong>, and <strong>how to filter/sort it</strong>.</p>
 
+      <div class="callout">
+        <p class="callout-lbl">Tables, Rows &amp; Columns</p>
+        <p>A <strong>database</strong> stores data in <strong>tables</strong> — think of each table like a spreadsheet tab. Every <strong>row</strong> is one record (one employee, one order, one event). Every <strong>column</strong> is one attribute of that record (name, salary, date). SQL queries read from one or more of these tables.</p>
+      </div>
+
       <div class="card-grid">
-        <div class="card"><h5>SELECT</h5><p>Which columns to return. Use <code>*</code> for all columns, or list specific ones.</p></div>
+        <div class="card"><h5>SELECT</h5><p>Which columns to return. Use <code>*</code> for all columns, or list specific ones. Add <code>AS</code> to rename a column in the output: <code>SELECT salary AS pay</code>.</p></div>
         <div class="card"><h5>FROM</h5><p>Which table to read from. Always required.</p></div>
         <div class="card"><h5>WHERE</h5><p>Filter rows <em>before</em> any grouping. Only rows matching the condition are kept.</p></div>
         <div class="card"><h5>ORDER BY</h5><p>Sort the results. <code>ASC</code> (default) = smallest first. <code>DESC</code> = largest first.</p></div>

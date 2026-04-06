@@ -798,6 +798,11 @@
         </div>
       </div>
 
+      <div class="callout">
+        <p class="callout-lbl">Table Aliases</p>
+        <p>In JOIN queries you'll see <code>FROM employees e</code> — the <code>e</code> is a <strong>table alias</strong>, a shorthand nickname. It lets you write <code>e.name</code> instead of <code>employees.name</code>. Aliases are required when you join a table to itself, and just cleaner everywhere else.</p>
+      </div>
+
       <div class="stabs">
         <div class="stab-row">
           <button class="stab on" onclick="stab(this,0,'jt')">INNER JOIN</button>
@@ -896,7 +901,7 @@
 
       <div class="callout">
         <p class="callout-lbl">The "Missing Data" Pattern</p>
-        <p><strong>LEFT JOIN + WHERE right.id IS NULL</strong> is one of the most common interview patterns. It finds rows in the left table with no match on the right — e.g., "customers who never placed an order", "users with no activity."</p>
+        <p><strong>LEFT JOIN + WHERE right.id IS NULL</strong> is one of the most useful patterns in real queries. It finds rows in the left table with no match on the right — e.g., "customers who never placed an order", "users with no activity."</p>
       </div>
 
     </div>

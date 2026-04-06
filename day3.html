@@ -726,7 +726,7 @@
 <span class="kw">GROUP BY</span> <span class="cl">department</span>;</code></pre>
       </div>
 
-      <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">WHERE vs HAVING — the most common interview gotcha</span><div class="dvd-line"></div></div>
+      <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">WHERE vs HAVING — the most common gotcha</span><div class="dvd-line"></div></div>
 
       <div class="compare">
         <div class="compare-col">
@@ -736,7 +736,7 @@
             <pre style="padding:14px 18px"><code><span class="cm">-- Filter individual rows first</span>
 <span class="kw">SELECT</span>   <span class="cl">department</span>, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="cl">cnt</span>
 <span class="kw">FROM</span>     <span class="tb">employees</span>
-<span class="kw">WHERE</span>    <span class="cl">salary</span> > <span class="nu">80000</span>    <span class="cm">← rows removed here</span>
+<span class="kw">WHERE</span>    <span class="cl">salary</span> > <span class="nu">80000</span>    <span class="cm">-- ← rows removed here</span>
 <span class="kw">GROUP BY</span> <span class="cl">department</span>;</code></pre>
           </div>
           <p style="font-size:13px;color:var(--crm2);margin-top:8px">Keeps only high-salary employees, <em>then</em> groups them. The group itself can have any size.</p>
@@ -749,7 +749,7 @@
 <span class="kw">SELECT</span>   <span class="cl">department</span>, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="cl">cnt</span>
 <span class="kw">FROM</span>     <span class="tb">employees</span>
 <span class="kw">GROUP BY</span> <span class="cl">department</span>
-<span class="kw">HAVING</span>   <span class="fn">COUNT</span>(*) > <span class="nu">1</span>;    <span class="cm">← groups removed here</span></code></pre>
+<span class="kw">HAVING</span>   <span class="fn">COUNT</span>(*) > <span class="nu">1</span>;    <span class="cm">-- ← groups removed here</span></code></pre>
           </div>
           <p style="font-size:13px;color:var(--crm2);margin-top:8px">Groups all employees first, <em>then</em> removes groups with only 1 person. You can only use aggregate functions here, not raw column values.</p>
         </div>

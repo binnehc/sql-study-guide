@@ -724,7 +724,7 @@
         </div>
         <div class="card">
           <h5>COALESCE()</h5>
-          <p><code>COALESCE(col, 0)</code> returns the first non-NULL value. Use it to substitute a default when a column is NULL.</p>
+          <p><code>COALESCE(a, b, c, ...)</code> returns the <strong>first non-NULL value</strong> from its arguments, left to right. <code>COALESCE(col, 0)</code> returns <code>col</code> if it's not NULL, otherwise <code>0</code>.</p>
         </div>
       </div>
 
