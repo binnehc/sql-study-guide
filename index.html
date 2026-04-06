@@ -2591,88 +2591,8 @@
     </div>
     <div id="float-body"></div>
     <div id="float-ref-body">
-      <div class="fref-tabs">
-        <button class="fref-tab on" onclick="selFref(this,'fref-dates')">Dates</button>
-        <button class="fref-tab"    onclick="selFref(this,'fref-strings')">Strings</button>
-        <button class="fref-tab"    onclick="selFref(this,'fref-patterns')">Patterns</button>
-      </div>
-      <!-- Dates -->
-      <div class="fref-panel on" id="fref-dates">
-        <div class="fref-fn"><h5>DATE_TRUNC(unit, col)</h5><p>Truncate to month/week/day/hour. Group events by month: <code>DATE_TRUNC('month', created_at)</code>.</p></div>
-        <div class="fref-fn"><h5>EXTRACT / DATE_PART</h5><p>Pull one component: <code>EXTRACT(YEAR FROM date_col)</code>. Works for month, day, hour.</p></div>
-        <div class="fref-fn"><h5>DATEDIFF / DATE_DIFF</h5><p>Days between dates. MySQL: <code>DATEDIFF(end,start)</code>. PG: <code>end - start</code> → interval.</p></div>
-        <div class="fref-fn"><h5>CURRENT_DATE / NOW()</h5><p><code>CURRENT_DATE</code> = today. <code>NOW()</code> = timestamp. Use for "days since X" or filtering recent rows.</p></div>
-        <div class="fref-fn"><h5>DATE_ADD / INTERVAL</h5><p>PG: <code>created_at + INTERVAL '7 days'</code>. MySQL: <code>DATE_ADD(col, INTERVAL 7 DAY)</code>.</p></div>
-        <div class="fref-fn"><h5>DATE(timestamp)</h5><p>Strips time, returns date only. <code>DATE(measurement_time)</code>.</p></div>
-        <div class="fref-pat-lbl" style="margin-top:12px">Examples</div>
-        <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Date Examples</span><button class="cp-btn" onclick="cp(this)">copy</button></div><pre><code><span class="cm">-- Events per month</span>
-<span class="kw">SELECT</span>   <span class="fn">DATE_TRUNC</span>(<span class="st">'month'</span>, <span class="cl">created_at</span>) <span class="kw">AS</span> <span class="cl">month</span>,
-         <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="cl">events</span>
-<span class="kw">FROM</span>     <span class="tb">orders</span>
-<span class="kw">GROUP BY</span> <span class="nu">1</span> <span class="kw">ORDER BY</span> <span class="nu">1</span>;
-
-<span class="cm">-- Filter to a specific year</span>
-<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tb">orders</span>
-<span class="kw">WHERE</span>  <span class="fn">EXTRACT</span>(<span class="kw">YEAR FROM</span> <span class="cl">created_at</span>) = <span class="nu">2024</span>;
-
-<span class="cm">-- Days since signup</span>
-<span class="kw">SELECT</span> <span class="cl">name</span>, <span class="fn">CURRENT_DATE</span> - <span class="cl">signup_date</span> <span class="kw">AS</span> <span class="cl">days_active</span>
-<span class="kw">FROM</span>   <span class="tb">users</span>;</code></pre></div>
-      </div>
-      <!-- Strings -->
-      <div class="fref-panel" id="fref-strings">
-        <div class="fref-fn"><h5>UPPER / LOWER</h5><p>Normalise case: <code>WHERE LOWER(email) = 'alice@example.com'</code>.</p></div>
-        <div class="fref-fn"><h5>TRIM / LTRIM / RTRIM</h5><p>Remove leading/trailing whitespace or a specific character.</p></div>
-        <div class="fref-fn"><h5>CONCAT / ||</h5><p><code>CONCAT(first_name,' ',last_name)</code>. PG also supports <code>||</code>.</p></div>
-        <div class="fref-fn"><h5>LEFT / RIGHT / SUBSTRING</h5><p><code>LEFT(phone,3)</code> gets area code. <code>SUBSTRING(col,1,5)</code> = first 5 chars.</p></div>
-        <div class="fref-fn"><h5>LENGTH / LEN</h5><p>Number of characters: <code>WHERE LENGTH(password) >= 8</code>.</p></div>
-        <div class="fref-fn"><h5>REPLACE</h5><p><code>REPLACE(phone,'-','')</code> strips dashes.</p></div>
-        <div class="fref-fn"><h5>LIKE / ILIKE</h5><p><code>%</code>=any chars, <code>_</code>=one char. <code>ILIKE</code> is case-insensitive (PG).</p></div>
-        <div class="fref-fn"><h5>POSITION / STRPOS</h5><p>Find substring index: <code>POSITION('@' IN email)</code>. Returns 0 if not found.</p></div>
-        <div class="fref-pat-lbl" style="margin-top:12px">Examples</div>
-        <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">String Examples</span><button class="cp-btn" onclick="cp(this)">copy</button></div><pre><code><span class="cm">-- Full name</span>
-<span class="kw">SELECT</span> <span class="fn">CONCAT</span>(<span class="cl">first_name</span>,<span class="st">' '</span>,<span class="cl">last_name</span>) <span class="kw">AS</span> <span class="cl">full_name</span> <span class="kw">FROM</span> <span class="tb">users</span>;
-
-<span class="cm">-- Case-insensitive search</span>
-<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tb">users</span>
-<span class="kw">WHERE</span>  <span class="fn">LOWER</span>(<span class="cl">email</span>) <span class="kw">LIKE</span> <span class="st">'%@gmail.com'</span>;
-
-<span class="cm">-- Extract domain from email</span>
-<span class="kw">SELECT</span> <span class="fn">SUBSTRING</span>(<span class="cl">email</span>, <span class="fn">POSITION</span>(<span class="st">'@'</span> <span class="kw">IN</span> <span class="cl">email</span>)+<span class="nu">1</span>) <span class="kw">AS</span> <span class="cl">domain</span>
-<span class="kw">FROM</span>   <span class="tb">users</span>;</code></pre></div>
-      </div>
-      <!-- Patterns -->
-      <div class="fref-panel" id="fref-patterns">
-        <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">Match the problem shape → apply the template.</p>
-        <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">1 · Find Duplicates</span><button class="cp-btn" onclick="cp(this)">copy</button></div><pre><code><span class="kw">SELECT</span>   <span class="cl">email</span>, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="cl">occurrences</span>
-<span class="kw">FROM</span>     <span class="tb">users</span>
-<span class="kw">GROUP BY</span> <span class="cl">email</span>
-<span class="kw">HAVING</span>   <span class="fn">COUNT</span>(*) > <span class="nu">1</span>;</code></pre></div>
-        <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">2 · Top N per Group</span><button class="cp-btn" onclick="cp(this)">copy</button></div><pre><code><span class="kw">WITH</span> <span class="tb">ranked</span> <span class="kw">AS</span> (
-  <span class="kw">SELECT</span> *, <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
-    <span class="kw">PARTITION BY</span> <span class="cl">dept</span> <span class="kw">ORDER BY</span> <span class="cl">salary</span> <span class="kw">DESC</span>) <span class="kw">AS</span> <span class="cl">rn</span>
-  <span class="kw">FROM</span> <span class="tb">employees</span>
-)
-<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tb">ranked</span> <span class="kw">WHERE</span> <span class="cl">rn</span> = <span class="nu">1</span>;</code></pre></div>
-        <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">3 · Never Did X</span><button class="cp-btn" onclick="cp(this)">copy</button></div><pre><code><span class="kw">SELECT</span>    <span class="cl">c.name</span>
-<span class="kw">FROM</span>      <span class="tb">customers</span> <span class="cl">c</span>
-<span class="kw">LEFT JOIN</span> <span class="tb">orders</span>    <span class="cl">o</span> <span class="kw">ON</span> <span class="cl">c.id</span> = <span class="cl">o.customer_id</span>
-<span class="kw">WHERE</span>     <span class="cl">o.id</span> <span class="kw">IS NULL</span>;</code></pre></div>
-        <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">4 · Running Total</span><button class="cp-btn" onclick="cp(this)">copy</button></div><pre><code><span class="kw">SELECT</span> <span class="cl">order_date</span>, <span class="cl">revenue</span>,
-  <span class="fn">SUM</span>(<span class="cl">revenue</span>) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> <span class="cl">order_date</span>) <span class="kw">AS</span> <span class="cl">running_total</span>
-<span class="kw">FROM</span> <span class="tb">orders</span>;</code></pre></div>
-        <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">5 · Month-over-Month</span><button class="cp-btn" onclick="cp(this)">copy</button></div><pre><code><span class="kw">WITH</span> <span class="tb">m</span> <span class="kw">AS</span> (
-  <span class="kw">SELECT</span> <span class="fn">DATE_TRUNC</span>(<span class="st">'month'</span>,<span class="cl">order_date</span>) <span class="kw">AS</span> <span class="cl">mo</span>, <span class="fn">SUM</span>(<span class="cl">revenue</span>) <span class="kw">AS</span> <span class="cl">rev</span>
-  <span class="kw">FROM</span> <span class="tb">orders</span> <span class="kw">GROUP BY</span> <span class="nu">1</span>
-)
-<span class="kw">SELECT</span> <span class="cl">mo</span>, <span class="cl">rev</span>,
-  <span class="cl">rev</span> - <span class="fn">LAG</span>(<span class="cl">rev</span>) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> <span class="cl">mo</span>) <span class="kw">AS</span> <span class="cl">change</span>
-<span class="kw">FROM</span> <span class="tb">m</span>;</code></pre></div>
-        <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">6 · % of Total</span><button class="cp-btn" onclick="cp(this)">copy</button></div><pre><code><span class="kw">SELECT</span> <span class="cl">department</span>, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="cl">headcount</span>,
-  <span class="fn">ROUND</span>(<span class="fn">COUNT</span>(*)*<span class="nu">100.0</span>/<span class="fn">SUM</span>(<span class="fn">COUNT</span>(*)) <span class="kw">OVER</span>(),<span class="nu">1</span>) <span class="kw">AS</span> <span class="cl">pct</span>
-<span class="kw">FROM</span>     <span class="tb">employees</span>
-<span class="kw">GROUP BY</span> <span class="cl">department</span>;</code></pre></div>
-      </div>
+      <div class="fref-tabs" id="fref-tab-row"></div>
+      <div id="fref-panels-wrap"></div>
     </div>`;
   document.body.appendChild(floatPanel);
 
@@ -2694,35 +2614,205 @@
     document.getElementById('float-ref-body').classList.add('on');
   });
 
-  function selFref(btn, id) {
-    btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach(b => b.classList.remove('on'));
-    btn.classList.add('on');
-    document.getElementById('float-ref-body').querySelectorAll('.fref-panel').forEach(p => p.classList.remove('on'));
-    document.getElementById(id).classList.add('on');
+  // ── Per-day cheat sheet content ──
+  function cb(lang, code) {
+    return `<div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">${lang}</span><button class="cp-btn" onclick="cp(this)">copy</button></div><pre><code>${code}</code></pre></div>`;
   }
+  function fn(t)  { return `<div class="fref-fn">${t}</div>`; }
+  function h5(t,b){ return `<h5>${t}</h5><p>${b}</p>`; }
 
-  // ── Detect the most relevant cheat sheet tab from question text ──
-  function refTabForQuestion(wrap) {
-    const q = (wrap.querySelector('.practice-q, .practice-prompt p') || {}).textContent || '';
-    const h = (wrap.querySelector('.practice-hint') || {}).textContent || '';
-    const text = (q + ' ' + h).toLowerCase();
+  const K = s => `<span class="kw">${s}</span>`;
+  const F = s => `<span class="fn">${s}</span>`;
+  const T = s => `<span class="tb">${s}</span>`;
+  const C = s => `<span class="cl">${s}</span>`;
+  const N = s => `<span class="nu">${s}</span>`;
+  const S = s => `<span class="st">${s}</span>`;
+  const M = s => `<span class="cm">${s}</span>`;
 
-    const dateKw    = ['date', 'timestamp', 'measurement_time', 'month', 'year', 'interval', 'time', 'datediff'];
-    const stringKw  = ['concat', 'upper', 'lower', 'trim', 'like', 'substring', 'length', 'string', 'email', 'replace', 'position'];
+  const dayCheatSheets = {
+    day1: {
+      tabs: ['SELECT', 'WHERE', 'ORDER BY'],
+      panels: [
+        fn(h5('SELECT col1, col2','Pick specific columns. Use <code>*</code> for all (avoid in prod).')) +
+        fn(h5('DISTINCT','<code>SELECT DISTINCT dept FROM employees</code> — removes duplicate rows.')) +
+        fn(h5('AS (alias)','Rename a column or expression: <code>salary * 12 AS annual_salary</code>.')) +
+        fn(h5('LIMIT / TOP','Cap rows returned. PG/MySQL: <code>LIMIT 10</code>. SQL Server: <code>SELECT TOP 10</code>.')) +
+        cb('SELECT basics',
+          `${K('SELECT')} ${C('name')}, ${C('department')}, ${C('salary')} * ${N('12')} ${K('AS')} ${C('annual_salary')}\n${K('FROM')}   ${T('employees')}\n${K('LIMIT')}  ${N('10')};`),
 
-    if (dateKw.some(k => text.includes(k)))   return 'fref-dates';
-    if (stringKw.some(k => text.includes(k))) return 'fref-strings';
-    return 'fref-patterns';
-  }
+        fn(h5('Comparison ops','<code>=  !=  &lt;  &gt;  &lt;=  &gt;=</code> — standard comparisons.')) +
+        fn(h5('BETWEEN','<code>WHERE salary BETWEEN 50000 AND 90000</code> — inclusive on both ends.')) +
+        fn(h5('IN / NOT IN','<code>WHERE dept IN (\'Eng\',\'Sales\')</code> — cleaner than multiple OR.')) +
+        fn(h5('LIKE','<code>%</code> = any chars, <code>_</code> = one char. <code>WHERE name LIKE \'A%\'</code>.')) +
+        fn(h5('IS NULL / IS NOT NULL','Never use <code>= NULL</code> — always <code>IS NULL</code>.')) +
+        cb('WHERE examples',
+          `${K('SELECT')} * ${K('FROM')} ${T('employees')}\n${K('WHERE')}  ${C('department')} ${K('IN')} (${S("'Engineering'")}, ${S("'Sales'")})\n  ${K('AND')}  ${C('salary')} ${K('BETWEEN')} ${N('60000')} ${K('AND')} ${N('120000')}\n  ${K('AND')}  ${C('manager_id')} ${K('IS NOT NULL')};`),
 
-  function syncRefTab(wrap) {
-    const targetPanel = refTabForQuestion(wrap);
-    const refBody = document.getElementById('float-ref-body');
-    refBody.querySelectorAll('.fref-panel').forEach(p => p.classList.remove('on'));
-    document.getElementById(targetPanel).classList.add('on');
-    const tabMap = { 'fref-dates': 0, 'fref-strings': 1, 'fref-patterns': 2 };
-    const idx = tabMap[targetPanel];
-    refBody.querySelectorAll('.fref-tab').forEach((t, i) => t.classList.toggle('on', i === idx));
+        fn(h5('ORDER BY col ASC/DESC','Default is ASC. Use DESC for highest-first.')) +
+        fn(h5('Multiple columns','<code>ORDER BY dept ASC, salary DESC</code> — sorts by dept first, then salary within each dept.')) +
+        fn(h5('ORDER BY position','<code>ORDER BY 1</code> = first SELECT column. Handy but fragile.')) +
+        cb('ORDER BY',
+          `${K('SELECT')}   ${C('name')}, ${C('department')}, ${C('salary')}\n${K('FROM')}     ${T('employees')}\n${K('WHERE')}    ${C('salary')} > ${N('70000')}\n${K('ORDER BY')} ${C('department')} ${K('ASC')}, ${C('salary')} ${K('DESC')};`)
+      ]
+    },
+    day2: {
+      tabs: ['JOIN Types', 'Syntax', 'Anti-join'],
+      panels: [
+        fn(h5('INNER JOIN','Returns only rows with a match in <em>both</em> tables.')) +
+        fn(h5('LEFT JOIN','All rows from the left table; NULLs where no match on the right.')) +
+        fn(h5('RIGHT JOIN','All rows from the right table; NULLs where no match on the left. Rarely used — rewrite as LEFT JOIN.')) +
+        fn(h5('FULL OUTER JOIN','All rows from both tables; NULLs on either side when no match.')) +
+        fn(h5('CROSS JOIN','Every row × every row (cartesian product). Use intentionally only.')) +
+        cb('JOIN types',
+          `${M('-- INNER: only matched pairs')}\n${K('SELECT')} ${C('e.name')}, ${C('d.dept_name')}\n${K('FROM')}   ${T('employees')} ${C('e')}\n${K('JOIN')}   ${T('departments')} ${C('d')} ${K('ON')} ${C('e.dept_id')} = ${C('d.dept_id')};\n\n${M('-- LEFT: all employees, even without a dept')}\n${K('SELECT')} ${C('e.name')}, ${C('d.dept_name')}\n${K('FROM')}   ${T('employees')} ${C('e')}\n${K('LEFT JOIN')} ${T('departments')} ${C('d')} ${K('ON')} ${C('e.dept_id')} = ${C('d.dept_id')};`),
+
+        fn(h5('ON clause','The join condition: <code>ON a.id = b.foreign_id</code>. Can be any boolean expression.')) +
+        fn(h5('Table aliases','<code>FROM employees e JOIN departments d</code> — shorter references in SELECT and WHERE.')) +
+        fn(h5('Multiple JOINs','Chain them: each JOIN adds another table. Order matters for LEFT JOINs.')) +
+        cb('Multi-table join',
+          `${K('SELECT')} ${C('e.name')}, ${C('d.dept_name')}, ${C('m.name')} ${K('AS')} ${C('manager')}\n${K('FROM')}      ${T('employees')}   ${C('e')}\n${K('JOIN')}      ${T('departments')} ${C('d')} ${K('ON')} ${C('e.dept_id')}    = ${C('d.dept_id')}\n${K('LEFT JOIN')} ${T('employees')}   ${C('m')} ${K('ON')} ${C('e.manager_id')} = ${C('m.employee_id')};`),
+
+        fn(h5('LEFT JOIN + WHERE IS NULL','Find rows in table A with <em>no</em> match in table B — the anti-join pattern.')) +
+        fn(h5('Why not NOT IN?','<code>NOT IN</code> breaks silently if the subquery returns any NULL. Prefer LEFT JOIN + IS NULL or NOT EXISTS.')) +
+        cb('Anti-join: employees with no department',
+          `${K('SELECT')}    ${C('e.name')}\n${K('FROM')}      ${T('employees')}   ${C('e')}\n${K('LEFT JOIN')} ${T('departments')} ${C('d')} ${K('ON')} ${C('e.dept_id')} = ${C('d.dept_id')}\n${K('WHERE')}     ${C('d.dept_id')} ${K('IS NULL')};`)
+      ]
+    },
+    day3: {
+      tabs: ['Aggregates', 'GROUP BY', 'HAVING'],
+      panels: [
+        fn(h5('COUNT(*)','Counts all rows including NULLs. <code>COUNT(col)</code> skips NULLs.')) +
+        fn(h5('SUM / AVG','<code>SUM(salary)</code>, <code>AVG(salary)</code>. Both ignore NULL rows.')) +
+        fn(h5('MIN / MAX','<code>MIN(hire_date)</code> = earliest hire. Works on dates, strings, numbers.')) +
+        fn(h5('ROUND','<code>ROUND(AVG(salary), 2)</code> — second arg is decimal places.')) +
+        fn(h5('COUNT(DISTINCT col)','Count unique values: <code>COUNT(DISTINCT customer_id)</code>.')) +
+        cb('Aggregate functions',
+          `${K('SELECT')}\n  ${C('department')},\n  ${F('COUNT')}(*)                    ${K('AS')} ${C('headcount')},\n  ${F('ROUND')}(${F('AVG')}(${C('salary')}), ${N('0')})   ${K('AS')} ${C('avg_salary')},\n  ${F('MAX')}(${C('salary')})             ${K('AS')} ${C('top_salary')}\n${K('FROM')}   ${T('employees')}\n${K('GROUP BY')} ${C('department')};`),
+
+        fn(h5('GROUP BY','All non-aggregate SELECT columns must appear in GROUP BY.')) +
+        fn(h5('GROUP BY multiple cols','<code>GROUP BY dept, year</code> — one row per unique combination.')) +
+        fn(h5('GROUP BY position','<code>GROUP BY 1</code> = first column. Useful but less readable.')) +
+        cb('GROUP BY',
+          `${M('-- Headcount per department per year')}\n${K('SELECT')}   ${C('department')}, ${F('EXTRACT')}(${K('YEAR FROM')} ${C('hire_date')}) ${K('AS')} ${C('yr')}, ${F('COUNT')}(*)\n${K('FROM')}     ${T('employees')}\n${K('GROUP BY')} ${C('department')}, ${N('2')}\n${K('ORDER BY')} ${C('department')}, ${C('yr')};`),
+
+        fn(h5('HAVING vs WHERE','<code>WHERE</code> filters rows <em>before</em> grouping. <code>HAVING</code> filters groups <em>after</em> aggregation.')) +
+        fn(h5('Rule of thumb','If your filter uses an aggregate function → HAVING. Otherwise → WHERE.')) +
+        cb('WHERE vs HAVING',
+          `${M('-- WHERE: filter rows first (no aggregate)')}\n${K('SELECT')}  ${C('department')}, ${F('COUNT')}(*) ${K('AS')} ${C('headcount')}\n${K('FROM')}    ${T('employees')}\n${K('WHERE')}   ${C('hire_date')} > ${S("'2020-01-01'")}\n${K('GROUP BY')} ${C('department')}\n${K('HAVING')}   ${F('COUNT')}(*) > ${N('3')};  ${M('-- HAVING: filter groups after')}`)
+      ]
+    },
+    day4: {
+      tabs: ['NULLs', 'Self-Join', 'Subqueries'],
+      panels: [
+        fn(h5('IS NULL / IS NOT NULL','Only way to check NULL. <code>col = NULL</code> always returns false.')) +
+        fn(h5('COALESCE','Returns first non-NULL value: <code>COALESCE(bonus, 0)</code>.')) +
+        fn(h5('NULLIF','Returns NULL if two values are equal: <code>NULLIF(revenue, 0)</code> prevents divide-by-zero.')) +
+        fn(h5('NULL in math','Any arithmetic with NULL returns NULL. Guard with COALESCE.')) +
+        fn(h5('NULL in aggregates','<code>COUNT(*)</code> includes NULLs; <code>COUNT(col)</code>, SUM, AVG all skip them.')) +
+        cb('NULL handling',
+          `${M('-- Replace NULL bonus with 0')}\n${K('SELECT')} ${C('name')}, ${F('COALESCE')}(${C('bonus')}, ${N('0')}) ${K('AS')} ${C('bonus')}\n${K('FROM')}   ${T('employees')};\n\n${M('-- Safe division')}\n${K('SELECT')} ${C('revenue')} / ${F('NULLIF')}(${C('units')}, ${N('0')}) ${K('AS')} ${C('rev_per_unit')}\n${K('FROM')}   ${T('sales')};`),
+
+        fn(h5('Self-join','Join a table to itself using two different aliases.')) +
+        fn(h5('Use case','Compare rows within the same table: employees vs their managers, or consecutive events.')) +
+        cb('Self-join: employee vs manager salary',
+          `${K('SELECT')}\n  ${C('e.name')}   ${K('AS')} ${C('employee')},\n  ${C('e.salary')} ${K('AS')} ${C('emp_salary')},\n  ${C('m.name')}   ${K('AS')} ${C('manager')},\n  ${C('m.salary')} ${K('AS')} ${C('mgr_salary')}\n${K('FROM')}       ${T('employees')} ${C('e')}\n${K('INNER JOIN')} ${T('employees')} ${C('m')} ${K('ON')} ${C('e.manager_id')} = ${C('m.employee_id')}\n${K('WHERE')}       ${C('e.salary')} > ${C('m.salary')};`),
+
+        fn(h5('Subquery in WHERE','<code>WHERE salary > (SELECT AVG(salary) FROM employees)</code>.')) +
+        fn(h5('Subquery in FROM','Treat the result as a derived table — must be aliased.')) +
+        fn(h5('Correlated subquery','References the outer query row by row. Powerful but slower than a JOIN.')) +
+        cb('Subquery examples',
+          `${M('-- Employees above average salary')}\n${K('SELECT')} ${C('name')}, ${C('salary')}\n${K('FROM')}   ${T('employees')}\n${K('WHERE')}  ${C('salary')} > (${K('SELECT')} ${F('AVG')}(${C('salary')}) ${K('FROM')} ${T('employees')});\n\n${M('-- Using a derived table')}\n${K('SELECT')} ${C('d.department')}, ${C('d.avg_sal')}\n${K('FROM')} (${K('SELECT')} ${C('department')}, ${F('AVG')}(${C('salary')}) ${K('AS')} ${C('avg_sal')}\n        ${K('FROM')} ${T('employees')} ${K('GROUP BY')} ${C('department')}) ${C('d')}\n${K('WHERE')} ${C('d.avg_sal')} > ${N('80000')};`)
+      ]
+    },
+    day5: {
+      tabs: ['CTE syntax', 'Chaining', 'CTE vs Sub'],
+      panels: [
+        fn(h5('WITH name AS (...)','Define a named result set before the main query. Runs once, referenced by name.')) +
+        fn(h5('Structure','<code>WITH cte AS ( SELECT ... ) SELECT ... FROM cte WHERE ...</code>')) +
+        fn(h5('Why use CTEs?','Makes complex queries readable. Easier to debug — test the CTE alone first.')) +
+        cb('Basic CTE',
+          `${K('WITH')} ${T('dept_totals')} ${K('AS')} (\n  ${K('SELECT')}   ${C('department')}, ${F('SUM')}(${C('salary')}) ${K('AS')} ${C('total_salary')}\n  ${K('FROM')}     ${T('employees')}\n  ${K('GROUP BY')} ${C('department')}\n)\n${K('SELECT')} ${C('department')}, ${C('total_salary')}\n${K('FROM')}   ${T('dept_totals')}\n${K('WHERE')}  ${C('total_salary')} > ${N('200000')};`),
+
+        fn(h5('Multiple CTEs','Separate with a comma. Later CTEs can reference earlier ones.')) +
+        cb('Chaining CTEs',
+          `${K('WITH')}\n  ${T('dept_avg')} ${K('AS')} (\n    ${K('SELECT')} ${C('department')}, ${F('AVG')}(${C('salary')}) ${K('AS')} ${C('avg_sal')}\n    ${K('FROM')}   ${T('employees')} ${K('GROUP BY')} ${C('department')}\n  ),\n  ${T('above_avg')} ${K('AS')} (\n    ${K('SELECT')} ${C('e.*')}\n    ${K('FROM')}   ${T('employees')} ${C('e')}\n    ${K('JOIN')}   ${T('dept_avg')} ${C('d')} ${K('ON')} ${C('e.department')} = ${C('d.department')}\n    ${K('WHERE')}  ${C('e.salary')} > ${C('d.avg_sal')}\n  )\n${K('SELECT')} * ${K('FROM')} ${T('above_avg')};`),
+
+        fn(h5('CTE','Defined once at top, named, reusable, easier to read and test step by step.')) +
+        fn(h5('Subquery','Inline, anonymous, can be correlated. Better for one-off simple filters.')) +
+        fn(h5('When to prefer CTE','When you need to reference the same result twice, or the logic has multiple steps.')) +
+        cb('Same query — CTE vs subquery',
+          `${M('-- Subquery')}\n${K('SELECT')} * ${K('FROM')} (\n  ${K('SELECT')} ${C('department')}, ${F('SUM')}(${C('salary')}) ${K('AS')} ${C('total')}\n  ${K('FROM')} ${T('employees')} ${K('GROUP BY')} ${C('department')}\n) ${C('t')} ${K('WHERE')} ${C('t.total')} > ${N('200000')};\n\n${M('-- CTE (same result, clearer intent)')}\n${K('WITH')} ${T('totals')} ${K('AS')} (\n  ${K('SELECT')} ${C('department')}, ${F('SUM')}(${C('salary')}) ${K('AS')} ${C('total')}\n  ${K('FROM')} ${T('employees')} ${K('GROUP BY')} ${C('department')}\n)\n${K('SELECT')} * ${K('FROM')} ${T('totals')} ${K('WHERE')} ${C('total')} > ${N('200000')};`)
+      ]
+    },
+    day6: {
+      tabs: ['Ranking', 'LAG / LEAD', 'Frame'],
+      panels: [
+        fn(h5('ROW_NUMBER()','Unique sequential number per partition. No ties: 1,2,3,4.')) +
+        fn(h5('RANK()','Ties get the same number; next rank skips: 1,2,2,4.')) +
+        fn(h5('DENSE_RANK()','Ties get the same number; next rank does NOT skip: 1,2,2,3.')) +
+        fn(h5('PARTITION BY','Restarts the ranking within each group (like GROUP BY but keeps all rows).')) +
+        cb('Ranking functions',
+          `${K('SELECT')}\n  ${C('name')}, ${C('department')}, ${C('salary')},\n  ${F('ROW_NUMBER')}()   ${K('OVER')} (${K('PARTITION BY')} ${C('department')} ${K('ORDER BY')} ${C('salary')} ${K('DESC')}) ${K('AS')} ${C('row_num')},\n  ${F('RANK')}()        ${K('OVER')} (${K('PARTITION BY')} ${C('department')} ${K('ORDER BY')} ${C('salary')} ${K('DESC')}) ${K('AS')} ${C('rank')},\n  ${F('DENSE_RANK')}()  ${K('OVER')} (${K('PARTITION BY')} ${C('department')} ${K('ORDER BY')} ${C('salary')} ${K('DESC')}) ${K('AS')} ${C('dense_rank')}\n${K('FROM')} ${T('employees')};`),
+
+        fn(h5('LAG(col, n)','Value from n rows <em>before</em> the current row. Default n=1.')) +
+        fn(h5('LEAD(col, n)','Value from n rows <em>after</em> the current row. Default n=1.')) +
+        fn(h5('Default value','<code>LAG(col, 1, 0)</code> — third arg is the fallback when there is no prior row.')) +
+        cb('LAG / LEAD: month-over-month change',
+          `${K('SELECT')}\n  ${C('month')}, ${C('revenue')},\n  ${F('LAG')}(${C('revenue')}) ${K('OVER')} (${K('ORDER BY')} ${C('month')})    ${K('AS')} ${C('prev_month')},\n  ${C('revenue')} - ${F('LAG')}(${C('revenue')}) ${K('OVER')} (${K('ORDER BY')} ${C('month')}) ${K('AS')} ${C('change')}\n${K('FROM')} ${T('monthly_revenue')};`),
+
+        fn(h5('Default frame','<code>RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code> — cumulative from start.')) +
+        fn(h5('Running total','<code>SUM(revenue) OVER (ORDER BY date)</code>')) +
+        fn(h5('Window avg','<code>AVG(salary) OVER (PARTITION BY dept)</code> — same avg repeated on every row.')) +
+        cb('Aggregate window functions',
+          `${K('SELECT')}\n  ${C('order_date')}, ${C('revenue')},\n  ${F('SUM')}(${C('revenue')}) ${K('OVER')} (${K('ORDER BY')} ${C('order_date')}) ${K('AS')} ${C('running_total')},\n  ${F('AVG')}(${C('revenue')}) ${K('OVER')} (${K('PARTITION BY')} ${F('DATE_TRUNC')}(${S("'month'")}, ${C('order_date')})) ${K('AS')} ${C('monthly_avg')}\n${K('FROM')} ${T('orders')};`)
+      ]
+    },
+    day7: {
+      tabs: ['Odd / Even', 'CTE + Window', 'Tips'],
+      panels: [
+        fn(h5('Row position','Use <code>ROW_NUMBER() OVER (PARTITION BY day ORDER BY time)</code> to number rows per group.')) +
+        fn(h5('Odd/Even check','<code>position % 2 = 1</code> → odd row, <code>% 2 = 0</code> → even row.')) +
+        fn(h5('CASE WHEN','Branch inside an aggregate: <code>SUM(CASE WHEN pos % 2 = 1 THEN val ELSE 0 END)</code>.')) +
+        cb('Odd/Even sums pattern',
+          `${K('WITH')} ${T('numbered')} ${K('AS')} (\n  ${K('SELECT')}\n    ${F('DATE')}(${C('measurement_time')})  ${K('AS')} ${C('day')},\n    ${C('measurement_value')},\n    ${F('ROW_NUMBER')}() ${K('OVER')} (\n      ${K('PARTITION BY')} ${F('DATE')}(${C('measurement_time')})\n      ${K('ORDER BY')}     ${C('measurement_time')}\n    ) ${K('AS')} ${C('pos')}\n  ${K('FROM')} ${T('measurements')}\n)\n${K('SELECT')}\n  ${C('day')},\n  ${F('SUM')}(${K('CASE WHEN')} ${C('pos')} % ${N('2')} = ${N('1')} ${K('THEN')} ${C('measurement_value')} ${K('ELSE')} ${N('0')} ${K('END')}) ${K('AS')} ${C('odd_sum')},\n  ${F('SUM')}(${K('CASE WHEN')} ${C('pos')} % ${N('2')} = ${N('0')} ${K('THEN')} ${C('measurement_value')} ${K('ELSE')} ${N('0')} ${K('END')}) ${K('AS')} ${C('even_sum')}\n${K('FROM')} ${T('numbered')}\n${K('GROUP BY')} ${C('day')};`),
+
+        fn(h5('Pattern','CTE to add a row number → main query aggregates using CASE WHEN on that number.')) +
+        fn(h5('Why a CTE?','You can\'t reference a window function alias in the same SELECT. The CTE materialises it first.')) +
+        cb('General CTE + window template',
+          `${K('WITH')} ${T('base')} ${K('AS')} (\n  ${K('SELECT')}\n    ${C('group_col')},\n    ${C('value_col')},\n    ${F('ROW_NUMBER')}() ${K('OVER')} (${K('PARTITION BY')} ${C('group_col')} ${K('ORDER BY')} ${C('order_col')}) ${K('AS')} ${C('rn')}\n  ${K('FROM')} ${T('source_table')}\n)\n${K('SELECT')}\n  ${C('group_col')},\n  ${F('SUM')}(${K('CASE WHEN')} ${C('rn')} % ${N('2')} = ${N('1')} ${K('THEN')} ${C('value_col')} ${K('ELSE')} ${N('0')} ${K('END')}) ${K('AS')} ${C('odd')},\n  ${F('SUM')}(${K('CASE WHEN')} ${C('rn')} % ${N('2')} = ${N('0')} ${K('THEN')} ${C('value_col')} ${K('ELSE')} ${N('0')} ${K('END')}) ${K('AS')} ${C('even')}\n${K('FROM')} ${T('base')}\n${K('GROUP BY')} ${C('group_col')};`),
+
+        `<div class="fref-fn"><h5>Interview approach</h5><p>State your plan aloud before writing: <em>"I'll use a CTE to number the rows, then aggregate with CASE WHEN."</em></p></div>` +
+        `<div class="fref-fn"><h5>Check clause order</h5><p><code>WITH → SELECT → FROM → JOIN → WHERE → GROUP BY → HAVING → ORDER BY → LIMIT</code></p></div>` +
+        `<div class="fref-fn"><h5>Common mistakes</h5><p>1) Using <code>WHERE</code> on a window alias — wrap in CTE first. 2) Integer division — cast with <code>::numeric</code> or <code>* 1.0</code>. 3) Forgetting <code>PARTITION BY</code> resets the counter per group.</p></div>` +
+        `<div class="fref-fn"><h5>Debug strategy</h5><p>Test the CTE alone first. Add one layer at a time. Check row counts at each step.</p></div>`
+      ]
+    }
+  };
+
+  function renderRefBody(dayId) {
+    const sheet = dayCheatSheets[dayId] || dayCheatSheets['day1'];
+    const tabRow  = document.getElementById('fref-tab-row');
+    const panWrap = document.getElementById('fref-panels-wrap');
+    tabRow.innerHTML  = '';
+    panWrap.innerHTML = '';
+    sheet.tabs.forEach((label, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'fref-tab' + (i === 0 ? ' on' : '');
+      btn.textContent = label;
+      btn.addEventListener('click', () => {
+        tabRow.querySelectorAll('.fref-tab').forEach(b => b.classList.remove('on'));
+        panWrap.querySelectorAll('.fref-panel').forEach(p => p.classList.remove('on'));
+        btn.classList.add('on');
+        panWrap.children[i].classList.add('on');
+      });
+      tabRow.appendChild(btn);
+      const panel = document.createElement('div');
+      panel.className = 'fref-panel' + (i === 0 ? ' on' : '');
+      panel.innerHTML = sheet.panels[i];
+      panWrap.appendChild(panel);
+    });
+    // Re-bind copy buttons inside the new content
+    panWrap.querySelectorAll('.cp-btn').forEach(b => { b.onclick = function(){ cp(this); }; });
   }
 
   let currentDayId   = null;
@@ -2801,7 +2891,7 @@
     const n = sectionId.replace('day', '');
     floatLabel.textContent = 'Day ' + n + ' · Practice';
     currentDayId = sectionId;
-    syncRefTab(wrap);
+    renderRefBody(sectionId);
     // Update nav highlight
     document.querySelectorAll('.fday-btn').forEach(b => b.classList.toggle('on', b.dataset.day === sectionId));
   }
