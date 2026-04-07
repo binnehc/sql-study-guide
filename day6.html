@@ -560,44 +560,60 @@
 
   /* ── CHECK BUTTON ── */
   .check-btn {
-    flex:1; padding:6px 10px;
-    background:rgba(121,184,255,0.08);
-    border:1px solid rgba(121,184,255,0.2);
-    color:var(--blue); border-radius:4px;
-    font-family:inherit; font-size:12px;
-    cursor:pointer; transition:background 0.15s;
+    display:block; width:calc(100% - 28px);
+    margin:0 14px 14px;
+    padding:9px 16px;
+    background:rgba(121,184,255,0.1);
+    border:1px solid rgba(121,184,255,0.25);
+    color:var(--blue); border-radius:6px;
+    font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500;
+    cursor:pointer; transition:background 0.15s, border-color 0.15s;
+    text-align:center; letter-spacing:0.01em;
   }
-  .check-btn:hover { background:rgba(121,184,255,0.16); }
+  .check-btn:hover { background:rgba(121,184,255,0.18); border-color:rgba(121,184,255,0.45); }
+  .check-btn:active { background:rgba(121,184,255,0.24); }
 
   /* ── ATTEMPT FEEDBACK ── */
   .practice-status {
-    margin:0 14px 6px; padding:8px 11px;
-    font-size:12px; line-height:1.5; border-radius:5px;
+    margin:0 14px 10px; padding:10px 13px;
+    font-size:13px; line-height:1.5; border-radius:6px;
+    border:1px solid transparent;
     display:none;
   }
   .practice-status.show { display:block; }
-  .practice-status.neutral { background:var(--bg3); color:var(--text2); }
-  .practice-status.correct { background:rgba(111,207,151,0.12); color:var(--green); border:1px solid rgba(111,207,151,0.25); }
+  .practice-status.neutral { background:var(--bg3); color:var(--text2); border-color:var(--bdr); }
+  .practice-status.correct { background:rgba(111,207,151,0.1); color:var(--green); border-color:rgba(111,207,151,0.3); }
 
   /* ── HINT BOX ── */
   .hint-box {
-    margin:0 14px 10px; padding:10px 12px;
-    background:var(--bg3); border-radius:5px;
-    border-left:2px solid var(--yel);
+    margin:0 14px 12px; padding:11px 14px;
+    background:rgba(255,171,112,0.06); border-radius:6px;
+    border:1px solid rgba(255,171,112,0.18);
     display:none;
   }
   .hint-box.show { display:block; }
   .hint-label {
     font-size:10px; text-transform:uppercase;
-    letter-spacing:0.08em; color:var(--text3); margin-bottom:6px;
+    letter-spacing:0.08em; color:var(--yel); opacity:0.7; margin-bottom:7px;
   }
   .hint-item {
-    font-size:12px; color:var(--yel); line-height:1.55;
+    font-size:12px; color:var(--text2); line-height:1.6;
   }
   .hint-item + .hint-item {
     margin-top:8px; padding-top:8px;
-    border-top:1px solid rgba(255,255,255,0.06);
+    border-top:1px solid rgba(255,171,112,0.1);
   }
+
+  /* ── CHEAT SHEET CODE ── */
+  .fref-code {
+    font-family:'JetBrains Mono',monospace; font-size:11px; line-height:1.8;
+    color:var(--text2); background:var(--bg3);
+    padding:10px 12px; border-radius:6px;
+    border:1px solid var(--bdr); margin-top:8px;
+    overflow-x:auto; white-space:pre;
+  }
+  .pp-tab:hover { color:var(--text2); background:var(--hover); }
+  .practice-ta:focus { background:rgba(15,15,15,0.6); }
 
   /* ── CASE STUDIES ── */
   .cases-layout { display:flex; gap:28px; align-items:flex-start; margin-top:32px; }
@@ -1081,6 +1097,7 @@
           <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="clearTa(this)">clear</button><button class="cp-btn" onclick="toggleAns(this)">show answer</button></div></div>
           <textarea class="practice-ta" placeholder="-- Write your SQL here...&#10;-- Press Tab to indent" spellcheck="false"></textarea>
         </div>
+        <button class="check-btn" onclick="checkQuery(this)">Check Answer</button>
         <div class="practice-answer">
           <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Answer</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
           <pre><code><span class="kw">SELECT</span>
@@ -1099,7 +1116,22 @@
       <!-- Cheat sheet body -->
       <div class="pp-ref" id="pp-ref">
         <div class="fref-tabs"><button class="fref-tab on" onclick="selRef(this,0)">Ranking</button><button class="fref-tab" onclick="selRef(this,1)">LAG / LEAD</button><button class="fref-tab" onclick="selRef(this,2)">Frame</button></div>
-        <div id="fref-panels"></div>
+        <div id="fref-panels"><div class="fref-panel on" id="fref-0"><div class="fref-fn"><h5>ROW_NUMBER()</h5><p>Unique integers 1, 2, 3 — no ties. Use when you need strict uniqueness.</p></div><div class="fref-fn"><h5>RANK()</h5><p>Ties get the same rank; next rank skips: 1, 1, 3.</p></div><div class="fref-fn"><h5>DENSE_RANK()</h5><p>Ties get the same rank; no gaps: 1, 1, 2. Best for "top N" problems.</p></div><div class="fref-fn"><h5>PARTITION BY</h5><p>Restart numbering within each group (e.g. per department).</p></div><pre class="fref-code">SELECT name, dept, salary,
+  DENSE_RANK() OVER (
+    PARTITION BY dept
+    ORDER BY salary DESC
+  ) AS dr
+FROM employees;</pre></div><div class="fref-panel" id="fref-1"><div class="fref-fn"><h5>LAG(col, n, default)</h5><p>Value from n rows <em>before</em> current row. Default fills if no prior row.</p></div><div class="fref-fn"><h5>LEAD(col, n, default)</h5><p>Value from n rows <em>after</em> current row.</p></div><div class="fref-fn"><h5>Default offset</h5><p>1 (previous/next row). Default fill value is NULL unless specified.</p></div><div class="fref-fn"><h5>Use cases</h5><p>Day-over-day change, compare to prior event, detect gaps.</p></div><pre class="fref-code">SELECT date, revenue,
+  LAG(revenue, 1, 0) OVER (ORDER BY date) AS prev_revenue,
+  revenue - LAG(revenue,1,0) OVER (ORDER BY date) AS delta
+FROM daily_sales;</pre></div><div class="fref-panel" id="fref-2"><div class="fref-fn"><h5>Default (ORDER BY only)</h5><p>RANGE UNBOUNDED PRECEDING AND CURRENT ROW — running total.</p></div><div class="fref-fn"><h5>ROWS BETWEEN</h5><p>More precise than RANGE. Use for sliding windows.</p></div><div class="fref-fn"><h5>Running total</h5><p><code>SUM() OVER (ORDER BY date)</code> — simplest form.</p></div><pre class="fref-code">-- Running total
+SUM(amount) OVER (ORDER BY date) AS running_total
+
+-- 3-row sliding average
+AVG(amount) OVER (
+  ORDER BY date
+  ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING
+) AS sliding_avg</pre></div></div>
       </div>
     </div>
   </div>
@@ -1171,33 +1203,16 @@
     }
   }
 
-  // ── Init practice wraps (inject id, Check btn, status, hint-box) ──
+  // ── Init practice wraps (inject id, status, hint-box) ──
   document.querySelectorAll('.practice-wrap').forEach(wrap => {
     wrap.id = 'practice-day6';
-    const btnRow = wrap.querySelector('.cb-head div[style]');
-    if (btnRow && !btnRow.querySelector('.check-btn')) {
-      const cb = document.createElement('button');
-      cb.className = 'check-btn'; cb.textContent = 'Check';
-      cb.onclick = function(){ checkQuery(this); };
-      btnRow.insertBefore(cb, btnRow.firstChild);
-    }
-    const practCb = wrap.querySelector('.practice-cb');
-    if (practCb && !wrap.querySelector('.practice-status')) {
+    if (!wrap.querySelector('.practice-status')) {
       const status = document.createElement('div'); status.className = 'practice-status';
       const hintBox = document.createElement('div'); hintBox.className = 'hint-box';
-      practCb.after(status); status.after(hintBox);
+      const checkBtn = wrap.querySelector('.check-btn');
+      if (checkBtn) { checkBtn.after(status); status.after(hintBox); }
     }
   });
-
-  // ── Cheat sheet panels (rendered from dayCheatSheets in main app) ──
-  // Panels are injected by the renderCheatSheet function below
-  (function renderCheatSheet() {
-    const wrap = document.getElementById('fref-panels');
-    if (!wrap) return;
-    // Panels populated from the main site's dayCheatSheets object would go here.
-    // For now we include a simplified inline version.
-    wrap.innerHTML = '<div class="fref-panel on" style="padding:12px 14px;font-family:var(--font-mono,monospace);font-size:12px;color:var(--text2)"><p>Open the Cheat Sheet to see Day 6 reference material.</p><p style="margin-top:8px;color:var(--text3)">Tip: the cheat sheet tabs match each concept you're studying today.</p></div>';
-  })();
 
 
   // ── Copy button ──
