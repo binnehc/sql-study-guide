@@ -1153,10 +1153,19 @@
   });
 
   // ── Scroll reveal ──
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); obs.unobserve(e.target); } });
-  }, { threshold: 0.08 });
-  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  (function() {
+    const reveals = document.querySelectorAll('.reveal');
+    // Immediately show anything already in the viewport (iOS Safari observer can miss these)
+    reveals.forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (r.top < window.innerHeight && r.bottom > 0) el.classList.add('vis');
+    });
+    // Animate the rest as they scroll into view
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); obs.unobserve(e.target); } });
+    }, { threshold: 0.01 });
+    reveals.forEach(el => { if (!el.classList.contains('vis')) obs.observe(el); });
+  })();
 
   // ── Tab switcher (stab) ──
   function stab(btn, idx, ns) {
