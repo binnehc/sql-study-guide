@@ -911,347 +911,348 @@
   </div>
   <div class="cases-layout reveal">
 
-    <!-- ── Question list ── -->
+<!-- ── Question list ── -->
     <div class="cases-list">
       <button class="case-btn on" onclick="selCase(this,'c1')">
-        <span class="case-btn-title">Filter Google Ads</span>
+        <span class="case-btn-title">High-Value Completed Orders</span>
         <div class="case-btn-meta"><span class="diff easy">Easy</span><span class="ctag">WHERE · AND</span></div>
       </button>
       <button class="case-btn" onclick="selCase(this,'c2')">
-        <span class="case-btn-title">Most Popular Search Category</span>
+        <span class="case-btn-title">Streams per Genre</span>
         <div class="case-btn-meta"><span class="diff easy">Easy</span><span class="ctag">JOIN · GROUP BY</span></div>
       </button>
       <button class="case-btn" onclick="selCase(this,'c3')">
-        <span class="case-btn-title">Google Maps Flagged UGC</span>
-        <div class="case-btn-meta"><span class="diff medium">Medium</span><span class="ctag">JOIN · LIMIT</span></div>
+        <span class="case-btn-title">Riders with No Trips</span>
+        <div class="case-btn-meta"><span class="diff medium">Medium</span><span class="ctag">LEFT JOIN · IS NULL</span></div>
       </button>
       <button class="case-btn" onclick="selCase(this,'c4')">
-        <span class="case-btn-title">Ad Campaign Performance</span>
-        <div class="case-btn-meta"><span class="diff medium">Medium</span><span class="ctag">GROUP BY · SUM</span></div>
+        <span class="case-btn-title">High-Revenue Categories</span>
+        <div class="case-btn-meta"><span class="diff medium">Medium</span><span class="ctag">GROUP BY · HAVING</span></div>
       </button>
       <button class="case-btn" onclick="selCase(this,'c5')">
-        <span class="case-btn-title">Ad Click-Through &amp; Conversion</span>
-        <div class="case-btn-meta"><span class="diff medium">Medium</span><span class="ctag">JOIN · Computed</span></div>
+        <span class="case-btn-title">Top Earner per Department</span>
+        <div class="case-btn-meta"><span class="diff medium">Medium</span><span class="ctag">CTE · DENSE_RANK</span></div>
       </button>
       <button class="case-btn" onclick="selCase(this,'c6')">
-        <span class="case-btn-title">Android In-App Purchases</span>
-        <div class="case-btn-meta"><span class="diff medium">Medium</span><span class="ctag">CTE · ROW_NUMBER</span></div>
+        <span class="case-btn-title">Weekend vs Weekday Revenue</span>
+        <div class="case-btn-meta"><span class="diff medium">Medium</span><span class="ctag">CASE WHEN · GROUP BY</span></div>
       </button>
       <button class="case-btn" onclick="selCase(this,'c7')">
         <span class="case-btn-title">Odd &amp; Even Measurements</span>
         <div class="case-btn-meta"><span class="diff medium">Medium</span><span class="ctag">CTE · CASE WHEN</span></div>
       </button>
       <button class="case-btn" onclick="selCase(this,'c8')">
-        <span class="case-btn-title">Median Search Frequency</span>
-        <div class="case-btn-meta"><span class="diff hard">Hard</span><span class="ctag">PERCENTILE · CTE</span></div>
+        <span class="case-btn-title">Cumulative Booking Revenue</span>
+        <div class="case-btn-meta"><span class="diff hard">Hard</span><span class="ctag">Window · SUM OVER</span></div>
       </button>
     </div>
 
     <!-- ── Detail panels ── -->
     <div class="cases-detail">
 
-      <!-- C1: Filter Google Ads -->
+      <!-- C1: High-Value Completed Orders (Amazon) -->
       <div class="case-panel on" id="c1">
         <div class="case-title-row">
           <span class="diff easy">Easy</span>
-          <span class="case-h">Filter Google Ads</span>
+          <span class="ctag">Amazon</span>
+          <span class="case-h">High-Value Completed Orders</span>
         </div>
-        <p class="s-body">Return the <strong>ad_id</strong> and <strong>name</strong> of all ads that are <em>active</em>, have more than <em>500,000 impressions</em>, and were last updated in <em>2024</em>.</p>
+        <p class="s-body">Return <strong>order_id</strong>, <strong>customer_id</strong>, and <strong>total_amount</strong> for all orders that are <em>completed</em>, have a total above <em>$500</em>, and were placed in <em>2024</em>. Order by amount descending.</p>
         <div class="tbl-wrap">
-          <table><thead><tr><th colspan="2">ads</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <table><thead><tr><th colspan="2">orders</th></tr><tr><th>column</th><th>type</th></tr></thead>
           <tbody>
-            <tr><td>ad_id</td><td>integer</td></tr>
-            <tr><td>name</td><td>varchar</td></tr>
-            <tr><td>status</td><td>varchar — 'active', 'paused', 'deleted'</td></tr>
-            <tr><td>impressions</td><td>integer</td></tr>
-            <tr><td>last_updated</td><td>date</td></tr>
+            <tr><td>order_id</td><td>integer</td></tr>
+            <tr><td>customer_id</td><td>integer</td></tr>
+            <tr><td>order_date</td><td>date</td></tr>
+            <tr><td>total_amount</td><td>decimal</td></tr>
+            <tr><td>status</td><td>varchar — 'completed', 'pending', 'cancelled'</td></tr>
           </tbody></table>
         </div>
         <div class="case-approach">
           <h5>Approach</h5>
           <ol>
-            <li><strong>SELECT</strong> ad_id, name — only the columns asked for.</li>
-            <li>Filter <strong>status = 'active'</strong> with WHERE.</li>
-            <li>Add <strong>AND impressions &gt; 500000</strong>.</li>
-            <li>Add <strong>AND EXTRACT(YEAR FROM last_updated) = 2024</strong> for the year filter.</li>
+            <li><strong>SELECT</strong> the three columns asked for — don't SELECT *.</li>
+            <li>Filter <strong>status = 'completed'</strong> in WHERE.</li>
+            <li>Add <strong>AND total_amount &gt; 500</strong>.</li>
+            <li>Add <strong>AND EXTRACT(YEAR FROM order_date) = 2024</strong> for the year filter.</li>
+            <li><strong>ORDER BY total_amount DESC</strong>.</li>
           </ol>
         </div>
         <div class="case-ta-head"><span>SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="this.closest('.case-panel').querySelector('.case-ta').value=''">clear</button></div></div>
         <textarea class="case-ta" placeholder="-- Write your SQL here...&#10;-- Press Tab to indent" spellcheck="false"></textarea>
-        <button class="case-sol-btn" onclick="toggleCaseSol(this)">▶ Show solution</button>
+        <button class="case-sol-btn" onclick="toggleCaseSol(this)">&#9658; Show solution</button>
         <div class="case-sol">
           <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
-          <pre><code><span class="kw">SELECT</span>  <span class="cl">ad_id</span>, <span class="cl">name</span>, <span class="cl">impressions</span>
-<span class="kw">FROM</span>    <span class="tb">ads</span>
-<span class="kw">WHERE</span>   <span class="cl">status</span> = <span class="st">'active'</span>
-  <span class="kw">AND</span>   <span class="cl">impressions</span> > <span class="nu">500000</span>
-  <span class="kw">AND</span>   <span class="fn">EXTRACT</span>(<span class="kw">YEAR FROM</span> <span class="cl">last_updated</span>) = <span class="nu">2024</span>;</code></pre></div>
+          <pre><code><span class="kw">SELECT</span>  <span class="cl">order_id</span>, <span class="cl">customer_id</span>, <span class="cl">total_amount</span>
+<span class="kw">FROM</span>    <span class="tb">orders</span>
+<span class="kw">WHERE</span>   <span class="cl">status</span> = <span class="st">'completed'</span>
+  <span class="kw">AND</span>   <span class="cl">total_amount</span> > <span class="nu">500</span>
+  <span class="kw">AND</span>   <span class="fn">EXTRACT</span>(<span class="kw">YEAR FROM</span> <span class="cl">order_date</span>) = <span class="nu">2024</span>
+<span class="kw">ORDER BY</span> <span class="cl">total_amount</span> <span class="kw">DESC</span>;</code></pre></div>
           <div class="callout" style="margin-top:12px">
-            <p class="callout-lbl">Why EXTRACT?</p>
-            <p>You could also write <code>last_updated &gt;= '2024-01-01' AND last_updated &lt; '2025-01-01'</code> — this is actually faster on indexed columns because it avoids wrapping the column in a function. Both are correct for an interview.</p>
+            <p class="callout-lbl">EXTRACT vs date range</p>
+            <p>You could also write <code>order_date &gt;= '2024-01-01' AND order_date &lt; '2025-01-01'</code>. On indexed columns this is faster because it avoids wrapping the column in a function — both are correct in an interview.</p>
           </div>
         </div>
       </div>
 
-      <!-- C2: Most Popular Search Category -->
+      <!-- C2: Streams per Genre (Spotify) -->
       <div class="case-panel" id="c2">
         <div class="case-title-row">
           <span class="diff easy">Easy</span>
-          <span class="case-h">Most Popular Search Category</span>
+          <span class="ctag">Spotify</span>
+          <span class="case-h">Streams per Genre</span>
         </div>
-        <p class="s-body">For each month in 2024, count the total searches per category. Return <strong>category_name</strong>, <strong>month</strong>, and <strong>total_searches</strong>, ordered by month then by count descending.</p>
+        <p class="s-body">Count the total number of streams per genre. Return <strong>genre</strong> and <strong>total_streams</strong>, ordered by most streamed first.</p>
         <div class="tbl-wrap">
-          <table><thead><tr><th colspan="2">searches</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <table><thead><tr><th colspan="2">streams</th></tr><tr><th>column</th><th>type</th></tr></thead>
           <tbody>
-            <tr><td>search_id</td><td>integer</td></tr>
+            <tr><td>stream_id</td><td>integer</td></tr>
             <tr><td>user_id</td><td>integer</td></tr>
-            <tr><td>search_date</td><td>date</td></tr>
-            <tr><td>category_id</td><td>integer</td></tr>
+            <tr><td>song_id</td><td>integer</td></tr>
+            <tr><td>streamed_at</td><td>timestamp</td></tr>
           </tbody></table>
         </div>
         <div class="tbl-wrap">
-          <table><thead><tr><th colspan="2">categories</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <table><thead><tr><th colspan="2">songs</th></tr><tr><th>column</th><th>type</th></tr></thead>
           <tbody>
-            <tr><td>category_id</td><td>integer</td></tr>
-            <tr><td>category_name</td><td>varchar</td></tr>
+            <tr><td>song_id</td><td>integer</td></tr>
+            <tr><td>title</td><td>varchar</td></tr>
+            <tr><td>genre</td><td>varchar</td></tr>
           </tbody></table>
         </div>
         <div class="case-approach">
           <h5>Approach</h5>
           <ol>
-            <li><strong>JOIN</strong> searches to categories on category_id to get the category name.</li>
-            <li>Filter to 2024: <strong>WHERE EXTRACT(YEAR FROM search_date) = 2024</strong>.</li>
-            <li>Use <strong>DATE_TRUNC('month', search_date)</strong> to group by month.</li>
-            <li><strong>GROUP BY</strong> category_name and the truncated month, then <strong>COUNT(*)</strong>.</li>
-            <li><strong>ORDER BY</strong> month ASC, total_searches DESC.</li>
+            <li><strong>JOIN</strong> streams to songs on song_id to get the genre for each stream.</li>
+            <li><strong>GROUP BY</strong> genre.</li>
+            <li><strong>COUNT(*)</strong> gives the number of streams per group.</li>
+            <li><strong>ORDER BY total_streams DESC</strong>.</li>
           </ol>
         </div>
         <div class="case-ta-head"><span>SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="this.closest('.case-panel').querySelector('.case-ta').value=''">clear</button></div></div>
         <textarea class="case-ta" placeholder="-- Write your SQL here..." spellcheck="false"></textarea>
-        <button class="case-sol-btn" onclick="toggleCaseSol(this)">▶ Show solution</button>
+        <button class="case-sol-btn" onclick="toggleCaseSol(this)">&#9658; Show solution</button>
         <div class="case-sol">
           <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
-          <pre><code><span class="kw">SELECT</span>   <span class="cl">c.category_name</span>,
-         <span class="fn">DATE_TRUNC</span>(<span class="st">'month'</span>, <span class="cl">s.search_date</span>) <span class="kw">AS</span> <span class="cl">month</span>,
-         <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="cl">total_searches</span>
-<span class="kw">FROM</span>     <span class="tb">searches</span>   <span class="cl">s</span>
-<span class="kw">JOIN</span>     <span class="tb">categories</span> <span class="cl">c</span> <span class="kw">ON</span> <span class="cl">s.category_id</span> = <span class="cl">c.category_id</span>
-<span class="kw">WHERE</span>    <span class="fn">EXTRACT</span>(<span class="kw">YEAR FROM</span> <span class="cl">s.search_date</span>) = <span class="nu">2024</span>
-<span class="kw">GROUP BY</span> <span class="cl">c.category_name</span>,
-         <span class="fn">DATE_TRUNC</span>(<span class="st">'month'</span>, <span class="cl">s.search_date</span>)
-<span class="kw">ORDER BY</span> <span class="cl">month</span> <span class="kw">ASC</span>, <span class="cl">total_searches</span> <span class="kw">DESC</span>;</code></pre></div>
+          <pre><code><span class="kw">SELECT</span>   <span class="cl">s.genre</span>,
+         <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="cl">total_streams</span>
+<span class="kw">FROM</span>     <span class="tb">streams</span>  <span class="cl">st</span>
+<span class="kw">JOIN</span>     <span class="tb">songs</span>    <span class="cl">s</span>  <span class="kw">ON</span> <span class="cl">st.song_id</span> = <span class="cl">s.song_id</span>
+<span class="kw">GROUP BY</span> <span class="cl">s.genre</span>
+<span class="kw">ORDER BY</span> <span class="cl">total_streams</span> <span class="kw">DESC</span>;</code></pre></div>
         </div>
       </div>
 
-      <!-- C3: Google Maps Flagged UGC -->
+      <!-- C3: Riders with No Trips (Uber) -->
       <div class="case-panel" id="c3">
         <div class="case-title-row">
           <span class="diff medium">Medium</span>
-          <span class="case-h">Google Maps Flagged UGC</span>
+          <span class="ctag">Uber</span>
+          <span class="case-h">Riders with No Trips</span>
         </div>
-        <p class="s-body">Find the <strong>single place category</strong> with the highest number of "off-topic" user-generated content reviews. Return the category name and its off-topic count.</p>
+        <p class="s-body">Find riders who signed up more than <em>60 days ago</em> but have <strong>never completed a trip</strong>. Return <strong>rider_id</strong> and <strong>name</strong>.</p>
         <div class="tbl-wrap">
-          <table><thead><tr><th colspan="2">maps_ugc_review</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <table><thead><tr><th colspan="2">riders</th></tr><tr><th>column</th><th>type</th></tr></thead>
           <tbody>
-            <tr><td>review_id</td><td>integer</td></tr>
-            <tr><td>place_id</td><td>integer</td></tr>
-            <tr><td>content_tag</td><td>varchar — e.g. 'off-topic', 'relevant'</td></tr>
+            <tr><td>rider_id</td><td>integer</td></tr>
+            <tr><td>name</td><td>varchar</td></tr>
+            <tr><td>signup_date</td><td>date</td></tr>
           </tbody></table>
         </div>
         <div class="tbl-wrap">
-          <table><thead><tr><th colspan="2">place_info</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <table><thead><tr><th colspan="2">trips</th></tr><tr><th>column</th><th>type</th></tr></thead>
           <tbody>
-            <tr><td>place_id</td><td>integer</td></tr>
-            <tr><td>place_category</td><td>varchar — e.g. 'restaurant', 'park'</td></tr>
+            <tr><td>trip_id</td><td>integer</td></tr>
+            <tr><td>rider_id</td><td>integer</td></tr>
+            <tr><td>completed_at</td><td>timestamp</td></tr>
           </tbody></table>
         </div>
         <div class="case-approach">
-          <h5>Approach</h5>
+          <h5>Approach — "missing data" pattern (Day 2)</h5>
           <ol>
-            <li><strong>JOIN</strong> maps_ugc_review to place_info on place_id.</li>
-            <li>Filter: <strong>WHERE content_tag = 'off-topic'</strong>.</li>
-            <li><strong>GROUP BY place_category</strong> and <strong>COUNT(*)</strong>.</li>
-            <li><strong>ORDER BY</strong> count <strong>DESC</strong> then <strong>LIMIT 1</strong> to get the top category.</li>
+            <li><strong>LEFT JOIN</strong> riders to trips on rider_id — every rider is kept even if they have no trips.</li>
+            <li><strong>WHERE trips.rider_id IS NULL</strong> — keeps only riders with no matching trip row.</li>
+            <li>Add <strong>AND r.signup_date &lt;= CURRENT_DATE - INTERVAL '60 days'</strong> to filter by account age.</li>
           </ol>
         </div>
         <div class="case-ta-head"><span>SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="this.closest('.case-panel').querySelector('.case-ta').value=''">clear</button></div></div>
         <textarea class="case-ta" placeholder="-- Write your SQL here..." spellcheck="false"></textarea>
-        <button class="case-sol-btn" onclick="toggleCaseSol(this)">▶ Show solution</button>
+        <button class="case-sol-btn" onclick="toggleCaseSol(this)">&#9658; Show solution</button>
         <div class="case-sol">
           <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
-          <pre><code><span class="kw">SELECT</span>   <span class="cl">p.place_category</span>,
-         <span class="fn">COUNT</span>(*) <span class="kw">AS</span> <span class="cl">off_topic_count</span>
-<span class="kw">FROM</span>     <span class="tb">maps_ugc_review</span> <span class="cl">r</span>
-<span class="kw">JOIN</span>     <span class="tb">place_info</span>      <span class="cl">p</span> <span class="kw">ON</span> <span class="cl">r.place_id</span> = <span class="cl">p.place_id</span>
-<span class="kw">WHERE</span>    <span class="cl">r.content_tag</span> = <span class="st">'off-topic'</span>
-<span class="kw">GROUP BY</span> <span class="cl">p.place_category</span>
-<span class="kw">ORDER BY</span> <span class="cl">off_topic_count</span> <span class="kw">DESC</span>
-<span class="kw">LIMIT</span>    <span class="nu">1</span>;</code></pre></div>
+          <pre><code><span class="kw">SELECT</span>  <span class="cl">r.rider_id</span>, <span class="cl">r.name</span>
+<span class="kw">FROM</span>    <span class="tb">riders</span> <span class="cl">r</span>
+<span class="kw">LEFT JOIN</span> <span class="tb">trips</span> <span class="cl">t</span> <span class="kw">ON</span> <span class="cl">r.rider_id</span> = <span class="cl">t.rider_id</span>
+<span class="kw">WHERE</span>   <span class="cl">t.rider_id</span> <span class="kw">IS NULL</span>
+  <span class="kw">AND</span>   <span class="cl">r.signup_date</span> &lt;= <span class="fn">CURRENT_DATE</span> - <span class="kw">INTERVAL</span> <span class="st">'60 days'</span>;</code></pre></div>
           <div class="callout" style="margin-top:12px">
-            <p class="callout-lbl">LIMIT 1 vs subquery</p>
-            <p>LIMIT 1 is the simplest approach. An alternative is wrapping in a subquery with <code>WHERE off_topic_count = MAX(off_topic_count)</code>, but LIMIT 1 is cleaner and equally valid in an interview.</p>
+            <p class="callout-lbl">Why LEFT JOIN + IS NULL?</p>
+            <p>INNER JOIN would drop riders with no trips entirely. LEFT JOIN keeps them — then <code>IS NULL</code> on the right table's column filters to only those with no match. This "missing data" pattern comes up constantly in analytics.</p>
           </div>
         </div>
       </div>
 
-      <!-- C4: Ad Campaign Performance -->
+      <!-- C4: High-Revenue Categories (Shopify) -->
       <div class="case-panel" id="c4">
         <div class="case-title-row">
           <span class="diff medium">Medium</span>
-          <span class="case-h">Ad Campaign Performance</span>
+          <span class="ctag">Shopify</span>
+          <span class="case-h">High-Revenue Product Categories</span>
         </div>
-        <p class="s-body">Calculate the <strong>average cost-per-click (CPC)</strong> for each campaign and ad group combination. CPC = total cost ÷ total clicks. Round to 2 decimal places.</p>
+        <p class="s-body">Find product categories where <strong>total revenue exceeds $50,000</strong>. Return <strong>category</strong> and <strong>total_revenue</strong> rounded to 2 decimal places, sorted by revenue descending.</p>
         <div class="tbl-wrap">
-          <table><thead><tr><th colspan="2">ad_clicks</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <table><thead><tr><th colspan="2">order_items</th></tr><tr><th>column</th><th>type</th></tr></thead>
           <tbody>
-            <tr><td>click_id</td><td>integer</td></tr>
-            <tr><td>date</td><td>date</td></tr>
-            <tr><td>campaign_id</td><td>integer</td></tr>
-            <tr><td>ad_group_id</td><td>integer</td></tr>
-            <tr><td>clicks</td><td>integer</td></tr>
-            <tr><td>cost</td><td>decimal</td></tr>
+            <tr><td>item_id</td><td>integer</td></tr>
+            <tr><td>order_id</td><td>integer</td></tr>
+            <tr><td>product_id</td><td>integer</td></tr>
+            <tr><td>quantity</td><td>integer</td></tr>
+            <tr><td>unit_price</td><td>decimal</td></tr>
+          </tbody></table>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th colspan="2">products</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <tbody>
+            <tr><td>product_id</td><td>integer</td></tr>
+            <tr><td>name</td><td>varchar</td></tr>
+            <tr><td>category</td><td>varchar</td></tr>
           </tbody></table>
         </div>
         <div class="case-approach">
           <h5>Approach</h5>
           <ol>
-            <li><strong>GROUP BY campaign_id, ad_group_id</strong> — two-column grouping.</li>
-            <li>CPC = <strong>SUM(cost) / SUM(clicks)</strong> — aggregate both before dividing.</li>
-            <li>Wrap in <strong>NULLIF(SUM(clicks), 0)</strong> to avoid division-by-zero errors.</li>
-            <li><strong>ROUND(..., 2)</strong> for 2 decimal places.</li>
+            <li><strong>JOIN</strong> order_items to products on product_id.</li>
+            <li>Revenue per row = <strong>quantity * unit_price</strong> — compute inside SUM.</li>
+            <li><strong>GROUP BY category</strong>, then <strong>SUM(quantity * unit_price)</strong>.</li>
+            <li><strong>HAVING SUM(...) &gt; 50000</strong> — filter groups after aggregation.</li>
+            <li>Wrap in <strong>ROUND(..., 2)</strong> and <strong>ORDER BY DESC</strong>.</li>
           </ol>
         </div>
         <div class="case-ta-head"><span>SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="this.closest('.case-panel').querySelector('.case-ta').value=''">clear</button></div></div>
         <textarea class="case-ta" placeholder="-- Write your SQL here..." spellcheck="false"></textarea>
-        <button class="case-sol-btn" onclick="toggleCaseSol(this)">▶ Show solution</button>
+        <button class="case-sol-btn" onclick="toggleCaseSol(this)">&#9658; Show solution</button>
         <div class="case-sol">
           <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
-          <pre><code><span class="kw">SELECT</span>   <span class="cl">campaign_id</span>,
-         <span class="cl">ad_group_id</span>,
-         <span class="fn">ROUND</span>(
-             <span class="fn">SUM</span>(<span class="cl">cost</span>) / <span class="fn">NULLIF</span>(<span class="fn">SUM</span>(<span class="cl">clicks</span>), <span class="nu">0</span>),
-         <span class="nu">2</span>) <span class="kw">AS</span> <span class="cl">avg_cpc</span>
-<span class="kw">FROM</span>     <span class="tb">ad_clicks</span>
-<span class="kw">GROUP BY</span> <span class="cl">campaign_id</span>, <span class="cl">ad_group_id</span>
-<span class="kw">ORDER BY</span> <span class="cl">campaign_id</span>, <span class="cl">ad_group_id</span>;</code></pre></div>
+          <pre><code><span class="kw">SELECT</span>   <span class="cl">p.category</span>,
+         <span class="fn">ROUND</span>(<span class="fn">SUM</span>(<span class="cl">oi.quantity</span> * <span class="cl">oi.unit_price</span>), <span class="nu">2</span>) <span class="kw">AS</span> <span class="cl">total_revenue</span>
+<span class="kw">FROM</span>     <span class="tb">order_items</span> <span class="cl">oi</span>
+<span class="kw">JOIN</span>     <span class="tb">products</span>    <span class="cl">p</span>  <span class="kw">ON</span> <span class="cl">oi.product_id</span> = <span class="cl">p.product_id</span>
+<span class="kw">GROUP BY</span> <span class="cl">p.category</span>
+<span class="kw">HAVING</span>   <span class="fn">SUM</span>(<span class="cl">oi.quantity</span> * <span class="cl">oi.unit_price</span>) > <span class="nu">50000</span>
+<span class="kw">ORDER BY</span> <span class="cl">total_revenue</span> <span class="kw">DESC</span>;</code></pre></div>
           <div class="callout" style="margin-top:12px">
-            <p class="callout-lbl">Why SUM(cost) / SUM(clicks), not AVG(cost/clicks)?</p>
-            <p>Dividing aggregates — <code>SUM(cost)/SUM(clicks)</code> — gives the true weighted average CPC across the group. <code>AVG(cost/clicks)</code> would average the per-row ratios, which is mathematically different and usually wrong.</p>
+            <p class="callout-lbl">Can't use the alias in HAVING</p>
+            <p>HAVING runs before SELECT, so the alias <code>total_revenue</code> doesn't exist yet. You must repeat the full expression — or wrap the whole thing in a CTE and filter in the outer query.</p>
           </div>
         </div>
       </div>
 
-      <!-- C5: Ad Click-Through & Conversion Rates -->
+      <!-- C5: Top Earner per Department (LinkedIn) -->
       <div class="case-panel" id="c5">
         <div class="case-title-row">
           <span class="diff medium">Medium</span>
-          <span class="case-h">Ad Click-Through &amp; Conversion Rates</span>
+          <span class="ctag">LinkedIn</span>
+          <span class="case-h">Top Earner per Department</span>
         </div>
-        <p class="s-body">For each ad, calculate total <strong>clicks</strong>, total <strong>conversions</strong>, <strong>click-through rate</strong> (clicks ÷ impressions × 100), and <strong>conversion rate</strong> (conversions ÷ clicks × 100). Round rates to 2 decimal places.</p>
+        <p class="s-body">Return the <strong>highest-paid employee in each department</strong>. If two employees tie, include both. Return employee_id, full_name, department, and salary.</p>
         <div class="tbl-wrap">
-          <table><thead><tr><th colspan="2">ad_performance</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <table><thead><tr><th colspan="2">employees</th></tr><tr><th>column</th><th>type</th></tr></thead>
           <tbody>
-            <tr><td>ad_id</td><td>integer</td></tr>
-            <tr><td>impressions</td><td>integer</td></tr>
-            <tr><td>clicks</td><td>integer</td></tr>
-            <tr><td>conversions</td><td>integer</td></tr>
+            <tr><td>employee_id</td><td>integer</td></tr>
+            <tr><td>full_name</td><td>varchar</td></tr>
+            <tr><td>department</td><td>varchar</td></tr>
+            <tr><td>salary</td><td>decimal</td></tr>
           </tbody></table>
         </div>
         <div class="case-approach">
-          <h5>Approach</h5>
+          <h5>Approach — "top N per group" (Day 6)</h5>
           <ol>
-            <li><strong>SELECT ad_id</strong>, clicks, and conversions directly.</li>
-            <li>CTR = <strong>clicks * 100.0 / NULLIF(impressions, 0)</strong> — multiply by 100.0 (not 100) to force decimal division.</li>
-            <li>Conversion rate = <strong>conversions * 100.0 / NULLIF(clicks, 0)</strong>.</li>
-            <li>Wrap both in <strong>ROUND(..., 2)</strong>.</li>
-          </ol>
-        </div>
-        <div class="case-ta-head"><span>SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="this.closest('.case-panel').querySelector('.case-ta').value=''">clear</button></div></div>
-        <textarea class="case-ta" placeholder="-- Write your SQL here..." spellcheck="false"></textarea>
-        <button class="case-sol-btn" onclick="toggleCaseSol(this)">▶ Show solution</button>
-        <div class="case-sol">
-          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
-          <pre><code><span class="kw">SELECT</span>
-    <span class="cl">ad_id</span>,
-    <span class="cl">clicks</span>,
-    <span class="cl">conversions</span>,
-    <span class="fn">ROUND</span>(<span class="cl">clicks</span> * <span class="nu">100.0</span> / <span class="fn">NULLIF</span>(<span class="cl">impressions</span>, <span class="nu">0</span>), <span class="nu">2</span>) <span class="kw">AS</span> <span class="cl">ctr</span>,
-    <span class="fn">ROUND</span>(<span class="cl">conversions</span> * <span class="nu">100.0</span> / <span class="fn">NULLIF</span>(<span class="cl">clicks</span>, <span class="nu">0</span>),      <span class="nu">2</span>) <span class="kw">AS</span> <span class="cl">conversion_rate</span>
-<span class="kw">FROM</span>  <span class="tb">ad_performance</span>;</code></pre></div>
-          <div class="callout" style="margin-top:12px">
-            <p class="callout-lbl">Integer division trap</p>
-            <p><code>clicks / impressions</code> in SQL returns <strong>0</strong> when both are integers and clicks &lt; impressions. Always multiply by <code>100.0</code> (float) first, or cast: <code>clicks::numeric / impressions</code>.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- C6: Android In-App Purchases -->
-      <div class="case-panel" id="c6">
-        <div class="case-title-row">
-          <span class="diff medium">Medium</span>
-          <span class="case-h">Android In-App Purchases</span>
-        </div>
-        <p class="s-body">For each customer, return their <strong>most recent purchase</strong> details — customer_id, first_name, last_name, product, and purchase_date.</p>
-        <div class="tbl-wrap">
-          <table><thead><tr><th colspan="2">customers</th></tr><tr><th>column</th><th>type</th></tr></thead>
-          <tbody>
-            <tr><td>customer_id</td><td>integer</td></tr>
-            <tr><td>first_name</td><td>varchar</td></tr>
-            <tr><td>last_name</td><td>varchar</td></tr>
-          </tbody></table>
-        </div>
-        <div class="tbl-wrap">
-          <table><thead><tr><th colspan="2">playstore_purchases</th></tr><tr><th>column</th><th>type</th></tr></thead>
-          <tbody>
-            <tr><td>purchase_id</td><td>integer</td></tr>
-            <tr><td>customer_id</td><td>integer</td></tr>
-            <tr><td>product</td><td>varchar</td></tr>
-            <tr><td>purchase_date</td><td>date</td></tr>
-          </tbody></table>
-        </div>
-        <div class="case-approach">
-          <h5>Approach — "Top N per group" pattern (Day 6)</h5>
-          <ol>
-            <li>Open a <strong>CTE</strong>. Inside it, use <strong>ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY purchase_date DESC)</strong> to rank each customer's purchases newest-first.</li>
-            <li>In the outer query, <strong>filter WHERE rn = 1</strong> to keep only the most recent purchase per customer.</li>
-            <li><strong>JOIN</strong> back to customers to get first_name and last_name.</li>
+            <li>In a <strong>CTE</strong>, use <strong>DENSE_RANK() OVER (PARTITION BY department ORDER BY salary DESC)</strong> to rank employees within each department.</li>
+            <li>Use <strong>DENSE_RANK</strong> (not ROW_NUMBER) so tied salaries both get rank 1.</li>
+            <li>Outer query: <strong>WHERE dr = 1</strong> to keep only top earners.</li>
           </ol>
         </div>
         <div class="case-ta-head"><span>SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="this.closest('.case-panel').querySelector('.case-ta').value=''">clear</button></div></div>
         <textarea class="case-ta" style="min-height:180px" placeholder="-- Write your SQL here..." spellcheck="false"></textarea>
-        <button class="case-sol-btn" onclick="toggleCaseSol(this)">▶ Show solution</button>
+        <button class="case-sol-btn" onclick="toggleCaseSol(this)">&#9658; Show solution</button>
         <div class="case-sol">
           <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
-          <pre><code><span class="kw">WITH</span> <span class="tb">latest</span> <span class="kw">AS</span> (
+          <pre><code><span class="kw">WITH</span> <span class="tb">ranked</span> <span class="kw">AS</span> (
     <span class="kw">SELECT</span>
-        <span class="cl">customer_id</span>,
-        <span class="cl">product</span>,
-        <span class="cl">purchase_date</span>,
-        <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
-            <span class="kw">PARTITION BY</span> <span class="cl">customer_id</span>
-            <span class="kw">ORDER BY</span>     <span class="cl">purchase_date</span> <span class="kw">DESC</span>
-        ) <span class="kw">AS</span> <span class="cl">rn</span>
-    <span class="kw">FROM</span>  <span class="tb">playstore_purchases</span>
+        <span class="cl">employee_id</span>, <span class="cl">full_name</span>, <span class="cl">department</span>, <span class="cl">salary</span>,
+        <span class="fn">DENSE_RANK</span>() <span class="kw">OVER</span> (
+            <span class="kw">PARTITION BY</span> <span class="cl">department</span>
+            <span class="kw">ORDER BY</span>     <span class="cl">salary</span> <span class="kw">DESC</span>
+        ) <span class="kw">AS</span> <span class="cl">dr</span>
+    <span class="kw">FROM</span> <span class="tb">employees</span>
 )
-<span class="kw">SELECT</span>
-    <span class="cl">c.customer_id</span>,
-    <span class="cl">c.first_name</span>,
-    <span class="cl">c.last_name</span>,
-    <span class="cl">l.product</span>,
-    <span class="cl">l.purchase_date</span>
-<span class="kw">FROM</span>     <span class="tb">customers</span> <span class="cl">c</span>
-<span class="kw">JOIN</span>     <span class="tb">latest</span>    <span class="cl">l</span> <span class="kw">ON</span> <span class="cl">c.customer_id</span> = <span class="cl">l.customer_id</span>
-<span class="kw">WHERE</span>    <span class="cl">l.rn</span> = <span class="nu">1</span>;</code></pre></div>
+<span class="kw">SELECT</span>  <span class="cl">employee_id</span>, <span class="cl">full_name</span>, <span class="cl">department</span>, <span class="cl">salary</span>
+<span class="kw">FROM</span>    <span class="tb">ranked</span>
+<span class="kw">WHERE</span>   <span class="cl">dr</span> = <span class="nu">1</span>
+<span class="kw">ORDER BY</span> <span class="cl">department</span>;</code></pre></div>
+          <div class="callout" style="margin-top:12px">
+            <p class="callout-lbl">DENSE_RANK vs ROW_NUMBER for ties</p>
+            <p>ROW_NUMBER gives every row a unique number — two tied employees get ranks 1 and 2, so only one would be kept by <code>WHERE rn = 1</code>. DENSE_RANK gives them both rank 1, so both are returned. Pick the one that matches what the question asks.</p>
+          </div>
         </div>
       </div>
 
-      <!-- C7: Odd & Even Measurements -->
+      <!-- C6: Weekend vs Weekday Revenue (DoorDash) -->
+      <div class="case-panel" id="c6">
+        <div class="case-title-row">
+          <span class="diff medium">Medium</span>
+          <span class="ctag">DoorDash</span>
+          <span class="case-h">Weekend vs Weekday Revenue</span>
+        </div>
+        <p class="s-body">For each restaurant, calculate <strong>total weekday revenue</strong> and <strong>total weekend revenue</strong> in a single row per restaurant. Saturday and Sunday count as weekend.</p>
+        <div class="tbl-wrap">
+          <table><thead><tr><th colspan="2">orders</th></tr><tr><th>column</th><th>type</th></tr></thead>
+          <tbody>
+            <tr><td>order_id</td><td>integer</td></tr>
+            <tr><td>restaurant_id</td><td>integer</td></tr>
+            <tr><td>order_time</td><td>timestamp</td></tr>
+            <tr><td>total_amount</td><td>decimal</td></tr>
+          </tbody></table>
+        </div>
+        <div class="case-approach">
+          <h5>Approach — pivot with CASE WHEN</h5>
+          <ol>
+            <li>Use <strong>EXTRACT(DOW FROM order_time)</strong> to get the day of week (0 = Sunday, 6 = Saturday).</li>
+            <li>Inside <strong>SUM()</strong>, use <strong>CASE WHEN DOW IN (0, 6) THEN total_amount ELSE 0 END</strong> for weekend revenue.</li>
+            <li>Repeat with <strong>NOT IN (0, 6)</strong> for weekday revenue.</li>
+            <li><strong>GROUP BY restaurant_id</strong>.</li>
+          </ol>
+        </div>
+        <div class="case-ta-head"><span>SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="this.closest('.case-panel').querySelector('.case-ta').value=''">clear</button></div></div>
+        <textarea class="case-ta" style="min-height:180px" placeholder="-- Write your SQL here..." spellcheck="false"></textarea>
+        <button class="case-sol-btn" onclick="toggleCaseSol(this)">&#9658; Show solution</button>
+        <div class="case-sol">
+          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+          <pre><code><span class="kw">SELECT</span>
+    <span class="cl">restaurant_id</span>,
+    <span class="fn">ROUND</span>(<span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> <span class="fn">EXTRACT</span>(<span class="kw">DOW FROM</span> <span class="cl">order_time</span>) <span class="kw">IN</span> (<span class="nu">0</span>, <span class="nu">6</span>)
+                  <span class="kw">THEN</span> <span class="cl">total_amount</span> <span class="kw">ELSE</span> <span class="nu">0</span> <span class="kw">END</span>), <span class="nu">2</span>) <span class="kw">AS</span> <span class="cl">weekend_revenue</span>,
+    <span class="fn">ROUND</span>(<span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> <span class="fn">EXTRACT</span>(<span class="kw">DOW FROM</span> <span class="cl">order_time</span>) <span class="kw">NOT IN</span> (<span class="nu">0</span>, <span class="nu">6</span>)
+                  <span class="kw">THEN</span> <span class="cl">total_amount</span> <span class="kw">ELSE</span> <span class="nu">0</span> <span class="kw">END</span>), <span class="nu">2</span>) <span class="kw">AS</span> <span class="cl">weekday_revenue</span>
+<span class="kw">FROM</span>   <span class="tb">orders</span>
+<span class="kw">GROUP BY</span> <span class="cl">restaurant_id</span>
+<span class="kw">ORDER BY</span> <span class="cl">restaurant_id</span>;</code></pre></div>
+          <div class="callout" style="margin-top:12px">
+            <p class="callout-lbl">Pivoting with CASE WHEN inside SUM</p>
+            <p>Instead of getting two rows per restaurant (one for each day type), <code>CASE WHEN</code> inside <code>SUM</code> produces two columns in one row — a very common interview pattern for conditional aggregation.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- C7: Odd & Even Measurements (Google — Day 7 capstone) -->
       <div class="case-panel" id="c7">
         <div class="case-title-row">
           <span class="diff medium">Medium</span>
+          <span class="ctag">Google</span>
           <span class="case-h">Odd &amp; Even Measurements</span>
         </div>
-        <p class="s-body">The capstone problem from <strong>Day 7</strong>. Within each day, measurements arrive in time order. Sum the values at <em>odd positions</em> (1st, 3rd, 5th…) and <em>even positions</em> (2nd, 4th, 6th…) separately. Output one row per day with measurement_day, odd_sum, even_sum.</p>
+        <p class="s-body">The capstone problem from <strong>Day 7</strong>. Within each day, measurements arrive in time order. Sum the values at <em>odd positions</em> (1st, 3rd, 5th&#x2026;) and <em>even positions</em> (2nd, 4th, 6th&#x2026;) separately. Output one row per day with measurement_day, odd_sum, even_sum.</p>
         <div class="tbl-wrap">
           <table><thead><tr><th colspan="2">measurements</th></tr><tr><th>column</th><th>type</th></tr></thead>
           <tbody>
@@ -1270,7 +1271,7 @@
         </div>
         <div class="case-ta-head"><span>SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="this.closest('.case-panel').querySelector('.case-ta').value=''">clear</button></div></div>
         <textarea class="case-ta" style="min-height:200px" placeholder="-- Write the full solution from memory..." spellcheck="false"></textarea>
-        <button class="case-sol-btn" onclick="toggleCaseSol(this)">▶ Show solution</button>
+        <button class="case-sol-btn" onclick="toggleCaseSol(this)">&#9658; Show solution</button>
         <div class="case-sol">
           <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
           <pre><code><span class="kw">WITH</span> <span class="tb">numbered</span> <span class="kw">AS</span> (
@@ -1297,62 +1298,65 @@
         </div>
       </div>
 
-      <!-- C8: Median Search Frequency -->
+      <!-- C8: Cumulative Booking Revenue (Airbnb) -->
       <div class="case-panel" id="c8">
         <div class="case-title-row">
           <span class="diff hard">Hard</span>
-          <span class="case-h">Median Google Search Frequency</span>
+          <span class="ctag">Airbnb</span>
+          <span class="case-h">Cumulative Booking Revenue</span>
         </div>
-        <p class="s-body">Calculate the <strong>median number of searches per user</strong>, rounded to 1 decimal place. The tricky part: the table is pre-aggregated — each row represents many users with the same search count.</p>
+        <p class="s-body">For each month in 2024, show <strong>monthly_revenue</strong> and <strong>running_total</strong> — the cumulative revenue from January through that month. Round both to 2 decimal places.</p>
         <div class="tbl-wrap">
-          <table><thead><tr><th colspan="2">search_frequency</th></tr><tr><th>column</th><th>type / meaning</th></tr></thead>
+          <table><thead><tr><th colspan="2">bookings</th></tr><tr><th>column</th><th>type</th></tr></thead>
           <tbody>
-            <tr><td>searches</td><td>integer — number of searches per session</td></tr>
-            <tr><td>num_users</td><td>integer — how many users had this many searches</td></tr>
-          </tbody></table>
-        </div>
-        <div class="tbl-wrap">
-          <table><thead><tr><th>searches</th><th>num_users</th><th>meaning</th></tr></thead>
-          <tbody>
-            <tr><td>1</td><td>2</td><td>2 users searched exactly once</td></tr>
-            <tr><td>2</td><td>3</td><td>3 users searched exactly twice</td></tr>
-            <tr><td>3</td><td>1</td><td>1 user searched 3 times</td></tr>
+            <tr><td>booking_id</td><td>integer</td></tr>
+            <tr><td>host_id</td><td>integer</td></tr>
+            <tr><td>check_in_date</td><td>date</td></tr>
+            <tr><td>total_price</td><td>decimal</td></tr>
           </tbody></table>
         </div>
         <div class="case-approach">
-          <h5>Approach</h5>
+          <h5>Approach — running total with a window function</h5>
           <ol>
-            <li>The data is <strong>aggregated</strong> — you need to "expand" it. Row (searches=2, num_users=3) represents 3 individual data points each equal to 2.</li>
-            <li>Use <strong>CROSS JOIN GENERATE_SERIES(1, num_users)</strong> to repeat each row the correct number of times, creating one row per user.</li>
-            <li>Then apply <strong>PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY searches)</strong> — this is the SQL median function.</li>
-            <li>Cast to numeric and <strong>ROUND(..., 1)</strong>.</li>
+            <li><strong>CTE:</strong> GROUP BY month using <code>DATE_TRUNC('month', check_in_date)</code>, SUM total_price to get monthly revenue.</li>
+            <li><strong>Outer query:</strong> use <code>SUM(monthly_revenue) OVER (ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)</code> to accumulate.</li>
+            <li>The window function runs across rows without collapsing them — each row keeps its monthly figure AND gets a running total column.</li>
           </ol>
         </div>
         <div class="callout">
-          <p class="callout-lbl">New functions here</p>
-          <p><code>GENERATE_SERIES(1, n)</code> generates n rows (PostgreSQL). <code>PERCENTILE_CONT(0.5)</code> returns the exact median interpolating between values. This is a Hard problem because it requires knowing these less-common functions.</p>
+          <p class="callout-lbl">Why not just GROUP BY again?</p>
+          <p>A running total requires looking at previous rows. Regular GROUP BY collapses rows — you'd lose the per-month breakdown. Window functions keep all rows and let you "look back" using <code>ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code>.</p>
         </div>
         <div class="case-ta-head"><span>SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="this.closest('.case-panel').querySelector('.case-ta').value=''">clear</button></div></div>
-        <textarea class="case-ta" style="min-height:160px" placeholder="-- Write your SQL here..." spellcheck="false"></textarea>
-        <button class="case-sol-btn" onclick="toggleCaseSol(this)">▶ Show solution</button>
+        <textarea class="case-ta" style="min-height:200px" placeholder="-- Write your SQL here..." spellcheck="false"></textarea>
+        <button class="case-sol-btn" onclick="toggleCaseSol(this)">&#9658; Show solution</button>
         <div class="case-sol">
           <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Solution</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
-          <pre><code><span class="kw">WITH</span> <span class="tb">expanded</span> <span class="kw">AS</span> (
-    <span class="kw">SELECT</span>   <span class="cl">searches</span>
-    <span class="kw">FROM</span>     <span class="tb">search_frequency</span>
-    <span class="kw">CROSS JOIN</span> <span class="fn">GENERATE_SERIES</span>(<span class="nu">1</span>, <span class="cl">num_users</span>)  <span class="cm">-- one row per user</span>
+          <pre><code><span class="kw">WITH</span> <span class="tb">monthly</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>
+        <span class="fn">DATE_TRUNC</span>(<span class="st">'month'</span>, <span class="cl">check_in_date</span>) <span class="kw">AS</span> <span class="cl">month</span>,
+        <span class="fn">ROUND</span>(<span class="fn">SUM</span>(<span class="cl">total_price</span>), <span class="nu">2</span>)             <span class="kw">AS</span> <span class="cl">monthly_revenue</span>
+    <span class="kw">FROM</span>    <span class="tb">bookings</span>
+    <span class="kw">WHERE</span>   <span class="fn">EXTRACT</span>(<span class="kw">YEAR FROM</span> <span class="cl">check_in_date</span>) = <span class="nu">2024</span>
+    <span class="kw">GROUP BY</span> <span class="fn">DATE_TRUNC</span>(<span class="st">'month'</span>, <span class="cl">check_in_date</span>)
 )
 <span class="kw">SELECT</span>
-    <span class="fn">ROUND</span>(
-        <span class="fn">PERCENTILE_CONT</span>(<span class="nu">0.5</span>) <span class="kw">WITHIN GROUP</span> (<span class="kw">ORDER BY</span> <span class="cl">searches</span>)::<span class="cl">numeric</span>,
-    <span class="nu">1</span>) <span class="kw">AS</span> <span class="cl">median</span>
-<span class="kw">FROM</span>  <span class="tb">expanded</span>;</code></pre></div>
+    <span class="cl">month</span>,
+    <span class="cl">monthly_revenue</span>,
+    <span class="fn">ROUND</span>(<span class="fn">SUM</span>(<span class="cl">monthly_revenue</span>) <span class="kw">OVER</span> (
+        <span class="kw">ORDER BY</span> <span class="cl">month</span>
+        <span class="kw">ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</span>
+    ), <span class="nu">2</span>) <span class="kw">AS</span> <span class="cl">running_total</span>
+<span class="kw">FROM</span>   <span class="tb">monthly</span>
+<span class="kw">ORDER BY</span> <span class="cl">month</span>;</code></pre></div>
           <div class="callout" style="margin-top:12px">
-            <p class="callout-lbl">If GENERATE_SERIES isn't available</p>
-            <p>In MySQL or older systems, you can use a numbers table or write a manual median with <code>ROW_NUMBER()</code> — count total rows, find the middle position(s), then average them. That approach is more complex but demonstrates the same logical thinking.</p>
+            <p class="callout-lbl">ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</p>
+            <p>This window frame means "from the first row in the partition up to and including the current row." For <code>SUM() OVER(ORDER BY ...)</code> this is actually the default — but writing it explicitly shows the interviewer you know what's happening.</p>
           </div>
         </div>
       </div>
+
+    </div><!-- .cases-detail -->
 
     </div><!-- .cases-detail -->
   </div><!-- .cases-layout -->
