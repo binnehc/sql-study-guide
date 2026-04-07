@@ -644,9 +644,24 @@
   .day-nav-back:hover { color:var(--text); }
   .day-nav-title { font-size:14px; font-weight:500; color:var(--text2); font-family:'DM Sans',sans-serif; flex:1; text-align:center; }
   .day-nav-counter { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); flex-shrink:0; }
-  .day-layout { display:grid; grid-template-columns:1fr 380px; gap:40px; align-items:start; padding-top:48px; padding-bottom:80px; }
-  @media(max-width:900px){ .day-layout { grid-template-columns:1fr; } }
-  .day-right-inline { position:sticky; top:68px; }
+  .day-layout {
+    display:grid;
+    grid-template-columns: minmax(0,1fr) 380px;
+    gap:48px;
+    align-items:start;
+    padding-top:48px;
+    padding-bottom:80px;
+    max-width:1400px;       /* was 740px via .wrap — give content room */
+    padding-left:48px;
+    padding-right:48px;
+  }
+  @media(max-width:1100px){
+    .day-layout { grid-template-columns:minmax(0,1fr) 340px; gap:32px; padding-left:32px; padding-right:32px; }
+  }
+  @media(max-width:768px){
+    .day-layout { grid-template-columns:1fr; padding-left:20px; padding-right:20px; }
+  }
+  .day-right-inline { position:sticky; top:64px; }
   .practice-panel {
     background:var(--bg2); border:1px solid var(--bdr); border-radius:12px;
     overflow:hidden; display:flex; flex-direction:column;
@@ -681,8 +696,9 @@
   }
   .day-complete-banner a:hover { opacity:0.85; }
   .day-footer {
-    border-top:1px solid var(--bdr); padding:20px 28px;
+    border-top:1px solid var(--bdr); padding:20px 0;
     display:flex; justify-content:space-between; align-items:center; margin-top:24px;
+    max-width:1400px; margin-left:auto; margin-right:auto; padding-left:48px; padding-right:48px;
   }
   .day-footer a {
     display:flex; align-items:center; gap:6px; text-decoration:none;
