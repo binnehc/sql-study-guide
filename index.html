@@ -550,8 +550,9 @@
   }
 
   /* ── CASE STUDIES ── */
-  .cases-layout { display:flex; gap:28px; align-items:flex-start; margin-top:32px; }
-  .cases-list { width:208px; flex-shrink:0; position:sticky; top:68px; max-height:calc(100dvh - 88px); overflow-y:auto; }
+  .cases-wrap { max-width:1400px; margin:0 auto; padding:56px 48px; }
+  .cases-layout { display:flex; gap:48px; align-items:flex-start; }
+  .cases-list { width:240px; flex-shrink:0; position:sticky; top:68px; max-height:calc(100dvh - 88px); overflow-y:auto; }
   .case-btn {
     display:block; width:100%; text-align:left;
     padding:10px 12px 10px 14px;
@@ -613,9 +614,10 @@
     margin-top:16px;
   }
   .case-ta-head span { font-size:11px; color:var(--text3); letter-spacing:0.04em; }
-  @media(max-width:760px){
+  @media(max-width:768px){
+    .cases-wrap { padding:40px 20px; }
     .cases-layout { flex-direction:column; }
-    .cases-list { width:100%; position:static; }
+    .cases-list { width:100%; position:static; max-height:none; }
   }
   @media(max-width:600px){
     body { padding-bottom:calc(55dvh + 16px); }
@@ -702,18 +704,7 @@
     padding:0 20px; font-family:'JetBrains Mono',monospace; font-size:11px;
     color:var(--text3); letter-spacing:0.08em; text-transform:uppercase;
   }
-  .cases-locked-overlay {
-    position:relative;
-  }
-  .cases-locked-banner {
-    display:none; position:absolute; inset:0; z-index:10;
-    background:rgba(15,15,15,0.82); backdrop-filter:blur(4px);
-    flex-direction:column; align-items:center; justify-content:center; gap:12px;
-    border-radius:12px;
-  }
-  .cases-locked-banner.show { display:flex; }
-  .cases-locked-banner p { font-size:15px; color:var(--text2); font-family:'DM Sans',sans-serif; }
-  .cases-locked-banner span { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text3); }
+
 
   /* ── MOBILE / TOUCH ENHANCEMENTS ── */
   /* :active states mirror :hover so touch devices get visual feedback */
@@ -912,26 +903,12 @@
   </div>
 </div>
 
-<!-- ── Case studies divider ── -->
-<div class="wrap">
+<!-- ── Case studies ── -->
+<section id="cases">
+  <div class="cases-wrap">
   <div class="cases-divider">
     <span class="cases-divider-inner">↓ Challenge problems — best attempted after Day 4</span>
   </div>
-</div>
-
-<!-- ── Case studies ── -->
-<section id="cases">
-  <div class="wrap">
-  <div class="cases-locked-overlay">
-
-    <section id="cases">
-  <div class="wrap">
-  <div class="reveal">
-    <p class="s-label">Case Studies</p>
-    <h2 class="s-title">CASE<br><em>STUDIES</em></h2>
-    <p class="s-body">Real Google SQL interview questions sourced from DataLemur. Pick a problem, write your query in the editor, then reveal the solution and walkthrough.</p>
-  </div>
-
   <div class="cases-layout reveal">
 
     <!-- ── Question list ── -->
@@ -1379,10 +1356,7 @@
 
     </div><!-- .cases-detail -->
   </div><!-- .cases-layout -->
-  </div><!-- .wrap -->
-</section>
-  </div>
-  </div>
+  </div><!-- .cases-wrap -->
 </section>
 
 <script>
