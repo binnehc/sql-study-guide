@@ -422,70 +422,6 @@
     border:1px solid var(--bdr); border-top:1px solid var(--bdr2);
   }
 
-  /* ── DAY LAYOUT — day-right is now a hidden store; content moves to float panel ── */
-  .day-layout { display:block; }
-  .day-right  { display:none; }
-
-  /* ── FLOATING PRACTICE PANEL ── */
-  #float-panel {
-    position:fixed; right:20px; top:68px;
-    width:340px; max-height:calc(100dvh - 88px);
-    background:var(--bg2);
-    border:1px solid var(--bdr2);
-    border-radius:10px;
-    box-shadow:0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
-    z-index:500;
-    display:flex; flex-direction:column;
-    overflow:hidden;
-  }
-  @media(max-width:600px) {
-    #float-panel {
-      left:0; right:0; bottom:0; top:auto;
-      width:100%; max-height:55dvh;
-      border-radius:14px 14px 0 0;
-      border-bottom:none;
-    }
-    #float-panel.minimized {
-      max-height:none;
-    }
-    #float-handle { border-radius:14px 14px 0 0; cursor:default; }
-    #float-panel.minimized #float-handle { border-radius:14px 14px 0 0; }
-  }
-  #float-panel.minimized #float-body { display:none; }
-  #float-handle {
-    display:flex; align-items:center; gap:10px;
-    padding:9px 14px;
-    background:var(--bg3); border-bottom:1px solid var(--bdr);
-    cursor:grab; flex-shrink:0;
-    border-radius:10px 10px 0 0;
-  }
-  #float-panel.minimized #float-handle { border-radius:10px; border-bottom:none; }
-  #float-handle:active { cursor:grabbing; }
-  #float-grip { color:var(--text3); display:flex; align-items:center; }
-  @media(max-width:600px) { #float-grip { display:none; } }
-  #float-day-label { flex:1; font-size:11px; color:var(--text2); letter-spacing:0.04em; text-transform:uppercase; }
-  #float-min-btn {
-    background:none; border:none; color:var(--text3);
-    cursor:pointer; padding:2px 5px; border-radius:3px;
-    font-size:13px; line-height:1;
-  }
-  #float-min-btn:hover { background:var(--hover); color:var(--text); }
-  #float-tabs { display:flex; border-bottom:1px solid var(--bdr); flex-shrink:0; }
-  .float-tab {
-    flex:1; padding:7px 0; background:none; border:none; border-bottom:2px solid transparent;
-    font-family:'DM Sans',sans-serif; font-size:11px; font-weight:500; letter-spacing:0.05em;
-    text-transform:uppercase; color:var(--text3); cursor:pointer; transition:color 0.15s, border-color 0.15s;
-    margin-bottom:-1px;
-  }
-  .float-tab:hover { color:var(--text2); }
-  .float-tab.on { color:var(--text); border-bottom-color:var(--blue); }
-  #float-panel.minimized #float-tabs,
-  #float-panel.minimized #float-ref-body { display:none; }
-  #float-body { overflow-y:auto; flex:1; }
-  #float-body .practice-wrap { margin:0; }
-  #float-body .practice-wrap > .dvd { display:none; }
-  #float-ref-body { overflow-y:auto; flex:1; display:none; }
-  #float-ref-body.on { display:block; }
   /* inner ref tabs */
   .fref-tabs { display:flex; gap:4px; padding:10px 12px 8px; border-bottom:1px solid var(--bdr); }
   .fref-tab {
@@ -570,7 +506,6 @@
     border:1px solid var(--bdr); margin-top:8px;
     overflow-x:auto; white-space:pre;
   }
-  .pp-tab:hover { color:var(--text2); background:var(--hover); }
   .practice-ta:focus { background:rgba(15,15,15,0.6); }
 
   /* ── CASE STUDIES ── */
@@ -661,41 +596,27 @@
   .day-nav-title { font-size:14px; font-weight:500; color:var(--text2); font-family:'DM Sans',sans-serif; flex:1; text-align:center; }
   .day-nav-counter { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); flex-shrink:0; }
   .day-layout {
-    display:grid;
-    grid-template-columns: minmax(0,1fr) 380px;
-    gap:48px;
-    align-items:start;
-    padding-top:48px;
-    padding-bottom:80px;
-    max-width:1400px;       /* was 740px via .wrap — give content room */
-    padding-left:48px;
-    padding-right:48px;
+    max-width:740px;
+    margin:0 auto;
+    padding:48px 24px 80px;
   }
-  @media(max-width:1100px){
-    .day-layout { grid-template-columns:minmax(0,1fr) 340px; gap:32px; padding-left:32px; padding-right:32px; }
+  @media(max-width:600px){
+    .day-layout { padding:32px 20px 60px; }
   }
-  @media(max-width:768px){
-    .day-layout { grid-template-columns:1fr; padding-left:20px; padding-right:20px; }
+  .practice-wrap { margin-top:48px; }
+  .ref-section { margin-top:16px; border:1px solid var(--bdr); border-radius:10px; overflow:hidden; }
+  .ref-toggle {
+    width:100%; display:flex; justify-content:space-between; align-items:center;
+    padding:11px 16px; background:var(--bg2); border:none; cursor:pointer;
+    font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600;
+    letter-spacing:0.05em; text-transform:uppercase; color:var(--text3);
+    transition:color 0.15s, background 0.15s;
   }
-  .day-right-inline { position:sticky; top:64px; }
-  .practice-panel {
-    background:var(--bg2); border:1px solid var(--bdr); border-radius:12px;
-    overflow:hidden; display:flex; flex-direction:column;
-  }
-  .pp-header {
-    padding:10px 14px 0; border-bottom:1px solid var(--bdr);
-    display:flex; flex-direction:column; gap:0;
-  }
-  .pp-tabs { display:flex; gap:0; }
-  .pp-tab {
-    font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500;
-    padding:8px 14px 9px; border:none; background:none; color:var(--text3);
-    cursor:pointer; border-bottom:2px solid transparent; transition:all 0.15s;
-  }
-  .pp-tab.on { color:var(--text); border-bottom-color:var(--blue); }
-  .pp-body { padding:14px; overflow-y:auto; max-height:calc(100dvh - 200px); }
-  .pp-ref { display:none; padding:14px; overflow-y:auto; max-height:calc(100dvh - 200px); }
-  .pp-ref.on { display:block; }
+  .ref-toggle:hover { color:var(--text2); background:var(--hover); }
+  .ref-toggle-icon { transition:transform 0.2s; }
+  .ref-section.open .ref-toggle-icon { transform:rotate(180deg); }
+  .ref-body { display:none; border-top:1px solid var(--bdr); }
+  .ref-section.open .ref-body { display:block; }
   .day-checklist { margin-top:40px; }
   .day-checklist h3 { font-size:13px; font-weight:600; color:var(--text3); letter-spacing:0.05em; text-transform:uppercase; margin-bottom:14px; }
   .day-complete-banner {
@@ -738,7 +659,6 @@
   .check-btn:active { background:rgba(121,184,255,0.16); }
   .case-sol-btn:active { background:var(--hover); color:var(--text); }
   .case-next-btn:active { background:rgba(121,184,255,0.14); border-color:rgba(121,184,255,0.4); }
-  .float-tab:active { color:var(--text2); }
   .fref-tab:active { color:var(--text2); border-color:var(--text3); }
   .cp-btn:active { color:var(--text); border-color:var(--bdr2); }
   .day-nav-back:active { color:var(--text); }
@@ -752,9 +672,7 @@
     .chk li    { padding:12px 4px; }
     .stab      { padding:12px 16px; }
     .case-btn  { padding:14px 12px 14px 14px; }
-    .float-tab { padding:11px 0; }
     .fref-tab  { padding:6px 12px; }
-    #float-min-btn { padding:8px 10px; }
   }
 </style>
 </head>
@@ -773,9 +691,6 @@
 
 <div class="wrap day-layout">
 
-  <!-- ── Left: theory ── -->
-  <div class="day-left-wrap">
-    
     <div class="reveal">
       <p class="s-label">Day 02 · Combining Tables</p>
       <h2 class="s-title">JOIN <em>TYPES</em></h2>
@@ -986,42 +901,33 @@
         <a href="day3.html">Continue to Day 3 →</a>
       </div>
     </div>
-  </div>
 
-  <!-- ── Right: practice + cheat sheet ── -->
-  <div class="day-right-inline">
-    <div class="practice-panel">
-      <div class="pp-header">
-        <div class="pp-tabs">
-          <button class="pp-tab on" id="pp-tab-practice">Practice</button>
-          <button class="pp-tab"    id="pp-tab-ref">Cheat Sheet</button>
-        </div>
-      </div>
-
-      <!-- Practice body -->
-      <div class="pp-body" id="pp-body">
-        <div class="practice-wrap">
-        <div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Practice</span><div class="dvd-line"></div></div>
-        <div class="practice-prompt"><div><p class="practice-q">Write a query to find all employees who have no department assigned. Return only the employee name.</p><p class="practice-hint">Tables: employees (id, name, dept_id) · departments (dept_id, dept_name)</p></div></div>
-        <div class="practice-cb">
-          <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="clearTa(this)">clear</button><button class="cp-btn" onclick="toggleAns(this)">show answer</button></div></div>
-          <textarea class="practice-ta" placeholder="-- Write your SQL here...&#10;-- Press Tab to indent" spellcheck="false"></textarea>
-        </div>
-        <button class="check-btn" onclick="checkQuery(this)">Check Answer</button>
-        <div class="practice-answer">
-          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Answer</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
-          <pre><code><span class="kw">SELECT</span>    <span class="cl">e.name</span>
+  <!-- ── Practice + Quick Reference ── -->
+<div class="practice-wrap">
+<div class="dvd"><div class="dvd-line"></div><span class="dvd-txt">Practice</span><div class="dvd-line"></div></div>
+<div class="practice-prompt"><div><p class="practice-q">Write a query to find all employees who have no department assigned. Return only the employee name.</p><p class="practice-hint">Tables: employees (id, name, dept_id) · departments (dept_id, dept_name)</p></div></div>
+<div class="practice-cb">
+  <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="clearTa(this)">clear</button><button class="cp-btn" onclick="toggleAns(this)">show answer</button></div></div>
+  <textarea class="practice-ta" placeholder="-- Write your SQL here...&#10;-- Press Tab to indent" spellcheck="false"></textarea>
+</div>
+<button class="check-btn" onclick="checkQuery(this)">Check Answer</button>
+<div class="practice-answer">
+  <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Answer</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+  <pre><code><span class="kw">SELECT</span>    <span class="cl">e.name</span>
 <span class="kw">FROM</span>      <span class="tb">employees</span>   <span class="cl">e</span>
 <span class="kw">LEFT JOIN</span> <span class="tb">departments</span> <span class="cl">d</span> <span class="kw">ON</span> <span class="cl">e.dept_id</span> = <span class="cl">d.dept_id</span>
 <span class="kw">WHERE</span>     <span class="cl">d.dept_id</span> <span class="kw">IS NULL</span>;</code></pre></div>
-        </div>
-      </div>
-      </div>
+</div>
+</div>
 
-      <!-- Cheat sheet body -->
-      <div class="pp-ref" id="pp-ref">
-        <div class="fref-tabs"><button class="fref-tab on" onclick="selRef(this,0)">JOIN Types</button><button class="fref-tab" onclick="selRef(this,1)">Syntax</button><button class="fref-tab" onclick="selRef(this,2)">Anti-join</button></div>
-        <div id="fref-panels"><div class="fref-panel" id="fref-0"><div class="fref-fn"><h5>INNER JOIN</h5><p>Only rows with a match in BOTH tables. Unmatched rows are dropped.</p></div><div class="fref-fn"><h5>LEFT JOIN</h5><p>All rows from the LEFT table + matching right rows. NULL where no match. Most common for "missing data" patterns.</p></div><div class="fref-fn"><h5>RIGHT JOIN</h5><p>All rows from the RIGHT table + matching left rows. Rarely used — just flip the table order and use LEFT JOIN instead.</p></div><div class="fref-fn"><h5>FULL OUTER JOIN</h5><p>All rows from both tables. NULLs where no match on either side.</p></div><pre class="fref-code">SELECT e.name, d.dept_name
+  <div class="ref-section">
+    <button class="ref-toggle" onclick="this.closest('.ref-section').classList.toggle('open')">
+      Quick Reference
+      <span class="ref-toggle-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </button>
+    <div class="ref-body">
+            <div class="fref-tabs"><button class="fref-tab on" onclick="selRef(this,0)">JOIN Types</button><button class="fref-tab" onclick="selRef(this,1)">Syntax</button><button class="fref-tab" onclick="selRef(this,2)">Anti-join</button></div>
+      <div id="fref-panels"><div class="fref-panel" id="fref-0"><div class="fref-fn"><h5>INNER JOIN</h5><p>Only rows with a match in BOTH tables. Unmatched rows are dropped.</p></div><div class="fref-fn"><h5>LEFT JOIN</h5><p>All rows from the LEFT table + matching right rows. NULL where no match. Most common for "missing data" patterns.</p></div><div class="fref-fn"><h5>RIGHT JOIN</h5><p>All rows from the RIGHT table + matching left rows. Rarely used — just flip the table order and use LEFT JOIN instead.</p></div><div class="fref-fn"><h5>FULL OUTER JOIN</h5><p>All rows from both tables. NULLs where no match on either side.</p></div><pre class="fref-code">SELECT e.name, d.dept_name
 FROM   employees   e
 LEFT JOIN departments d
      ON e.dept_id = d.dept_id;</pre></div><div class="fref-panel" id="fref-1"><div class="fref-fn"><h5>ON clause</h5><p>Specifies which columns to match — usually a foreign key = primary key.</p></div><div class="fref-fn"><h5>Table aliases</h5><p>e for employees, d for departments. Always use short, consistent aliases.</p></div><div class="fref-fn"><h5>Column prefix</h5><p>e.name, d.dept_name — required when both tables share a column name.</p></div><div class="fref-fn"><h5>Chaining JOINs</h5><p>Stack multiple JOINs to bring in more tables one at a time.</p></div><pre class="fref-code">SELECT e.name, d.dept_name
@@ -1033,11 +939,9 @@ FROM   employees   e
 LEFT JOIN departments d
      ON e.dept_id = d.dept_id
 WHERE  d.dept_id IS NULL;
--- d.dept_id IS NULL means "no matching dept"</pre></div></div></div>
-      </div>
+-- d.dept_id IS NULL means "no matching dept"</pre></div></div>
     </div>
   </div>
-
 </div>
 
 <div class="wrap day-footer">
@@ -1139,19 +1043,6 @@ WHERE  d.dept_id IS NULL;
   });
 
   // ── Practice panel tabs ──
-  document.getElementById('pp-tab-practice').addEventListener('click', () => {
-    document.getElementById('pp-tab-practice').classList.add('on');
-    document.getElementById('pp-tab-ref').classList.remove('on');
-    document.getElementById('pp-body').style.display = 'block';
-    document.getElementById('pp-ref').style.display = 'none';
-  });
-  document.getElementById('pp-tab-ref').addEventListener('click', () => {
-    document.getElementById('pp-tab-ref').classList.add('on');
-    document.getElementById('pp-tab-practice').classList.remove('on');
-    document.getElementById('pp-body').style.display = 'none';
-    document.getElementById('pp-ref').style.display = 'block';
-  });
-
   // ── Cheat sheet sub-tabs ──
   function selRef(btn, idx) {
     btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach((b, i) => {

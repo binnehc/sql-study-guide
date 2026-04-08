@@ -413,70 +413,6 @@
     border:1px solid var(--bdr); border-top:1px solid var(--bdr2);
   }
 
-  /* ── DAY LAYOUT — day-right is now a hidden store; content moves to float panel ── */
-  .day-layout { display:block; }
-  .day-right  { display:none; }
-
-  /* ── FLOATING PRACTICE PANEL ── */
-  #float-panel {
-    position:fixed; right:20px; top:68px;
-    width:340px; max-height:calc(100dvh - 88px);
-    background:var(--bg2);
-    border:1px solid var(--bdr2);
-    border-radius:10px;
-    box-shadow:0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
-    z-index:500;
-    display:flex; flex-direction:column;
-    overflow:hidden;
-  }
-  @media(max-width:600px) {
-    #float-panel {
-      left:0; right:0; bottom:0; top:auto;
-      width:100%; max-height:55dvh;
-      border-radius:14px 14px 0 0;
-      border-bottom:none;
-    }
-    #float-panel.minimized {
-      max-height:none;
-    }
-    #float-handle { border-radius:14px 14px 0 0; cursor:default; }
-    #float-panel.minimized #float-handle { border-radius:14px 14px 0 0; }
-  }
-  #float-panel.minimized #float-body { display:none; }
-  #float-handle {
-    display:flex; align-items:center; gap:10px;
-    padding:9px 14px;
-    background:var(--bg3); border-bottom:1px solid var(--bdr);
-    cursor:grab; flex-shrink:0;
-    border-radius:10px 10px 0 0;
-  }
-  #float-panel.minimized #float-handle { border-radius:10px; border-bottom:none; }
-  #float-handle:active { cursor:grabbing; }
-  #float-grip { color:var(--text3); display:flex; align-items:center; }
-  @media(max-width:600px) { #float-grip { display:none; } }
-  #float-day-label { flex:1; font-size:11px; color:var(--text2); letter-spacing:0.04em; text-transform:uppercase; }
-  #float-min-btn {
-    background:none; border:none; color:var(--text3);
-    cursor:pointer; padding:2px 5px; border-radius:3px;
-    font-size:13px; line-height:1;
-  }
-  #float-min-btn:hover { background:var(--hover); color:var(--text); }
-  #float-tabs { display:flex; border-bottom:1px solid var(--bdr); flex-shrink:0; }
-  .float-tab {
-    flex:1; padding:7px 0; background:none; border:none; border-bottom:2px solid transparent;
-    font-family:'DM Sans',sans-serif; font-size:11px; font-weight:500; letter-spacing:0.05em;
-    text-transform:uppercase; color:var(--text3); cursor:pointer; transition:color 0.15s, border-color 0.15s;
-    margin-bottom:-1px;
-  }
-  .float-tab:hover { color:var(--text2); }
-  .float-tab.on { color:var(--text); border-bottom-color:var(--blue); }
-  #float-panel.minimized #float-tabs,
-  #float-panel.minimized #float-ref-body { display:none; }
-  #float-body { overflow-y:auto; flex:1; }
-  #float-body .practice-wrap { margin:0; }
-  #float-body .practice-wrap > .dvd { display:none; }
-  #float-ref-body { overflow-y:auto; flex:1; display:none; }
-  #float-ref-body.on { display:block; }
   /* inner ref tabs */
   .fref-tabs { display:flex; gap:4px; padding:10px 12px 8px; border-bottom:1px solid var(--bdr); }
   .fref-tab {
@@ -561,7 +497,6 @@
     border:1px solid var(--bdr); margin-top:8px;
     overflow-x:auto; white-space:pre;
   }
-  .pp-tab:hover { color:var(--text2); background:var(--hover); }
   .practice-ta:focus { background:rgba(15,15,15,0.6); }
 
   /* ── CASE STUDIES ── */
@@ -652,41 +587,27 @@
   .day-nav-title { font-size:14px; font-weight:500; color:var(--text2); font-family:'DM Sans',sans-serif; flex:1; text-align:center; }
   .day-nav-counter { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); flex-shrink:0; }
   .day-layout {
-    display:grid;
-    grid-template-columns: minmax(0,1fr) 380px;
-    gap:48px;
-    align-items:start;
-    padding-top:48px;
-    padding-bottom:80px;
-    max-width:1400px;       /* was 740px via .wrap — give content room */
-    padding-left:48px;
-    padding-right:48px;
+    max-width:740px;
+    margin:0 auto;
+    padding:48px 24px 80px;
   }
-  @media(max-width:1100px){
-    .day-layout { grid-template-columns:minmax(0,1fr) 340px; gap:32px; padding-left:32px; padding-right:32px; }
+  @media(max-width:600px){
+    .day-layout { padding:32px 20px 60px; }
   }
-  @media(max-width:768px){
-    .day-layout { grid-template-columns:1fr; padding-left:20px; padding-right:20px; }
+  .practice-wrap { margin-top:48px; }
+  .ref-section { margin-top:16px; border:1px solid var(--bdr); border-radius:10px; overflow:hidden; }
+  .ref-toggle {
+    width:100%; display:flex; justify-content:space-between; align-items:center;
+    padding:11px 16px; background:var(--bg2); border:none; cursor:pointer;
+    font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600;
+    letter-spacing:0.05em; text-transform:uppercase; color:var(--text3);
+    transition:color 0.15s, background 0.15s;
   }
-  .day-right-inline { position:sticky; top:64px; }
-  .practice-panel {
-    background:var(--bg2); border:1px solid var(--bdr); border-radius:12px;
-    overflow:hidden; display:flex; flex-direction:column;
-  }
-  .pp-header {
-    padding:10px 14px 0; border-bottom:1px solid var(--bdr);
-    display:flex; flex-direction:column; gap:0;
-  }
-  .pp-tabs { display:flex; gap:0; }
-  .pp-tab {
-    font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500;
-    padding:8px 14px 9px; border:none; background:none; color:var(--text3);
-    cursor:pointer; border-bottom:2px solid transparent; transition:all 0.15s;
-  }
-  .pp-tab.on { color:var(--text); border-bottom-color:var(--blue); }
-  .pp-body { padding:14px; overflow-y:auto; max-height:calc(100dvh - 200px); }
-  .pp-ref { display:none; padding:14px; overflow-y:auto; max-height:calc(100dvh - 200px); }
-  .pp-ref.on { display:block; }
+  .ref-toggle:hover { color:var(--text2); background:var(--hover); }
+  .ref-toggle-icon { transition:transform 0.2s; }
+  .ref-section.open .ref-toggle-icon { transform:rotate(180deg); }
+  .ref-body { display:none; border-top:1px solid var(--bdr); }
+  .ref-section.open .ref-body { display:block; }
   .day-checklist { margin-top:40px; }
   .day-checklist h3 { font-size:13px; font-weight:600; color:var(--text3); letter-spacing:0.05em; text-transform:uppercase; margin-bottom:14px; }
   .day-complete-banner {
@@ -729,7 +650,6 @@
   .check-btn:active { background:rgba(121,184,255,0.16); }
   .case-sol-btn:active { background:var(--hover); color:var(--text); }
   .case-next-btn:active { background:rgba(121,184,255,0.14); border-color:rgba(121,184,255,0.4); }
-  .float-tab:active { color:var(--text2); }
   .fref-tab:active { color:var(--text2); border-color:var(--text3); }
   .cp-btn:active { color:var(--text); border-color:var(--bdr2); }
   .day-nav-back:active { color:var(--text); }
@@ -743,9 +663,7 @@
     .chk li    { padding:12px 4px; }
     .stab      { padding:12px 16px; }
     .case-btn  { padding:14px 12px 14px 14px; }
-    .float-tab { padding:11px 0; }
     .fref-tab  { padding:6px 12px; }
-    #float-min-btn { padding:8px 10px; }
   }
 </style>
 </head>
@@ -764,9 +682,6 @@
 
 <div class="wrap day-layout">
 
-  <!-- ── Left: theory ── -->
-  <div class="day-left-wrap">
-    
     <div class="reveal">
       <p class="s-label">Day 07 · Capstone Problem</p>
       <h2 class="s-title">THE ODD/EVEN<br><em>SOLUTION</em></h2>
@@ -958,58 +873,49 @@
         <a href="index.html#cases">See Case Studies →</a>
       </div>
     </div>
-  </div>
 
-  <!-- ── Right: practice + cheat sheet ── -->
-  <div class="day-right-inline">
-    <div class="practice-panel">
-      <div class="pp-header">
-        <div class="pp-tabs">
-          <button class="pp-tab on" id="pp-tab-practice">Practice</button>
-          <button class="pp-tab"    id="pp-tab-ref">Cheat Sheet</button>
-        </div>
-      </div>
-
-      <!-- Practice body -->
-      <div class="pp-body" id="pp-body">
-        <div class="practice-wrap">
-        <div class="practice-prompt"><div><p class="practice-q">Write the complete odd/even measurements solution from memory — no peeking at the solution above.</p><p class="practice-hint">Table: measurements (measurement_id, measurement_value, measurement_time) — output: measurement_day, odd_sum, even_sum</p></div></div>
-        <div class="practice-cb">
-          <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="clearTa(this)">clear</button><button class="cp-btn" onclick="toggleAns(this)">show answer</button></div></div>
-          <textarea class="practice-ta" style="min-height:240px" placeholder="-- Write your SQL here...&#10;-- Press Tab to indent" spellcheck="false"></textarea>
-        </div>
-        <button class="check-btn" onclick="checkQuery(this)">Check Answer</button>
-        <div class="practice-answer">
-          <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Answer</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
-          <pre><code><span class="kw">WITH</span> <span class="tb">numbered</span> <span class="kw">AS</span> (
-    <span class="kw">SELECT</span>
-        <span class="cl">measurement_value</span>,
-        <span class="fn">DATE</span>(<span class="cl">measurement_time</span>) <span class="kw">AS</span> <span class="cl">measurement_day</span>,
-        <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
-            <span class="kw">PARTITION BY</span> <span class="fn">DATE</span>(<span class="cl">measurement_time</span>)
-            <span class="kw">ORDER BY</span>     <span class="cl">measurement_time</span>
-        ) <span class="kw">AS</span> <span class="cl">position</span>
-    <span class="kw">FROM</span> <span class="tb">measurements</span>
+  <!-- ── Practice + Quick Reference ── -->
+<div class="practice-wrap">
+<div class="practice-prompt"><div><p class="practice-q">Write the complete odd/even measurements solution from memory — no peeking at the solution above.</p><p class="practice-hint">Table: measurements (measurement_id, measurement_value, measurement_time) — output: measurement_day, odd_sum, even_sum</p></div></div>
+<div class="practice-cb">
+  <div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">SQL</span><div style="display:flex;gap:6px"><button class="cp-btn" onclick="clearTa(this)">clear</button><button class="cp-btn" onclick="toggleAns(this)">show answer</button></div></div>
+  <textarea class="practice-ta" style="min-height:240px" placeholder="-- Write your SQL here...&#10;-- Press Tab to indent" spellcheck="false"></textarea>
+</div>
+<button class="check-btn" onclick="checkQuery(this)">Check Answer</button>
+<div class="practice-answer">
+  <div class="cb"><div class="cb-head"><div class="cb-dots"><div class="cb-dot"></div><div class="cb-dot"></div><div class="cb-dot"></div></div><span class="cb-lang">Answer</span><button class="cp-btn" onclick="cp(this)">copy</button></div>
+  <pre><code><span class="kw">WITH</span> <span class="tb">numbered</span> <span class="kw">AS</span> (
+<span class="kw">SELECT</span>
+<span class="cl">measurement_value</span>,
+<span class="fn">DATE</span>(<span class="cl">measurement_time</span>) <span class="kw">AS</span> <span class="cl">measurement_day</span>,
+<span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+    <span class="kw">PARTITION BY</span> <span class="fn">DATE</span>(<span class="cl">measurement_time</span>)
+    <span class="kw">ORDER BY</span>     <span class="cl">measurement_time</span>
+) <span class="kw">AS</span> <span class="cl">position</span>
+<span class="kw">FROM</span> <span class="tb">measurements</span>
 )
 <span class="kw">SELECT</span>
-    <span class="cl">measurement_day</span>,
-    <span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> <span class="cl">position</span> % <span class="nu">2</span> = <span class="nu">1</span>
-             <span class="kw">THEN</span> <span class="cl">measurement_value</span> <span class="kw">ELSE</span> <span class="nu">0</span>
-        <span class="kw">END</span>) <span class="kw">AS</span> <span class="cl">odd_sum</span>,
-    <span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> <span class="cl">position</span> % <span class="nu">2</span> = <span class="nu">0</span>
-             <span class="kw">THEN</span> <span class="cl">measurement_value</span> <span class="kw">ELSE</span> <span class="nu">0</span>
-        <span class="kw">END</span>) <span class="kw">AS</span> <span class="cl">even_sum</span>
+<span class="cl">measurement_day</span>,
+<span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> <span class="cl">position</span> % <span class="nu">2</span> = <span class="nu">1</span>
+     <span class="kw">THEN</span> <span class="cl">measurement_value</span> <span class="kw">ELSE</span> <span class="nu">0</span>
+<span class="kw">END</span>) <span class="kw">AS</span> <span class="cl">odd_sum</span>,
+<span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> <span class="cl">position</span> % <span class="nu">2</span> = <span class="nu">0</span>
+     <span class="kw">THEN</span> <span class="cl">measurement_value</span> <span class="kw">ELSE</span> <span class="nu">0</span>
+<span class="kw">END</span>) <span class="kw">AS</span> <span class="cl">even_sum</span>
 <span class="kw">FROM</span>     <span class="tb">numbered</span>
 <span class="kw">GROUP BY</span> <span class="cl">measurement_day</span>
 <span class="kw">ORDER BY</span> <span class="cl">measurement_day</span>;</code></pre></div>
-        </div>
-      </div>
-      </div>
+</div>
+</div>
 
-      <!-- Cheat sheet body -->
-      <div class="pp-ref" id="pp-ref">
-        <div class="fref-tabs"><button class="fref-tab on" onclick="selRef(this,0)">Odd / Even</button><button class="fref-tab" onclick="selRef(this,1)">CTE + Window</button><button class="fref-tab" onclick="selRef(this,2)">Tips</button></div>
-        <div id="fref-panels"><div class="fref-panel" id="fref-0"><div class="fref-fn"><h5>Step 1 — CTE</h5><p>Assign a position to each measurement within its day using ROW_NUMBER().</p></div><div class="fref-fn"><h5>PARTITION BY DATE(...)</h5><p>Restart counting at 1 for each new day.</p></div><div class="fref-fn"><h5>Step 2 — Outer query</h5><p>GROUP BY day, then SUM with CASE WHEN to split odd vs even positions.</p></div><div class="fref-fn"><h5>position % 2 = 1</h5><p>Odd (1st, 3rd, 5th...). position % 2 = 0 = Even (2nd, 4th, 6th...).</p></div><pre class="fref-code">WITH numbered AS (
+  <div class="ref-section">
+    <button class="ref-toggle" onclick="this.closest('.ref-section').classList.toggle('open')">
+      Quick Reference
+      <span class="ref-toggle-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </button>
+    <div class="ref-body">
+            <div class="fref-tabs"><button class="fref-tab on" onclick="selRef(this,0)">Odd / Even</button><button class="fref-tab" onclick="selRef(this,1)">CTE + Window</button><button class="fref-tab" onclick="selRef(this,2)">Tips</button></div>
+      <div id="fref-panels"><div class="fref-panel" id="fref-0"><div class="fref-fn"><h5>Step 1 — CTE</h5><p>Assign a position to each measurement within its day using ROW_NUMBER().</p></div><div class="fref-fn"><h5>PARTITION BY DATE(...)</h5><p>Restart counting at 1 for each new day.</p></div><div class="fref-fn"><h5>Step 2 — Outer query</h5><p>GROUP BY day, then SUM with CASE WHEN to split odd vs even positions.</p></div><div class="fref-fn"><h5>position % 2 = 1</h5><p>Odd (1st, 3rd, 5th...). position % 2 = 0 = Even (2nd, 4th, 6th...).</p></div><pre class="fref-code">WITH numbered AS (
   SELECT
     measurement_value,
     DATE(measurement_time)   AS measurement_day,
@@ -1022,17 +928,17 @@
 SELECT
   measurement_day,
   SUM(CASE WHEN position % 2 = 1
-           THEN measurement_value ELSE 0 END) AS odd_sum,
+         THEN measurement_value ELSE 0 END) AS odd_sum,
   SUM(CASE WHEN position % 2 = 0
-           THEN measurement_value ELSE 0 END) AS even_sum
+         THEN measurement_value ELSE 0 END) AS even_sum
 FROM   numbered
 GROUP BY measurement_day
 ORDER BY measurement_day;</pre></div><div class="fref-panel" id="fref-1"><div class="fref-fn"><h5>CTE first</h5><p>Always write and test the CTE standalone before adding the outer query.</p></div><div class="fref-fn"><h5>PARTITION BY DATE(ts)</h5><p>Groups by day. DATE() strips the time component from a timestamp.</p></div><div class="fref-fn"><h5>CASE WHEN pivot</h5><p>SUM(CASE WHEN cond THEN val ELSE 0 END) = "add val when odd, 0 when even."</p></div><div class="fref-fn"><h5>Two passes, one query</h5><p>CTE handles the row numbering; outer query handles the aggregation.</p></div><pre class="fref-code">-- Test CTE standalone first:
 SELECT measurement_value,
        DATE(measurement_time) AS day,
        ROW_NUMBER() OVER (
-         PARTITION BY DATE(measurement_time)
-         ORDER BY measurement_time
+       PARTITION BY DATE(measurement_time)
+       ORDER BY measurement_time
        ) AS position
 FROM measurements
 LIMIT 20;</pre></div><div class="fref-panel" id="fref-2"><div class="fref-fn"><h5>Window fn in WHERE</h5><p>FORBIDDEN — wrap in a CTE, then filter in the outer query.</p></div><div class="fref-fn"><h5>DENSE_RANK vs ROW_NUMBER</h5><p>Use DENSE_RANK when ties should both be returned. ROW_NUMBER for strict one-per-group.</p></div><div class="fref-fn"><h5>Naming CTEs</h5><p>numbered, ranked, base, totals — self-documenting names speed up interviews.</p></div><div class="fref-fn"><h5>FILTER (PostgreSQL)</h5><p>COUNT(*) FILTER (WHERE x &gt; 0) — cleaner alternative to CASE WHEN ELSE 0.</p></div><pre class="fref-code">-- WRONG: window fn in WHERE
@@ -1043,11 +949,9 @@ WITH r AS (
   SELECT *, ROW_NUMBER() OVER (...) AS rn
   FROM t
 )
-SELECT * FROM r WHERE rn = 1;</pre></div></div></div>
-      </div>
+SELECT * FROM r WHERE rn = 1;</pre></div></div>
     </div>
   </div>
-
 </div>
 
 <div class="wrap day-footer">
@@ -1149,19 +1053,6 @@ SELECT * FROM r WHERE rn = 1;</pre></div></div></div>
   });
 
   // ── Practice panel tabs ──
-  document.getElementById('pp-tab-practice').addEventListener('click', () => {
-    document.getElementById('pp-tab-practice').classList.add('on');
-    document.getElementById('pp-tab-ref').classList.remove('on');
-    document.getElementById('pp-body').style.display = 'block';
-    document.getElementById('pp-ref').style.display = 'none';
-  });
-  document.getElementById('pp-tab-ref').addEventListener('click', () => {
-    document.getElementById('pp-tab-ref').classList.add('on');
-    document.getElementById('pp-tab-practice').classList.remove('on');
-    document.getElementById('pp-body').style.display = 'none';
-    document.getElementById('pp-ref').style.display = 'block';
-  });
-
   // ── Cheat sheet sub-tabs ──
   function selRef(btn, idx) {
     btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach((b, i) => {
