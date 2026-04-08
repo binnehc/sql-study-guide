@@ -1093,7 +1093,7 @@ WHERE  d.dept_id IS NULL;
       status.textContent = 'Not quite — second hint unlocked.';
       status.className = 'practice-status show neutral';
     } else if (attempts >= 7) {
-      status.innerHTML = 'Still not matching — don't give up! ';
+      status.innerHTML = "Still not matching — don't give up! ";
       const rb = document.createElement('button'); rb.className = 'cp-btn'; rb.textContent = 'reveal answer';
       rb.style.cssText = 'margin-left:6px;color:var(--green);border-color:rgba(111,207,151,0.4)';
       rb.onclick = function(){ toggleAns(this); }; status.appendChild(rb);
