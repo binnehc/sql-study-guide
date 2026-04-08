@@ -955,17 +955,27 @@
       <!-- Cheat sheet body -->
       <div class="pp-ref" id="pp-ref">
         <div class="fref-tabs"><button class="fref-tab on" onclick="selRef(this,0)">NULLs</button><button class="fref-tab" onclick="selRef(this,1)">Self-Join</button><button class="fref-tab" onclick="selRef(this,2)">Subqueries</button></div>
-        <div id="fref-panels"><div class="fref-panel on" id="fref-0"><div class="fref-fn"><h5>IS NULL / IS NOT NULL</h5><p>The only correct way to check for NULL — never <code>= NULL</code>.</p></div><div class="fref-fn"><h5>COALESCE(a, b, c)</h5><p>Returns the first non-NULL argument. Great for defaults.</p></div><div class="fref-fn"><h5>NULLIF(a, b)</h5><p>Returns NULL if a = b, otherwise returns a. Avoids divide-by-zero.</p></div><div class="fref-fn"><h5>Aggregates &amp; NULLs</h5><p>All aggregates (SUM, AVG, COUNT(col)) ignore NULLs automatically.</p></div><pre class="fref-code">SELECT COALESCE(phone, email, 'no contact') AS contact
-FROM   customers;
+        <div id="fref-panels"><div class="fref-panel" id="fref-0"><div class="fref-fn"><h5>IS NULL</h5><p>manager_id IS NULL = top-level employees (no manager). The only correct NULL check.</p></div><div class="fref-fn"><h5>= NULL is WRONG</h5><p>NULL = NULL evaluates to UNKNOWN — always use IS NULL instead.</p></div><div class="fref-fn"><h5>COALESCE(a, b)</h5><p>Returns first non-NULL argument. Great for default values.</p></div><div class="fref-fn"><h5>COUNT(*) vs COUNT(col)</h5><p>COUNT(*) counts all rows; COUNT(manager_id) skips NULL manager_ids.</p></div><pre class="fref-code">SELECT name,
+       COALESCE(manager_id, employee_id) AS reports_to
+FROM   employees;
 
--- Avoid divide-by-zero
-SELECT revenue / NULLIF(orders, 0) AS avg_order;</pre></div><div class="fref-panel" id="fref-1"><div class="fref-fn"><h5>Same table twice</h5><p>Alias each copy differently to avoid ambiguity.</p></div><div class="fref-fn"><h5>Use case</h5><p>Employee→manager, category→parent, event→prior event.</p></div><pre class="fref-code">SELECT e.name AS employee, m.name AS manager
-FROM   employees e
-JOIN   employees m ON e.mgr_id = m.emp_id;</pre></div><div class="fref-panel" id="fref-2"><div class="fref-fn"><h5>Scalar subquery</h5><p>Returns a single value. Use in SELECT or WHERE comparisons.</p></div><div class="fref-fn"><h5>IN subquery</h5><p>Returns a list. Use with WHERE col IN (SELECT ...).</p></div><div class="fref-fn"><h5>Correlated</h5><p>References the outer query — re-runs per outer row (slow on large data).</p></div><div class="fref-fn"><h5>Prefer CTEs</h5><p>For readability, convert nested subqueries to CTEs (Day 5).</p></div><pre class="fref-code">-- Scalar: employees above average salary
+-- Top-level employees:
+WHERE manager_id IS NULL</pre></div><div class="fref-panel" id="fref-1"><div class="fref-fn"><h5>Two aliases</h5><p>e = the employee row, m = the manager row — same table, different roles.</p></div><div class="fref-fn"><h5>Join condition</h5><p>e.manager_id = m.employee_id links the employee to their manager's row.</p></div><div class="fref-fn"><h5>Compare across rows</h5><p>Now e.salary and m.salary are both available in the same row to compare.</p></div><pre class="fref-code">SELECT e.name     AS employee,
+       e.salary,
+       m.name     AS manager,
+       m.salary   AS mgr_salary
+FROM   employees  e
+JOIN   employees  m
+     ON e.manager_id = m.employee_id
+WHERE  e.salary > m.salary;</pre></div><div class="fref-panel" id="fref-2"><div class="fref-fn"><h5>Scalar subquery</h5><p>Returns a single value — use in WHERE for comparison.</p></div><div class="fref-fn"><h5>IN subquery</h5><p>Returns a list — use WHERE col IN (SELECT ...).</p></div><div class="fref-fn"><h5>Tip: prefer CTEs</h5><p>When subquery logic is complex, rewrite as a CTE (Day 5) for readability.</p></div><pre class="fref-code">-- Employees earning above avg:
 WHERE salary > (SELECT AVG(salary) FROM employees)
 
--- IN: filter by subquery results
-WHERE dept_id IN (SELECT id FROM depts WHERE active = true)</pre></div></div>
+-- Employees who are managers:
+WHERE employee_id IN (
+  SELECT DISTINCT manager_id
+  FROM   employees
+  WHERE  manager_id IS NOT NULL
+)</pre></div></div></div>
       </div>
     </div>
   </div>
@@ -1074,21 +1084,29 @@ WHERE dept_id IN (SELECT id FROM depts WHERE active = true)</pre></div></div>
   document.getElementById('pp-tab-practice').addEventListener('click', () => {
     document.getElementById('pp-tab-practice').classList.add('on');
     document.getElementById('pp-tab-ref').classList.remove('on');
-    document.getElementById('pp-body').style.display = '';
-    document.getElementById('pp-ref').classList.remove('on');
+    document.getElementById('pp-body').style.display = 'block';
+    document.getElementById('pp-ref').style.display = 'none';
   });
   document.getElementById('pp-tab-ref').addEventListener('click', () => {
     document.getElementById('pp-tab-ref').classList.add('on');
     document.getElementById('pp-tab-practice').classList.remove('on');
     document.getElementById('pp-body').style.display = 'none';
-    document.getElementById('pp-ref').classList.add('on');
+    document.getElementById('pp-ref').style.display = 'block';
   });
 
   // ── Cheat sheet sub-tabs ──
   function selRef(btn, idx) {
-    btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach((b,i) => b.classList.toggle('on', i===idx));
-    document.querySelectorAll('.fref-panel').forEach((p,i) => p.classList.toggle('on', i===idx));
+    btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach((b, i) => {
+      b.classList.toggle('on', i === idx);
+    });
+    document.querySelectorAll('.fref-panel').forEach((p, i) => {
+      p.style.display = i === idx ? 'block' : 'none';
+    });
   }
+  // Initialise panel visibility
+  document.querySelectorAll('.fref-panel').forEach((p, i) => {
+    p.style.display = i === 0 ? 'block' : 'none';
+  });
 
   // ── Answer toggle ──
   function toggleAns(btn) {

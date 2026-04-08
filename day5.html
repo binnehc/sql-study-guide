@@ -999,23 +999,37 @@
       <!-- Cheat sheet body -->
       <div class="pp-ref" id="pp-ref">
         <div class="fref-tabs"><button class="fref-tab on" onclick="selRef(this,0)">CTE syntax</button><button class="fref-tab" onclick="selRef(this,1)">Chaining</button><button class="fref-tab" onclick="selRef(this,2)">CTE vs Sub</button></div>
-        <div id="fref-panels"><div class="fref-panel on" id="fref-0"><div class="fref-fn"><h5>WITH name AS (...)</h5><p>Define a named temporary result set. Treated like a table below.</p></div><div class="fref-fn"><h5>Reusable</h5><p>Reference the CTE multiple times in the main query.</p></div><div class="fref-fn"><h5>Readable</h5><p>Breaks complex logic into named, debuggable steps.</p></div><pre class="fref-code">WITH ranked AS (
-  SELECT *,
-    DENSE_RANK() OVER (PARTITION BY dept
-                       ORDER BY salary DESC) AS dr
-  FROM employees
+        <div id="fref-panels"><div class="fref-panel" id="fref-0"><div class="fref-fn"><h5>WITH name AS (...)</h5><p>Defines a named temp result. Reference it like a table below the WITH block.</p></div><div class="fref-fn"><h5>Read top to bottom</h5><p>Define the CTE first, query it after. Keeps complex logic readable.</p></div><div class="fref-fn"><h5>Reusable</h5><p>Use the same CTE name multiple times in the main query.</p></div><pre class="fref-code">WITH dept_totals AS (
+  SELECT department,
+         SUM(salary) AS total_sal
+  FROM   employees
+  GROUP BY department
 )
-SELECT * FROM ranked WHERE dr = 1;</pre></div><div class="fref-panel" id="fref-1"><div class="fref-fn"><h5>Multiple CTEs</h5><p>Separate with commas. Each can reference ones defined above it.</p></div><div class="fref-fn"><h5>Build incrementally</h5><p>Start with base data, filter, then enrich — keep each step named.</p></div><pre class="fref-code">WITH base AS (
-  SELECT * FROM orders WHERE year = 2024
+SELECT department, total_sal
+FROM   dept_totals
+WHERE  total_sal > 200000;</pre></div><div class="fref-panel" id="fref-1"><div class="fref-fn"><h5>Multiple CTEs</h5><p>WITH a AS (...), b AS (...) — comma between each CTE, no comma before the main SELECT.</p></div><div class="fref-fn"><h5>Each builds on prior</h5><p>b can reference a, c can reference a and b — build incrementally.</p></div><div class="fref-fn"><h5>Name each step</h5><p>Use clear names: base, filtered, with_totals, ranked, final.</p></div><pre class="fref-code">WITH base AS (
+  SELECT * FROM employees
+  WHERE  department IS NOT NULL
 ),
-agg AS (
-  SELECT cust_id, SUM(amount) AS total
-  FROM base GROUP BY cust_id
+totals AS (
+  SELECT department, SUM(salary) AS total
+  FROM   base
+  GROUP BY department
 )
-SELECT c.name, a.total
-FROM agg a JOIN customers c ON a.cust_id = c.id;</pre></div><div class="fref-panel" id="fref-2"><div class="fref-fn"><h5>Named</h5><p>CTE: yes. Subquery: no — it's anonymous.</p></div><div class="fref-fn"><h5>Reusable in query</h5><p>CTE: reference multiple times. Subquery: must repeat.</p></div><div class="fref-fn"><h5>Debuggable</h5><p>CTE: run just the WITH block to inspect. Subquery: harder.</p></div><div class="fref-fn"><h5>When to use sub</h5><p>Single simple filter that doesn't need a name is fine as subquery.</p></div><pre class="fref-code">-- Prefer CTE for complex logic
-WITH high_value AS (SELECT id FROM orders WHERE amount > 1000)
-SELECT * FROM customers WHERE id IN (SELECT id FROM high_value);</pre></div></div>
+SELECT department, total
+FROM   totals
+WHERE  total > 200000;</pre></div><div class="fref-panel" id="fref-2"><div class="fref-fn"><h5>CTE: named & readable</h5><p>Each step has a name — easy to debug by running the WITH block alone.</p></div><div class="fref-fn"><h5>Subquery: inline & anonymous</h5><p>Nested inside another query — hard to read, can't be reused.</p></div><div class="fref-fn"><h5>Same result</h5><p>Both approaches return identical data. CTE wins on readability.</p></div><div class="fref-fn"><h5>When subquery is fine</h5><p>A single, simple filter that doesn't need a name.</p></div><pre class="fref-code">-- Subquery (hard to read):
+SELECT department FROM (
+  SELECT department, SUM(salary) t
+  FROM employees GROUP BY department
+) x WHERE t > 200000;
+
+-- CTE (clear & debuggable):
+WITH totals AS (
+  SELECT department, SUM(salary) t
+  FROM employees GROUP BY department
+)
+SELECT department FROM totals WHERE t > 200000;</pre></div></div></div>
       </div>
     </div>
   </div>
@@ -1124,21 +1138,29 @@ SELECT * FROM customers WHERE id IN (SELECT id FROM high_value);</pre></div></di
   document.getElementById('pp-tab-practice').addEventListener('click', () => {
     document.getElementById('pp-tab-practice').classList.add('on');
     document.getElementById('pp-tab-ref').classList.remove('on');
-    document.getElementById('pp-body').style.display = '';
-    document.getElementById('pp-ref').classList.remove('on');
+    document.getElementById('pp-body').style.display = 'block';
+    document.getElementById('pp-ref').style.display = 'none';
   });
   document.getElementById('pp-tab-ref').addEventListener('click', () => {
     document.getElementById('pp-tab-ref').classList.add('on');
     document.getElementById('pp-tab-practice').classList.remove('on');
     document.getElementById('pp-body').style.display = 'none';
-    document.getElementById('pp-ref').classList.add('on');
+    document.getElementById('pp-ref').style.display = 'block';
   });
 
   // ── Cheat sheet sub-tabs ──
   function selRef(btn, idx) {
-    btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach((b,i) => b.classList.toggle('on', i===idx));
-    document.querySelectorAll('.fref-panel').forEach((p,i) => p.classList.toggle('on', i===idx));
+    btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach((b, i) => {
+      b.classList.toggle('on', i === idx);
+    });
+    document.querySelectorAll('.fref-panel').forEach((p, i) => {
+      p.style.display = i === idx ? 'block' : 'none';
+    });
   }
+  // Initialise panel visibility
+  document.querySelectorAll('.fref-panel').forEach((p, i) => {
+    p.style.display = i === 0 ? 'block' : 'none';
+  });
 
   // ── Answer toggle ──
   function toggleAns(btn) {

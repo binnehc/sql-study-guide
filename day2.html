@@ -1021,16 +1021,19 @@
       <!-- Cheat sheet body -->
       <div class="pp-ref" id="pp-ref">
         <div class="fref-tabs"><button class="fref-tab on" onclick="selRef(this,0)">JOIN Types</button><button class="fref-tab" onclick="selRef(this,1)">Syntax</button><button class="fref-tab" onclick="selRef(this,2)">Anti-join</button></div>
-        <div id="fref-panels"><div class="fref-panel on" id="fref-0"><div class="fref-fn"><h5>INNER JOIN</h5><p>Only rows with a match in <em>both</em> tables. Most common.</p></div><div class="fref-fn"><h5>LEFT JOIN</h5><p>All rows from left table; NULL on right if no match.</p></div><div class="fref-fn"><h5>RIGHT JOIN</h5><p>All rows from right table; NULL on left if no match.</p></div><div class="fref-fn"><h5>FULL OUTER JOIN</h5><p>All rows from both; NULL where no match on either side.</p></div><pre class="fref-code">-- INNER: only matches
-FROM orders o JOIN customers c ON o.cust_id = c.id
-
--- LEFT: keep all orders even without a customer
-FROM orders o LEFT JOIN customers c ON o.cust_id = c.id</pre></div><div class="fref-panel" id="fref-1"><div class="fref-fn"><h5>FROM a JOIN b ON ...</h5><p>Join condition after ON. Use table aliases to keep it short.</p></div><div class="fref-fn"><h5>Chaining JOINs</h5><p>Stack multiple JOINs — each adds another table to the row.</p></div><div class="fref-fn"><h5>Column ambiguity</h5><p>If two tables share a column name, prefix: <code>e.id</code> vs <code>d.id</code>.</p></div><pre class="fref-code">FROM employees e
-JOIN depts d       ON e.dept_id = d.id
-JOIN locations loc ON d.loc_id  = loc.id;</pre></div><div class="fref-panel" id="fref-2"><div class="fref-fn"><h5>Find rows with no match</h5><p>LEFT JOIN + WHERE right.col IS NULL = rows that don't appear in the right table.</p></div><div class="fref-fn"><h5>Classic pattern</h5><p>Users who never ordered, riders with no trips, items never sold.</p></div><pre class="fref-code">SELECT r.id, r.name
-FROM   riders r
-LEFT JOIN trips t ON r.id = t.rider_id
-WHERE  t.rider_id IS NULL;</pre></div></div>
+        <div id="fref-panels"><div class="fref-panel" id="fref-0"><div class="fref-fn"><h5>INNER JOIN</h5><p>Only rows with a match in BOTH tables. Unmatched rows are dropped.</p></div><div class="fref-fn"><h5>LEFT JOIN</h5><p>All rows from the LEFT table + matching right rows. NULL where no match. Most common for "missing data" patterns.</p></div><div class="fref-fn"><h5>RIGHT JOIN</h5><p>All rows from the RIGHT table + matching left rows. Rarely used — just flip the table order and use LEFT JOIN instead.</p></div><div class="fref-fn"><h5>FULL OUTER JOIN</h5><p>All rows from both tables. NULLs where no match on either side.</p></div><pre class="fref-code">SELECT e.name, d.dept_name
+FROM   employees   e
+LEFT JOIN departments d
+     ON e.dept_id = d.dept_id;</pre></div><div class="fref-panel" id="fref-1"><div class="fref-fn"><h5>ON clause</h5><p>Specifies which columns to match — usually a foreign key = primary key.</p></div><div class="fref-fn"><h5>Table aliases</h5><p>e for employees, d for departments. Always use short, consistent aliases.</p></div><div class="fref-fn"><h5>Column prefix</h5><p>e.name, d.dept_name — required when both tables share a column name.</p></div><div class="fref-fn"><h5>Chaining JOINs</h5><p>Stack multiple JOINs to bring in more tables one at a time.</p></div><pre class="fref-code">SELECT e.name, d.dept_name
+FROM   employees   e
+JOIN   departments d
+     ON e.dept_id = d.dept_id;
+-- Prefix with alias: e.name, not just name</pre></div><div class="fref-panel" id="fref-2"><div class="fref-fn"><h5>Anti-join pattern</h5><p>LEFT JOIN + WHERE right_table.col IS NULL = rows with NO match in the right table.</p></div><div class="fref-fn"><h5>Day 2 practice</h5><p>Employees with no department: LEFT JOIN departments, filter where dept_id IS NULL.</p></div><div class="fref-fn"><h5>Why not INNER JOIN?</h5><p>INNER JOIN would drop employees with no dept entirely — you'd get an empty result.</p></div><pre class="fref-code">SELECT e.name
+FROM   employees   e
+LEFT JOIN departments d
+     ON e.dept_id = d.dept_id
+WHERE  d.dept_id IS NULL;
+-- d.dept_id IS NULL means "no matching dept"</pre></div></div></div>
       </div>
     </div>
   </div>
@@ -1139,21 +1142,29 @@ WHERE  t.rider_id IS NULL;</pre></div></div>
   document.getElementById('pp-tab-practice').addEventListener('click', () => {
     document.getElementById('pp-tab-practice').classList.add('on');
     document.getElementById('pp-tab-ref').classList.remove('on');
-    document.getElementById('pp-body').style.display = '';
-    document.getElementById('pp-ref').classList.remove('on');
+    document.getElementById('pp-body').style.display = 'block';
+    document.getElementById('pp-ref').style.display = 'none';
   });
   document.getElementById('pp-tab-ref').addEventListener('click', () => {
     document.getElementById('pp-tab-ref').classList.add('on');
     document.getElementById('pp-tab-practice').classList.remove('on');
     document.getElementById('pp-body').style.display = 'none';
-    document.getElementById('pp-ref').classList.add('on');
+    document.getElementById('pp-ref').style.display = 'block';
   });
 
   // ── Cheat sheet sub-tabs ──
   function selRef(btn, idx) {
-    btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach((b,i) => b.classList.toggle('on', i===idx));
-    document.querySelectorAll('.fref-panel').forEach((p,i) => p.classList.toggle('on', i===idx));
+    btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach((b, i) => {
+      b.classList.toggle('on', i === idx);
+    });
+    document.querySelectorAll('.fref-panel').forEach((p, i) => {
+      p.style.display = i === idx ? 'block' : 'none';
+    });
   }
+  // Initialise panel visibility
+  document.querySelectorAll('.fref-panel').forEach((p, i) => {
+    p.style.display = i === 0 ? 'block' : 'none';
+  });
 
   // ── Answer toggle ──
   function toggleAns(btn) {

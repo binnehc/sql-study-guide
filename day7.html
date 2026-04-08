@@ -1009,32 +1009,41 @@
       <!-- Cheat sheet body -->
       <div class="pp-ref" id="pp-ref">
         <div class="fref-tabs"><button class="fref-tab on" onclick="selRef(this,0)">Odd / Even</button><button class="fref-tab" onclick="selRef(this,1)">CTE + Window</button><button class="fref-tab" onclick="selRef(this,2)">Tips</button></div>
-        <div id="fref-panels"><div class="fref-panel on" id="fref-0"><div class="fref-fn"><h5>Number rows first</h5><p>Use ROW_NUMBER() OVER (PARTITION BY day ORDER BY time) to get position.</p></div><div class="fref-fn"><h5>Modulo check</h5><p><code>position % 2 = 1</code> = odd, <code>position % 2 = 0</code> = even.</p></div><div class="fref-fn"><h5>Pivot with CASE</h5><p>SUM(CASE WHEN pos % 2 = 1 THEN val ELSE 0 END) for each bucket.</p></div><pre class="fref-code">WITH numbered AS (
-  SELECT measurement_value AS v,
-    DATE(measurement_time)  AS day,
+        <div id="fref-panels"><div class="fref-panel" id="fref-0"><div class="fref-fn"><h5>Step 1 — CTE</h5><p>Assign a position to each measurement within its day using ROW_NUMBER().</p></div><div class="fref-fn"><h5>PARTITION BY DATE(...)</h5><p>Restart counting at 1 for each new day.</p></div><div class="fref-fn"><h5>Step 2 — Outer query</h5><p>GROUP BY day, then SUM with CASE WHEN to split odd vs even positions.</p></div><div class="fref-fn"><h5>position % 2 = 1</h5><p>Odd (1st, 3rd, 5th...). position % 2 = 0 = Even (2nd, 4th, 6th...).</p></div><pre class="fref-code">WITH numbered AS (
+  SELECT
+    measurement_value,
+    DATE(measurement_time)   AS measurement_day,
     ROW_NUMBER() OVER (
       PARTITION BY DATE(measurement_time)
       ORDER BY measurement_time
-    ) AS pos
+    ) AS position
   FROM measurements
 )
-SELECT day,
-  SUM(CASE WHEN pos%2=1 THEN v ELSE 0 END) AS odd_sum,
-  SUM(CASE WHEN pos%2=0 THEN v ELSE 0 END) AS even_sum
-FROM numbered GROUP BY day ORDER BY day;</pre></div><div class="fref-panel" id="fref-1"><div class="fref-fn"><h5>Step 1 — number rows</h5><p>CTE assigns position with ROW_NUMBER() OVER (PARTITION BY ... ORDER BY ...).</p></div><div class="fref-fn"><h5>Step 2 — aggregate</h5><p>Outer query GROUP BY + SUM(CASE WHEN) to produce the pivot columns.</p></div><div class="fref-fn"><h5>Why not one step?</h5><p>Window functions run after WHERE/GROUP BY — you can't filter on them in the same query level.</p></div><pre class="fref-code">-- Pattern: number → aggregate
-WITH base AS (
-  SELECT *, ROW_NUMBER() OVER (...) AS rn
-  FROM source_table
-)
-SELECT group_col,
-  SUM(CASE WHEN rn%2=1 THEN val ELSE 0 END),
-  SUM(CASE WHEN rn%2=0 THEN val ELSE 0 END)
-FROM base GROUP BY group_col;</pre></div><div class="fref-panel" id="fref-2"><div class="fref-fn"><h5>Window fns in WHERE</h5><p>Not allowed — wrap in a CTE or subquery, then filter in outer query.</p></div><div class="fref-fn"><h5>Naming CTEs</h5><p>Use descriptive names: <code>numbered</code>, <code>ranked</code>, <code>running_totals</code>.</p></div><div class="fref-fn"><h5>DENSE_RANK vs ROW_NUMBER</h5><p>DENSE_RANK for tied top-N. ROW_NUMBER when you need exactly one per group.</p></div><div class="fref-fn"><h5>FILTER clause (PG)</h5><p><code>COUNT(*) FILTER (WHERE status='active')</code> — clean alternative to CASE WHEN.</p></div><pre class="fref-code">-- Window fn in WHERE: WRONG
+SELECT
+  measurement_day,
+  SUM(CASE WHEN position % 2 = 1
+           THEN measurement_value ELSE 0 END) AS odd_sum,
+  SUM(CASE WHEN position % 2 = 0
+           THEN measurement_value ELSE 0 END) AS even_sum
+FROM   numbered
+GROUP BY measurement_day
+ORDER BY measurement_day;</pre></div><div class="fref-panel" id="fref-1"><div class="fref-fn"><h5>CTE first</h5><p>Always write and test the CTE standalone before adding the outer query.</p></div><div class="fref-fn"><h5>PARTITION BY DATE(ts)</h5><p>Groups by day. DATE() strips the time component from a timestamp.</p></div><div class="fref-fn"><h5>CASE WHEN pivot</h5><p>SUM(CASE WHEN cond THEN val ELSE 0 END) = "add val when odd, 0 when even."</p></div><div class="fref-fn"><h5>Two passes, one query</h5><p>CTE handles the row numbering; outer query handles the aggregation.</p></div><pre class="fref-code">-- Test CTE standalone first:
+SELECT measurement_value,
+       DATE(measurement_time) AS day,
+       ROW_NUMBER() OVER (
+         PARTITION BY DATE(measurement_time)
+         ORDER BY measurement_time
+       ) AS position
+FROM measurements
+LIMIT 20;</pre></div><div class="fref-panel" id="fref-2"><div class="fref-fn"><h5>Window fn in WHERE</h5><p>FORBIDDEN — wrap in a CTE, then filter in the outer query.</p></div><div class="fref-fn"><h5>DENSE_RANK vs ROW_NUMBER</h5><p>Use DENSE_RANK when ties should both be returned. ROW_NUMBER for strict one-per-group.</p></div><div class="fref-fn"><h5>Naming CTEs</h5><p>numbered, ranked, base, totals — self-documenting names speed up interviews.</p></div><div class="fref-fn"><h5>FILTER (PostgreSQL)</h5><p>COUNT(*) FILTER (WHERE x &gt; 0) — cleaner alternative to CASE WHEN ELSE 0.</p></div><pre class="fref-code">-- WRONG: window fn in WHERE
 WHERE ROW_NUMBER() OVER (...) = 1  -- error!
 
--- Correct: wrap in CTE
-WITH r AS (SELECT *, ROW_NUMBER() OVER (...) AS rn FROM t)
-SELECT * FROM r WHERE rn = 1;</pre></div></div>
+-- CORRECT: wrap in CTE
+WITH r AS (
+  SELECT *, ROW_NUMBER() OVER (...) AS rn
+  FROM t
+)
+SELECT * FROM r WHERE rn = 1;</pre></div></div></div>
       </div>
     </div>
   </div>
@@ -1143,21 +1152,29 @@ SELECT * FROM r WHERE rn = 1;</pre></div></div>
   document.getElementById('pp-tab-practice').addEventListener('click', () => {
     document.getElementById('pp-tab-practice').classList.add('on');
     document.getElementById('pp-tab-ref').classList.remove('on');
-    document.getElementById('pp-body').style.display = '';
-    document.getElementById('pp-ref').classList.remove('on');
+    document.getElementById('pp-body').style.display = 'block';
+    document.getElementById('pp-ref').style.display = 'none';
   });
   document.getElementById('pp-tab-ref').addEventListener('click', () => {
     document.getElementById('pp-tab-ref').classList.add('on');
     document.getElementById('pp-tab-practice').classList.remove('on');
     document.getElementById('pp-body').style.display = 'none';
-    document.getElementById('pp-ref').classList.add('on');
+    document.getElementById('pp-ref').style.display = 'block';
   });
 
   // ── Cheat sheet sub-tabs ──
   function selRef(btn, idx) {
-    btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach((b,i) => b.classList.toggle('on', i===idx));
-    document.querySelectorAll('.fref-panel').forEach((p,i) => p.classList.toggle('on', i===idx));
+    btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach((b, i) => {
+      b.classList.toggle('on', i === idx);
+    });
+    document.querySelectorAll('.fref-panel').forEach((p, i) => {
+      p.style.display = i === idx ? 'block' : 'none';
+    });
   }
+  // Initialise panel visibility
+  document.querySelectorAll('.fref-panel').forEach((p, i) => {
+    p.style.display = i === 0 ? 'block' : 'none';
+  });
 
   // ── Answer toggle ──
   function toggleAns(btn) {

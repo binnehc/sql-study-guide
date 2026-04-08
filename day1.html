@@ -978,11 +978,13 @@
       <!-- Cheat sheet body -->
       <div class="pp-ref" id="pp-ref">
         <div class="fref-tabs"><button class="fref-tab on" onclick="selRef(this,0)">SELECT</button><button class="fref-tab" onclick="selRef(this,1)">WHERE</button><button class="fref-tab" onclick="selRef(this,2)">ORDER BY</button></div>
-        <div id="fref-panels"><div class="fref-panel on" id="fref-0"><div class="fref-fn"><h5>SELECT col1, col2</h5><p>Pick specific columns. Avoid <code>SELECT *</code> in production.</p></div><div class="fref-fn"><h5>SELECT DISTINCT col</h5><p>Return only unique values in that column.</p></div><div class="fref-fn"><h5>col AS alias</h5><p>Rename a column in the output. Alias is available in ORDER BY.</p></div><div class="fref-fn"><h5>LIMIT n</h5><p>Return at most <code>n</code> rows. Pair with ORDER BY for predictability.</p></div><pre class="fref-code">SELECT  name, salary AS pay
+        <div id="fref-panels"><div class="fref-panel" id="fref-0"><div class="fref-fn"><h5>SELECT col1, col2</h5><p>Pick only the columns you need. List them after SELECT.</p></div><div class="fref-fn"><h5>SELECT DISTINCT col</h5><p>Remove duplicate rows — returns each unique value once.</p></div><div class="fref-fn"><h5>col AS alias</h5><p>Rename column in output. Alias works in ORDER BY but NOT in WHERE.</p></div><div class="fref-fn"><h5>LIMIT n</h5><p>Return at most n rows. Always pair with ORDER BY for consistent results.</p></div><pre class="fref-code">SELECT  name, salary AS pay
 FROM    employees
-LIMIT   10;</pre></div><div class="fref-panel" id="fref-1"><div class="fref-fn"><h5>=  !=  &lt;  &gt;  &lt;=  &gt;=</h5><p>Standard comparisons. Single <code>=</code> for equality (not <code>==</code>).</p></div><div class="fref-fn"><h5>IN ('a', 'b')  /  NOT IN</h5><p>Match or exclude a list of values.</p></div><div class="fref-fn"><h5>BETWEEN x AND y</h5><p>Inclusive range — same as <code>&gt;= x AND &lt;= y</code>.</p></div><div class="fref-fn"><h5>LIKE 'A%'</h5><p><code>%</code> matches any chars, <code>_</code> matches exactly one.</p></div><div class="fref-fn"><h5>IS NULL  /  IS NOT NULL</h5><p>NULL checks — never use <code>= NULL</code>.</p></div><pre class="fref-code">WHERE dept IN ('Eng', 'Mktg')
-  AND salary > 80000
-  AND name LIKE 'A%';</pre></div><div class="fref-panel" id="fref-2"><div class="fref-fn"><h5>ASC / DESC</h5><p><code>ASC</code> is the default. <code>DESC</code> for highest-first.</p></div><div class="fref-fn"><h5>ORDER BY col1, col2 DESC</h5><p>Sort by col1 first; break ties by col2 descending.</p></div><div class="fref-fn"><h5>Execution order</h5><p>Runs at step 6 — after SELECT, so aliases work here.</p></div><pre class="fref-code">ORDER BY salary DESC, name ASC;</pre></div></div>
+LIMIT   5;</pre></div><div class="fref-panel" id="fref-1"><div class="fref-fn"><h5>= &apos;Engineering&apos;</h5><p>Exact match. Use single quotes for strings.</p></div><div class="fref-fn"><h5>IN (&apos;Eng&apos;, &apos;Mktg&apos;)</h5><p>Match any value in the list — cleaner than multiple OR conditions.</p></div><div class="fref-fn"><h5>BETWEEN 60000 AND 120000</h5><p>Inclusive range — same as &gt;= 60000 AND &lt;= 120000.</p></div><div class="fref-fn"><h5>LIKE &apos;S%&apos;</h5><p>% = any chars, _ = exactly one char. Case-sensitive in most DBs.</p></div><div class="fref-fn"><h5>IS NULL / IS NOT NULL</h5><p>NULL checks — never use = NULL, it always returns UNKNOWN.</p></div><pre class="fref-code">WHERE department = 'Engineering'
+  AND salary BETWEEN 60000 AND 120000
+  AND name LIKE 'S%';</pre></div><div class="fref-panel" id="fref-2"><div class="fref-fn"><h5>ORDER BY salary DESC</h5><p>Highest first. ASC is the default (lowest first).</p></div><div class="fref-fn"><h5>Multiple cols</h5><p>ORDER BY department, salary DESC — sort by dept, then break ties by salary desc.</p></div><div class="fref-fn"><h5>Execution order</h5><p>Runs at step 6 — after SELECT, so aliases defined in SELECT are usable here.</p></div><pre class="fref-code">SELECT  name, department, salary
+FROM    employees
+ORDER BY department ASC, salary DESC;</pre></div></div></div>
       </div>
     </div>
   </div>
@@ -1091,21 +1093,29 @@ LIMIT   10;</pre></div><div class="fref-panel" id="fref-1"><div class="fref-fn">
   document.getElementById('pp-tab-practice').addEventListener('click', () => {
     document.getElementById('pp-tab-practice').classList.add('on');
     document.getElementById('pp-tab-ref').classList.remove('on');
-    document.getElementById('pp-body').style.display = '';
-    document.getElementById('pp-ref').classList.remove('on');
+    document.getElementById('pp-body').style.display = 'block';
+    document.getElementById('pp-ref').style.display = 'none';
   });
   document.getElementById('pp-tab-ref').addEventListener('click', () => {
     document.getElementById('pp-tab-ref').classList.add('on');
     document.getElementById('pp-tab-practice').classList.remove('on');
     document.getElementById('pp-body').style.display = 'none';
-    document.getElementById('pp-ref').classList.add('on');
+    document.getElementById('pp-ref').style.display = 'block';
   });
 
   // ── Cheat sheet sub-tabs ──
   function selRef(btn, idx) {
-    btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach((b,i) => b.classList.toggle('on', i===idx));
-    document.querySelectorAll('.fref-panel').forEach((p,i) => p.classList.toggle('on', i===idx));
+    btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach((b, i) => {
+      b.classList.toggle('on', i === idx);
+    });
+    document.querySelectorAll('.fref-panel').forEach((p, i) => {
+      p.style.display = i === idx ? 'block' : 'none';
+    });
   }
+  // Initialise panel visibility
+  document.querySelectorAll('.fref-panel').forEach((p, i) => {
+    p.style.display = i === 0 ? 'block' : 'none';
+  });
 
   // ── Answer toggle ──
   function toggleAns(btn) {

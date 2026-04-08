@@ -965,20 +965,19 @@
       <!-- Cheat sheet body -->
       <div class="pp-ref" id="pp-ref">
         <div class="fref-tabs"><button class="fref-tab on" onclick="selRef(this,0)">Aggregates</button><button class="fref-tab" onclick="selRef(this,1)">GROUP BY</button><button class="fref-tab" onclick="selRef(this,2)">HAVING</button></div>
-        <div id="fref-panels"><div class="fref-panel on" id="fref-0"><div class="fref-fn"><h5>COUNT(*)</h5><p>Count all rows including NULLs.</p></div><div class="fref-fn"><h5>COUNT(col)</h5><p>Count non-NULL values in that column.</p></div><div class="fref-fn"><h5>COUNT(DISTINCT col)</h5><p>Count unique non-NULL values.</p></div><div class="fref-fn"><h5>SUM / AVG / MIN / MAX</h5><p>All aggregate functions ignore NULLs.</p></div><pre class="fref-code">SELECT dept,
-       COUNT(*)           AS total,
-       COUNT(DISTINCT mgr) AS managers,
-       AVG(salary)         AS avg_pay
+        <div id="fref-panels"><div class="fref-panel" id="fref-0"><div class="fref-fn"><h5>COUNT(*)</h5><p>Count ALL rows including NULLs. Best for "how many rows are in this group."</p></div><div class="fref-fn"><h5>COUNT(col)</h5><p>Count only non-NULL values in that column.</p></div><div class="fref-fn"><h5>AVG(salary)</h5><p>Average — ignores NULLs in both numerator and denominator.</p></div><div class="fref-fn"><h5>ROUND(AVG(salary), 2)</h5><p>Round to 2 decimal places. Use inside SELECT.</p></div><pre class="fref-code">SELECT department,
+       COUNT(*)                AS headcount,
+       ROUND(AVG(salary), 2)   AS avg_salary
 FROM   employees
-GROUP BY dept;</pre></div><div class="fref-panel" id="fref-1"><div class="fref-fn"><h5>GROUP BY col</h5><p>One output row per unique value of col.</p></div><div class="fref-fn"><h5>Multiple columns</h5><p>GROUP BY a, b — one row per unique (a, b) combination.</p></div><div class="fref-fn"><h5>SELECT rule</h5><p>Every non-aggregate column in SELECT must appear in GROUP BY.</p></div><div class="fref-fn"><h5>Execution</h5><p>Runs AFTER WHERE, BEFORE HAVING.</p></div><pre class="fref-code">SELECT dept, EXTRACT(YEAR FROM hire_date) AS yr,
-       COUNT(*) AS n
+GROUP BY department;</pre></div><div class="fref-panel" id="fref-1"><div class="fref-fn"><h5>GROUP BY col</h5><p>One output row per unique value of col.</p></div><div class="fref-fn"><h5>Must match SELECT</h5><p>Every non-aggregate column in SELECT must appear in GROUP BY — or you'll get an error.</p></div><div class="fref-fn"><h5>Execution order</h5><p>Runs AFTER WHERE (rows filtered first), BEFORE HAVING (groups filtered after).</p></div><div class="fref-fn"><h5>Multiple columns</h5><p>GROUP BY dept, year — one row per unique (dept, year) combination.</p></div><pre class="fref-code">SELECT department, COUNT(*) AS n
 FROM   employees
-GROUP BY dept, yr
-ORDER BY yr, n DESC;</pre></div><div class="fref-panel" id="fref-2"><div class="fref-fn"><h5>HAVING vs WHERE</h5><p><code>WHERE</code> filters rows before grouping. <code>HAVING</code> filters groups after.</p></div><div class="fref-fn"><h5>Can use aggregates</h5><p><code>HAVING COUNT(*) &gt; 5</code> — can't do this in WHERE.</p></div><div class="fref-fn"><h5>Runs after GROUP BY</h5><p>ORDER 4 in execution. Uses same expressions as SELECT aggregates.</p></div><pre class="fref-code">SELECT dept, SUM(salary) AS total
+WHERE  department IS NOT NULL
+GROUP BY department
+ORDER BY n DESC;</pre></div><div class="fref-panel" id="fref-2"><div class="fref-fn"><h5>HAVING vs WHERE</h5><p>WHERE filters individual rows. HAVING filters groups after aggregation.</p></div><div class="fref-fn"><h5>Must use aggregate</h5><p>HAVING AVG(salary) &gt; 75000 — can't put aggregate conditions in WHERE.</p></div><div class="fref-fn"><h5>Alias in HAVING</h5><p>HAVING can't use SELECT aliases — repeat the full expression: HAVING AVG(salary) &gt; 75000.</p></div><div class="fref-fn"><h5>Execution order</h5><p>Step 4 — runs after GROUP BY, before SELECT and ORDER BY.</p></div><pre class="fref-code">SELECT department, ROUND(AVG(salary), 2) AS avg_sal
 FROM   employees
-GROUP BY dept
-HAVING SUM(salary) > 500000
-ORDER BY total DESC;</pre></div></div>
+GROUP BY department
+HAVING AVG(salary) > 75000
+ORDER BY avg_sal DESC;</pre></div></div></div>
       </div>
     </div>
   </div>
@@ -1087,21 +1086,29 @@ ORDER BY total DESC;</pre></div></div>
   document.getElementById('pp-tab-practice').addEventListener('click', () => {
     document.getElementById('pp-tab-practice').classList.add('on');
     document.getElementById('pp-tab-ref').classList.remove('on');
-    document.getElementById('pp-body').style.display = '';
-    document.getElementById('pp-ref').classList.remove('on');
+    document.getElementById('pp-body').style.display = 'block';
+    document.getElementById('pp-ref').style.display = 'none';
   });
   document.getElementById('pp-tab-ref').addEventListener('click', () => {
     document.getElementById('pp-tab-ref').classList.add('on');
     document.getElementById('pp-tab-practice').classList.remove('on');
     document.getElementById('pp-body').style.display = 'none';
-    document.getElementById('pp-ref').classList.add('on');
+    document.getElementById('pp-ref').style.display = 'block';
   });
 
   // ── Cheat sheet sub-tabs ──
   function selRef(btn, idx) {
-    btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach((b,i) => b.classList.toggle('on', i===idx));
-    document.querySelectorAll('.fref-panel').forEach((p,i) => p.classList.toggle('on', i===idx));
+    btn.closest('.fref-tabs').querySelectorAll('.fref-tab').forEach((b, i) => {
+      b.classList.toggle('on', i === idx);
+    });
+    document.querySelectorAll('.fref-panel').forEach((p, i) => {
+      p.style.display = i === idx ? 'block' : 'none';
+    });
   }
+  // Initialise panel visibility
+  document.querySelectorAll('.fref-panel').forEach((p, i) => {
+    p.style.display = i === 0 ? 'block' : 'none';
+  });
 
   // ── Answer toggle ──
   function toggleAns(btn) {
